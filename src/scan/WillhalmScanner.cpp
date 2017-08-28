@@ -34,14 +34,13 @@ void WillhalmScanner::scan(int* data, int length, int* dest, Predicate* p) {
 	__m256i current;
 	while (counter < length) {
 		current = _mm256_stream_load_si256((__m256i *) (data + counter));
-		// Shift data
+		// Shift data to have 32 byte alignment
 		int shift = computeShift(counter);
 		if (shift != 0) {
-			current = _mm256_alignr_epi8(prev, current, shift);
+//			current = _mm256_alignr_epi8(prev, current, shift);
 		}
+		// Shift data to have 16 byte alignment
 		// Use shuffle to make 4-byte alignment
-
-		_mm256_permutevar8x32_epi32(current,)
 
 
 		// Use shuffle to make bit-alignment

@@ -37,6 +37,7 @@ __m256i buildMask(int bitLength) {
 }
 
 HaoScanner::HaoScanner(int bs) {
+	assert(bitSize < 32 && bitSize > 0);
 	this->bitSize = bs;
 }
 
@@ -45,7 +46,7 @@ HaoScanner::~HaoScanner() {
 }
 
 void HaoScanner::scan(int* data, int length, int* dest, Predicate* p) {
-	// TODO For experimental purpose, assume data is aligned for now
+	// XXX For experimental purpose, assume data is aligned for now
 	assert(length % (SIMD_LEN/INT_LEN) == 0);
 
 	this->data = data;
@@ -68,7 +69,7 @@ void HaoScanner::scan(int* data, int length, int* dest, Predicate* p) {
 }
 
 void HaoScanner::eq() {
-// Build comparator
+	// Build comparator
 	__m256i eqnum = build(this->val1, this->bitSize);
 	__m256i mask = buildMask(this->bitSize);
 	__m256i one = _mm256_set1_epi32(0xffff);

@@ -5,19 +5,26 @@
  *      Author: harper
  */
 
-#ifndef SRC_SCAN_WILLHALMSCANNER_H_
-#define SRC_SCAN_WILLHALMSCANNER_H_
+#ifndef SRC_SCAN_WILLHALMSCANNER128_H_
+#define SRC_SCAN_WILLHALMSCANNER128_H_
 
+#include <immintrin.h>
 #include "Scanner.h"
 
-class WillhalmScanner: public Scanner {
+class WillhalmScanner128: public Scanner {
 private:
 	int bitSize;
+	int shuffleCount;
+	__m128i* shuffles;
+	__m128i* compareMask;
+	__m128i* val1;
+	__m128i* val2;
 protected:
 	int computeShift(int);
+	void computePredicate(Predicate*);
 public:
-	WillhalmScanner(int);
-	virtual ~WillhalmScanner();
+	WillhalmScanner128(int);
+	virtual ~WillhalmScanner128();
 
 	void scan(int*, int, int*, Predicate*);
 };
