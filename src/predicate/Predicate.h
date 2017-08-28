@@ -9,7 +9,7 @@
 #define PREDICATE_H_
 
 enum Opr {
-	eq = 0, neq, in
+	opr_eq = 0, opr_neq, opr_in
 };
 
 class Predicate {

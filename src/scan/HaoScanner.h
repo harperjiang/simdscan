@@ -10,6 +10,7 @@
 #ifndef SRC_SCAN_HAOSCANNER_H_
 #define SRC_SCAN_HAOSCANNER_H_
 
+#include <stdlib.h>
 #include "Scanner.h"
 
 class HaoScanner: public Scanner {
@@ -26,7 +27,7 @@ public:
 	HaoScanner(int);
 	virtual ~HaoScanner();
 
-	int* scan(int*, int, int*, Predicate*);
+	void scan(int*, int, int*, Predicate*);
 
 protected:
 	void eq();

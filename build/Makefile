@@ -2,6 +2,7 @@
 
 CXX=g++
 RM=rm
+GTEST=/home/harper/git/googletest/googletest
 
 INCLUDE=
 
@@ -12,7 +13,7 @@ CXX_FLAG= -O3 -Wall -std=gnu++11 -mavx2 -c -fmessage-length=0 -pthread $(INCLUDE
 BIN = ../bin
 
 INCLUDE_GTEST= -I $(GTEST)/include
-LIB_GTEST= $(LIBS) -L $(GTEST)/make -l:gtest_main.a
+LIB_GTEST= $(LIBS) -L $(GTEST)/make -lgtest
 CXX_TESTFLAG = $(CXX_FLAG) $(INCLUDE_GTEST)
 
 
@@ -25,7 +26,7 @@ endif
 COMMON_OBJS = \
 ./src/predicate/Predicate.o \
 ./src/scan/Scanner.o \
-./src/scan/AVX2Scanner.o
+./src/scan/HaoScanner.o
 
 
 TEST_OBJS = \
@@ -72,5 +73,5 @@ clean:
 	
 unittest: $(COMMON_OBJS) $(TEST_OBJS)
 	@echo 'Generating Unit Test'
-	$(CXX) -o $(BIN)/unittest $(COMMON_OBJS) $(TEST_OBJS) $(LIB_GTEST)
+	$(CXX) -o $(BIN)/unittest $(COMMON_OBJS) $(TEST_OBJS) $(LIB_GTEST) -lgtest_main
 	@echo 'Unit Test generated'

@@ -15,7 +15,7 @@ public:
 	Scanner();
 	virtual ~Scanner();
 
-	virtual int* scan(int*, int, int*, Predicate*) = 0;
+	virtual void scan(int*, int, int*, Predicate*) = 0;
 };
 
 #endif /* SCANNER_H_ */

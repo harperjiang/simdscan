@@ -6,6 +6,7 @@
  */
 
 #include <immintrin.h>
+#include <assert.h>
 #include "HaoScanner.h"
 
 #define INT_LEN 32
@@ -18,20 +19,16 @@ __m256i build(int num, int bitLength) {
 	for (int i = 0; i < 8; i++) {
 		int val = 0;
 		int current = offset;
+		if (offset != 0) {
+			val |= (num >> (bitLength - offset));
+		}
 		while (current < INT_LEN) {
-			int shift = INT_LEN - bitLength - current;
-			if (shift > 0) {
-				val |= (num << shift);
-			} else if (shift < 0) {
-				val |= (num >> -shift);
-			} else {
-				val |= num;
-			}
+			val |= (num << current);
 			current += bitLength;
 		}
-		offset = bitLength - (INT_LEN % bitLength) + offset;
+		r[i] = val;
+		offset = bitLength - (INT_LEN - offset) % bitLength;
 	}
-
 	return _mm256_setr_epi32(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]);
 }
 
@@ -47,7 +44,10 @@ HaoScanner::~HaoScanner() {
 
 }
 
-int* HaoScanner::scan(int* data, int length, int* dest, Predicate* p) {
+void HaoScanner::scan(int* data, int length, int* dest, Predicate* p) {
+	// TODO For experimental purpose, assume data is aligned for now
+	assert(length % (SIMD_LEN/INT_LEN) == 0);
+
 	this->data = data;
 	this->dest = dest;
 	this->length = length;
@@ -55,17 +55,16 @@ int* HaoScanner::scan(int* data, int length, int* dest, Predicate* p) {
 	this->val2 = val2;
 
 	switch (p->getOpr()) {
-	case eq:
-	case neq:
+	case opr_eq:
+	case opr_neq:
 		eq();
 		break;
-	case in:
+	case opr_in:
 		in();
 		break;
 	default:
 		break;
 	}
-	return this->dest;
 }
 
 void HaoScanner::eq() {
