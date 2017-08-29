@@ -13,12 +13,7 @@
 
 class WillhalmScanner128: public Scanner {
 private:
-	int bitSize;
-	int shuffleCount;
-	__m128i* shuffles;
-	__m128i* compareMask;
-	__m128i* val1;
-	__m128i* val2;
+	int entrySize;
 protected:
 	int computeShift(int);
 	void computePredicate(Predicate*);
