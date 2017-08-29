@@ -15,8 +15,6 @@ class WillhalmScanner128: public Scanner {
 private:
 	int entrySize;
 protected:
-	int computeShift(int);
-	void computePredicate(Predicate*);
 public:
 	WillhalmScanner128(int);
 	virtual ~WillhalmScanner128();

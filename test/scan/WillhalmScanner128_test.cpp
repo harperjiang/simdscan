@@ -9,9 +9,30 @@
 #include <immintrin.h>
 #include <gtest/gtest.h>
 
+extern int computeShuffle(int* shuffleIdx, int* maskIdx, int* shiftIdx,
+		int offset, int entrySize);
 
-TEST(WillhalmScanner128, TestBuild) {
+TEST(WillhalmScanner128, TestComputeShuffle) {
 
+	int shuffleIdx[16];
+	int maskIdx[16];
+	int shiftIdx[4];
 
+	computeShuffle(shuffleIdx, maskIdx, shiftIdx, 0, 15);
+
+	int shuffleExpect[] = { 0, 1, 0xff, 0xff, 1, 2, 0xff, 0xff, 2, 3, 0xff,
+			0xff, 3, 4, 0xff, 0xff };
+	int maskExpect[] = { 0xff, 0x7f, 0, 0, 0x80, 0xff, 0x3f, 0, 0xc0, 0xff,
+			0x1f, 0, 0xe0, 0xff, 0xf, 0 };
+	int shiftExpect[] = { 0, 7, 6, 5 };
+
+	for (int i = 0; i < 16; i++) {
+		ASSERT_EQ(shuffleExpect[i], shuffleIdx[i]);
+		ASSERT_EQ(maskExpect[i], maskIdx[i]);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		ASSERT_EQ(shiftExpect[i], shiftIdx[i]);
+	}
 }
 
