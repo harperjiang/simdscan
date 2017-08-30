@@ -8,6 +8,7 @@
 #include <immintrin.h>
 #include "WillhalmScanner128.h"
 #include <assert.h>
+#include <stdint.h>
 
 #define INT_LEN 32
 #define SIMD_LEN 128
@@ -135,7 +136,6 @@ void WillhalmScanner128::scan(int* data, int length, int* dest, Predicate* p) {
 	__m128i current;
 
 	int entryCounter = 0;
-	int entryOffset = 0;
 
 	int wordCounter = 0;
 
@@ -151,7 +151,7 @@ void WillhalmScanner128::scan(int* data, int length, int* dest, Predicate* p) {
 			__m128i aligned = align(prev, current, alignByte);
 
 			// Read the cross-boundary entry
-			long long data = _mm_extract_epi64(aligned, 0);
+			int64_t data = _mm_extract_epi64(aligned, 0);
 			int entryVal = (int) (data >> (remain % BYTE_LEN) & 0xffffffff);
 			switch (p->getOpr()) {
 			case opr_eq:
