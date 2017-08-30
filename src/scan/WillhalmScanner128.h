@@ -16,6 +16,8 @@ private:
 	int entrySize;
 	int* dest;
 	int destCounter;
+	int buffer[4];
+	int bufferCounter;
 protected:
 	void writeToDest(__m128i, int);
 	void writeToDest(int);
