@@ -14,7 +14,11 @@
 class WillhalmScanner128: public Scanner {
 private:
 	int entrySize;
+	int* dest;
+	int destCounter;
 protected:
+	void writeToDest(__m128i, int);
+	void writeToDest(int);
 public:
 	WillhalmScanner128(int);
 	virtual ~WillhalmScanner128();
