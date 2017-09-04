@@ -278,7 +278,7 @@ void WillhalmScanner128::writeToDest(int result) {
 	if (bufferCounter == 4) {
 		__m128i write = _mm_setr_epi32(buffer[0], buffer[1], buffer[2],
 				buffer[3]);
-		_mm_stream_si128((__m128i *) (dest + destCounter * 4), write);
+		_mm_stream_si128((__m128i *) (dest + destCounter), write);
 		bufferCounter = 0;
 		destCounter += 4;
 	}
@@ -302,7 +302,7 @@ void WillhalmScanner128::scan(int* data, int length, int* dest, Predicate* p) {
 
 void WillhalmScanner128::scanUnaligned() {
 	long offset = 0;
-	long bitLength = length * sizeof(int);
+	long bitLength = length * entrySize;
 	int step = SIMD_LEN / entrySize;
 	int parallel = SIMD_LEN / INT_LEN;
 
@@ -310,36 +310,33 @@ void WillhalmScanner128::scanUnaligned() {
 	__m128i val2 = _mm_set1_epi32(p->getVal2());
 
 	while (offset < bitLength) {
-		__m128i data = _mm_loadu_si128((__m128i *) (data + offset));
-
-		int numGroup = step / parallel + (step % parallel) ? 1 : 0;
+		__m128i current = _mm_loadu_si128((__m128i *) (data + offset));
+		__m128i mask;
+		__m128i shift;
+		int numGroup = step / parallel + (step % parallel ? 1 : 0);
 		int dataOffset = 0;
 
 		for (int i = 0; i < numGroup; i++) {
 			int numEntry = step - i * parallel;
 			if (numEntry > parallel)
 				numEntry = parallel;
-			__m128i mask;
-			__m128i shift;
 
-			__m128i shuffled = shuffle(data, &dataOffset, entrySize, &shift,
+			__m128i shuffled = shuffle(current, &dataOffset, entrySize, &shift,
 					&mask);
-
 			// Compare the aligned data with predicate
-			__m128i masked = _mm_and_si128(shuffled, mask);
 			__m128i result;
 			switch (p->getOpr()) {
 			case opr_eq:
 			case opr_neq:
-				result = _mm_cmpeq_epi32(masked, _mm_sllv_epi32(val1, shift));
+				result = _mm_cmpeq_epi32(shuffled, _mm_sllv_epi32(val1, shift));
 				break;
 			case opr_in: {
 				__m128i v1shift = _mm_sllv_epi32(val1, shift);
 				__m128i v2shift = _mm_sllv_epi32(val2, shift);
-				__m128i lower = _mm_cmpgt_epi32(masked, v1shift);
-				__m128i upper = _mm_cmpgt_epi32(masked, v2shift);
-				__m128i leq = _mm_cmpeq_epi32(masked, v1shift);
-				__m128i ueq = _mm_cmpeq_epi32(masked, v2shift);
+				__m128i lower = _mm_cmpgt_epi32(shuffled, v1shift);
+				__m128i upper = _mm_cmpgt_epi32(shuffled, v2shift);
+				__m128i leq = _mm_cmpeq_epi32(shuffled, v1shift);
+				__m128i ueq = _mm_cmpeq_epi32(shuffled, v2shift);
 				result = _mm_or_si128(_mm_xor_si128(lower, upper),
 						_mm_or_si128(leq, ueq));
 			}
@@ -357,8 +354,6 @@ void WillhalmScanner128::scanUnaligned() {
 
 void WillhalmScanner128::scanAligned() {
 	int step = SIMD_LEN / INT_LEN;
-// XXX For experimental purpose, assume data is aligned for now
-	assert(length % step == 0);
 
 	__m128i val1 = _mm_set1_epi32(p->getVal1());
 	__m128i val2 = _mm_set1_epi32(p->getVal2());
@@ -369,8 +364,10 @@ void WillhalmScanner128::scanAligned() {
 	int entryCounter = 0;
 
 	int wordCounter = 0;
+	int numWord = length * entrySize / INT_LEN
+			+ (length * entrySize % INT_LEN ? 1 : 0);
 
-	while (wordCounter < length) {
+	while (wordCounter < numWord) {
 		current = _mm_stream_load_si128((__m128i *) (data + wordCounter));
 
 		// Process cross-boundary entry

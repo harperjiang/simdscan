@@ -17,10 +17,10 @@ private:
 	bool aligned = false;
 
 	int* data;
+	int* dest;
 	int length;
 	Predicate* p;
 
-	int* dest;
 	int destCounter;
 	int buffer[4];
 	int bufferCounter;

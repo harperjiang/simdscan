@@ -11,6 +11,7 @@
 
 #define INT_LEN 32
 #define SIMD_LEN 256
+#define BYTE_LEN 8
 
 __m256i build(int num, int bitLength) {
 	int offset = 0;
@@ -78,7 +79,7 @@ void HaoScanner::eq() {
 	__m256i current;
 	long offset = 0;
 	int step = SIMD_LEN / entrySize;
-	long bitLength = length * sizeof(int);
+	long bitLength = length * entrySize;
 
 	while (offset < bitLength) {
 		current = _mm256_loadu_si256((__m256i *) (data + offset));
@@ -108,7 +109,7 @@ void HaoScanner::in() {
 	__m256i current;
 	long offset = 0;
 	int step = SIMD_LEN / entrySize;
-	long bitLength = length * sizeof(int);
+	long bitLength = length * entrySize;
 
 	while (offset < bitLength) {
 		current = _mm256_loadu_si256((__m256i *) (data + offset));
