@@ -14,6 +14,12 @@
 class WillhalmScanner128: public Scanner {
 private:
 	int entrySize;
+	bool aligned = false;
+
+	int* data;
+	int length;
+	Predicate* p;
+
 	int* dest;
 	int destCounter;
 	int buffer[4];
@@ -21,6 +27,10 @@ private:
 protected:
 	void writeToDest(__m128i, int);
 	void writeToDest(int);
+
+
+	void scanAligned();
+	void scanUnaligned();
 public:
 	WillhalmScanner128(int);
 	virtual ~WillhalmScanner128();

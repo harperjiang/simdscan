@@ -15,7 +15,8 @@
 
 class HaoScanner: public Scanner {
 private:
-	int bitSize;
+	int entrySize;
+	bool uload = true;
 
 	int* data = NULL;
 	int* dest = NULL;
