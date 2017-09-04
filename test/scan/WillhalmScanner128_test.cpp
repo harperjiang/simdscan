@@ -20,6 +20,7 @@ extern __m128i shuffle(__m128i data, int* offset, int entrySize, __m128i* shift,
 extern int* encode(int* input, int* output, int length, int entrySize);
 
 TEST(WillhalmScanner128, TestShift64) {
+
 	__m64 f = _mm_set_pi64x(54l);
 	__m64 s = _mm_set_pi64x(32l);
 	__m128i data = _mm_setr_epi64(f, s);
@@ -179,19 +180,20 @@ TEST(WillhalmScanner128, TestShuffle32Lane) {
 TEST(WillhalmScanner128, TestScanUnaligned) {
 
 	int entrySize = 9;
-	int data[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	int data[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 16, 17,
+			18, 19, 20 };
 	int result[3];
 	int output[12];
-	encode(data, result, 10, entrySize);
+	encode(data, result, 20, entrySize);
 
 	WillhalmScanner128* scanner = new WillhalmScanner128(entrySize);
 
-	Predicate p(opr_eq, 4, 0);
+	Predicate p(opr_eq, 18, 0);
 
 	scanner->scan(result, 10, output, &p);
 	for (int i = 0; i < 10; i++) {
-		if (i == 3)
-			EXPECT_EQ((int)0xffffffff, output[i]);
+		if (i == 17)
+			EXPECT_EQ((int )0xffffffff, output[i]);
 		else
 			EXPECT_EQ(0, output[i]);
 	}

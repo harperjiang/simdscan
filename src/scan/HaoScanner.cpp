@@ -77,17 +77,35 @@ void HaoScanner::eq() {
 	__m256i notmask = _mm256_xor_si256(mask, one);
 
 	__m256i current;
-	long offset = 0;
-	int step = SIMD_LEN / entrySize;
-	long bitLength = length * entrySize;
 
-	while (offset < bitLength) {
-		current = _mm256_loadu_si256((__m256i *) (data + offset));
+	void* byteData = data;
+	void* byteDest = dest;
+	int byteOffset = 0;
+	int bitOffset = 0;
+
+	int entryCounter = 0;
+
+	while (entryCounter < length) {
+		current = _mm256_loadu_si256((__m256i *) (byteData + byteOffset));
 		__m256i d = _mm256_xor_si256(current, eqnum);
 		__m256i result = _mm256_or_si256(
 				_mm256_add_epi32(_mm256_and_si256(d, notmask), notmask), d);
-		_mm256_storeu_si256((__m256i *) (dest + offset), result);
-		offset += step * entrySize;
+		__m256i mask = _mm256_setr_epi32(-1 << bitOffset, -1, -1, -1, -1, -1,
+				-1, -1);
+		__m256i exist = _mm256_setr_epi32((int) *((char*)(byteData+byteOffset)), 0, 0, 0,
+				0, 0, 0, 0);
+
+		__m256i joined = _mm256_xor_si256(_mm256_and_si256(mask, result),
+				exist);
+
+		_mm256_storeu_si256((__m256i *) (byteDest + byteOffset), joined);
+
+		int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
+		entryCounter += numFullEntry;
+		int bitAdvance = (bitOffset + numFullEntry * entrySize);
+		int byteAdvance = bitAdvance / BYTE_LEN;
+		byteOffset += byteAdvance;
+		bitOffset = bitAdvance % BYTE_LEN;
 	}
 }
 
@@ -107,12 +125,16 @@ void HaoScanner::in() {
 	__m256i bornm = _mm256_and_si256(b, notmask);
 
 	__m256i current;
-	long offset = 0;
-	int step = SIMD_LEN / entrySize;
-	long bitLength = length * entrySize;
 
-	while (offset < bitLength) {
-		current = _mm256_loadu_si256((__m256i *) (data + offset));
+	void* byteData = data;
+	void* byteDest = dest;
+	int byteOffset = 0;
+	int bitOffset = 0;
+
+	int entryCounter = 0;
+
+	while (entryCounter < length) {
+		current = _mm256_loadu_si256((__m256i *) (byteData + byteOffset));
 		__m256i xorm = _mm256_or_si256(current, mask);
 		__m256i l = _mm256_sub_epi32(xorm, aornm);
 		__m256i h = _mm256_sub_epi32(xorm, bornm);
@@ -121,8 +143,23 @@ void HaoScanner::in() {
 		__m256i eh = _mm256_and_si256(_mm256_or_si256(current, nb),
 				_mm256_or_si256(_mm256_and_si256(current, nb), h));
 		__m256i result = _mm256_xor_si256(el, eh);
-		_mm256_storeu_si256((__m256i *) (dest + offset), result);
-		offset += step * entrySize;
+
+		__m256i mask = _mm256_setr_epi32(-1 << bitOffset, -1, -1, -1, -1, -1,
+				-1, -1);
+		__m256i exist = _mm256_setr_epi32((int) *((char*)(byteData+byteOffset)), 0, 0, 0,
+				0, 0, 0, 0);
+
+		__m256i joined = _mm256_xor_si256(_mm256_and_si256(mask, result),
+				exist);
+
+		_mm256_storeu_si256((__m256i *) (byteDest + byteOffset), joined);
+
+		int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
+		entryCounter += numFullEntry;
+		int bitAdvance = (bitOffset + numFullEntry * entrySize);
+		int byteAdvance = bitAdvance / BYTE_LEN;
+		byteOffset += byteAdvance;
+		bitOffset = bitAdvance % BYTE_LEN;
 	}
 
 }

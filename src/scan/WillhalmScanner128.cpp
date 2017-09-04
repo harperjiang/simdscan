@@ -301,16 +301,20 @@ void WillhalmScanner128::scan(int* data, int length, int* dest, Predicate* p) {
 }
 
 void WillhalmScanner128::scanUnaligned() {
-	long offset = 0;
-	long bitLength = length * entrySize;
+	long entryCounter = 0;
 	int step = SIMD_LEN / entrySize;
 	int parallel = SIMD_LEN / INT_LEN;
+
+	void* byteData = (void*) data;
+	int byteOffset = 0;
+	int bitOffset = 0;
 
 	__m128i val1 = _mm_set1_epi32(p->getVal1());
 	__m128i val2 = _mm_set1_epi32(p->getVal2());
 
-	while (offset < bitLength) {
-		__m128i current = _mm_loadu_si128((__m128i *) (data + offset));
+	while (entryCounter < length) {
+		__m128i current = _mm_loadu_si128((__m128i *) (data + byteOffset));
+
 		__m128i mask;
 		__m128i shift;
 		int numGroup = step / parallel + (step % parallel ? 1 : 0);
@@ -348,7 +352,14 @@ void WillhalmScanner128::scanUnaligned() {
 			dataOffset += numEntry * entrySize;
 		}
 
-		offset += step * entrySize;
+		entryCounter += entrySize;
+
+		// Compute next byte offset
+		int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
+		int bitAdvance = (bitOffset + numFullEntry * entrySize);
+		int byteAdvance = bitAdvance / BYTE_LEN;
+		byteOffset += byteAdvance;
+		bitOffset = bitAdvance % BYTE_LEN;
 	}
 }
 

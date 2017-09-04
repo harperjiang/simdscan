@@ -55,7 +55,17 @@ void uloadSpeed() {
 	printf("%d\n", _mm256_extract_epi32(result, 0));
 }
 
+void loadalign() {
+	int data[] = { 2, 4, 8, 16, 0 };
+	void* d = data;
+	__m128i x0 = _mm_loadu_si128((__m128i*) d);
+	__m128i x = _mm_loadu_si128((__m128i *) (d + 1));
+
+	printf("%d,%d,%d,%d", _mm_extract_epi32(x, 0), _mm_extract_epi32(x, 1),
+			_mm_extract_epi32(x, 2), _mm_extract_epi32(x, 3));
+}
+
 int main(int argc, char** argv) {
-	uloadSpeed();
+	loadalign();
 }
 
