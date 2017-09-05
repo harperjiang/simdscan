@@ -302,7 +302,6 @@ void WillhalmScanner128::scan(int* data, int length, int* dest, Predicate* p) {
 
 void WillhalmScanner128::scanUnaligned() {
 	long entryCounter = 0;
-	int step = SIMD_LEN / entrySize;
 	int parallel = SIMD_LEN / INT_LEN;
 
 	void* byteData = (void*) data;
@@ -313,22 +312,24 @@ void WillhalmScanner128::scanUnaligned() {
 	__m128i val2 = _mm_set1_epi32(p->getVal2());
 
 	while (entryCounter < length) {
-		__m128i current = _mm_loadu_si128((__m128i *) (data + byteOffset));
+		__m128i current = _mm_loadu_si128((__m128i *) (byteData + byteOffset));
 
 		__m128i mask;
 		__m128i shift;
-		int numGroup = step / parallel + (step % parallel ? 1 : 0);
-		int dataOffset = 0;
+		int numEntry = (SIMD_LEN - bitOffset) / entrySize;
+		int numGroup = numEntry / parallel + (numEntry % parallel ? 1 : 0);
+		int dataOffset = bitOffset;
 
 		for (int i = 0; i < numGroup; i++) {
-			int numEntry = step - i * parallel;
-			if (numEntry > parallel)
-				numEntry = parallel;
+			int numEntryInGroup = numEntry - i * parallel;
+			if (numEntryInGroup > parallel)
+				numEntryInGroup = parallel;
 
 			__m128i shuffled = shuffle(current, &dataOffset, entrySize, &shift,
 					&mask);
 			// Compare the aligned data with predicate
 			__m128i result;
+			__m128i shifted = _mm_srlv_epi32(shuffled,shift);
 			switch (p->getOpr()) {
 			case opr_eq:
 			case opr_neq:
@@ -348,15 +349,13 @@ void WillhalmScanner128::scanUnaligned() {
 			default:
 				break;
 			}
-			writeToDest(result, numEntry);
-			dataOffset += numEntry * entrySize;
+			writeToDest(result, numEntryInGroup);
 		}
 
-		entryCounter += entrySize;
+		entryCounter += numEntry;
 
 		// Compute next byte offset
-		int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
-		int bitAdvance = (bitOffset + numFullEntry * entrySize);
+		int bitAdvance = (bitOffset + numEntry * entrySize);
 		int byteAdvance = bitAdvance / BYTE_LEN;
 		byteOffset += byteAdvance;
 		bitOffset = bitAdvance % BYTE_LEN;

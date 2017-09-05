@@ -15,7 +15,6 @@ extern __m128i shuffle64Lane(__m128i data, int* offset, int entrySize, __m128i* 
 extern __m128i shuffleShift32Lane(__m128i data, int* offset, int entrySize,
 		__m128i* shift, __m128i* mask);
 extern __m128i shuffle32Lane(__m128i data, int* offset, int entrySize, __m128i* shift, __m128i* mask);
-extern __m128i shuffle(__m128i data, int* offset, int entrySize, __m128i* shift, __m128i* mask);
 
 extern int* encode(int* input, int* output, int length, int entrySize);
 
@@ -180,22 +179,32 @@ TEST(WillhalmScanner128, TestShuffle32Lane) {
 TEST(WillhalmScanner128, TestScanUnaligned) {
 
 	int entrySize = 9;
-	int data[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 16, 17,
+	int data[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 			18, 19, 20 };
 	int result[3];
-	int output[12];
+	int output[30];
 	encode(data, result, 20, entrySize);
 
 	WillhalmScanner128* scanner = new WillhalmScanner128(entrySize);
 
 	Predicate p(opr_eq, 18, 0);
 
-	scanner->scan(result, 10, output, &p);
-	for (int i = 0; i < 10; i++) {
+	scanner->scan(result, 20, output, &p);
+	for (int i = 0; i < 20; i++) {
 		if (i == 17)
-			EXPECT_EQ((int )0xffffffff, output[i]);
+			EXPECT_EQ((int )0xffffffff, output[i]) << i;
 		else
-			EXPECT_EQ(0, output[i]);
+			EXPECT_EQ(0, output[i]) << i;
+	}
+
+	Predicate p2(opr_in, 3, 7);
+
+	scanner->scan(result, 20, output, &p2);
+	for (int i = 0; i < 20; i++) {
+		if (i >= 2 && i <= 6)
+			EXPECT_EQ((int )0xffffffff, output[i]) << i;
+		else
+			EXPECT_EQ(0, output[i]) << i;
 	}
 }
 

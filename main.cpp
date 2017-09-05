@@ -65,6 +65,18 @@ void loadalign() {
 			_mm_extract_epi32(x, 2), _mm_extract_epi32(x, 3));
 }
 
+
+void loadvsshift() {
+	int data[10000003];
+
+	// Load entire 128 bit and shift
+	for(int i = 0 ; i < 10000000;i++) {
+		__m128i loaded = _mm_loadu_si128((__m128i*)(data+i));
+		__m128i shift =
+	}
+
+}
+
 int main(int argc, char** argv) {
 	loadalign();
 }

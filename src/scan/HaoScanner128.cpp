@@ -37,9 +37,9 @@ __m128i buildMask128(int bitLength) {
 	return build128(1 << (bitLength - 1), bitLength);
 }
 
-HaoScanner128::HaoScanner128(int bs) {
+HaoScanner128::HaoScanner128(int es) {
+	this->entrySize = es;
 	assert(entrySize < 32 && entrySize > 0);
-	this->entrySize = bs;
 }
 
 HaoScanner128::~HaoScanner128() {
@@ -53,8 +53,8 @@ void HaoScanner128::scan(int* data, int length, int* dest, Predicate* p) {
 	this->data = data;
 	this->dest = dest;
 	this->length = length;
-	this->val1 = val1;
-	this->val2 = val2;
+	this->val1 = p->getVal1();
+	this->val2 = p->getVal2();
 
 	switch (p->getOpr()) {
 	case opr_eq:
@@ -73,7 +73,7 @@ void HaoScanner128::eq() {
 	// Build comparator
 	__m128i eqnum = build128(this->val1, this->entrySize);
 	__m128i mask = buildMask128(this->entrySize);
-	__m128i one = _mm_set1_epi32(0xffff);
+	__m128i one = _mm_set1_epi32(0xffffffff);
 	__m128i notmask = _mm_xor_si128(mask, one);
 
 	__m128i current;
@@ -90,10 +90,10 @@ void HaoScanner128::eq() {
 		__m128i d = _mm_xor_si128(current, eqnum);
 		__m128i result = _mm_or_si128(
 				_mm_add_epi32(_mm_and_si128(d, notmask), notmask), d);
-		__m128i mask = _mm_setr_epi32(-1 << bitOffset, -1, -1, -1);
-		__m128i exist = _mm_setr_epi32((int)*((char*)(byteData+byteOffset)), 0, 0, 0);
+		__m128i existMask = _mm_setr_epi32(-1 << bitOffset, -1, -1, -1);
+		__m128i exist = _mm_setr_epi32((int)*((char*)(byteDest+byteOffset)), 0, 0, 0);
 
-		__m128i joined = _mm_xor_si128(_mm_and_si128(mask, result), exist);
+		__m128i joined = _mm_xor_si128(_mm_and_si128(existMask, result), exist);
 
 		_mm_storeu_si128((__m128i *) (byteDest + byteOffset), joined);
 
