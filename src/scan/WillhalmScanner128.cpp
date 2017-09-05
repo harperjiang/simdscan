@@ -7,6 +7,7 @@
 
 #include <immintrin.h>
 #include "WillhalmScanner128.h"
+#include "../util/template.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -15,20 +16,6 @@
 #define BYTE_LEN 8
 #define BYTE_IN_SIMD SIMD_LEN / BYTE_LEN
 #define STEP SIMD_LEN / INT_LEN
-
-int extract(__m128i data, int index) {
-	switch (index) {
-	case 0:
-		return _mm_extract_epi32(data, 0);
-	case 1:
-		return _mm_extract_epi32(data, 1);
-	case 2:
-		return _mm_extract_epi32(data, 2);
-	case 3:
-	default:
-		return _mm_extract_epi32(data, 3);
-	}
-}
 
 __m128i setr_epi8(int* data) {
 	return _mm_setr_epi8(data[0], data[1], data[2], data[3], data[4], data[5],
@@ -50,45 +37,6 @@ __m128i shift_64(__m128i data, int s12, int s34) {
 		return _mm_srlv_epi64(
 				_mm_sllv_epi64(data, _mm_setr_epi32(-s12, 0, 0, 0)),
 				_mm_setr_epi32(0, 0, s34, 0));
-	}
-}
-
-__m128i align(__m128i a, __m128i b, int offset) {
-	switch (offset) {
-	case 0:
-		return b;
-	case 1:
-		return _mm_alignr_epi8(a, b, 1);
-	case 2:
-		return _mm_alignr_epi8(a, b, 2);
-	case 3:
-		return _mm_alignr_epi8(a, b, 3);
-	case 4:
-		return _mm_alignr_epi8(a, b, 4);
-	case 5:
-		return _mm_alignr_epi8(a, b, 5);
-	case 6:
-		return _mm_alignr_epi8(a, b, 6);
-	case 7:
-		return _mm_alignr_epi8(a, b, 7);
-	case 8:
-		return _mm_alignr_epi8(a, b, 8);
-	case 9:
-		return _mm_alignr_epi8(a, b, 9);
-	case 10:
-		return _mm_alignr_epi8(a, b, 10);
-	case 11:
-		return _mm_alignr_epi8(a, b, 11);
-	case 12:
-		return _mm_alignr_epi8(a, b, 12);
-	case 13:
-		return _mm_alignr_epi8(a, b, 13);
-	case 14:
-		return _mm_alignr_epi8(a, b, 14);
-	case 15:
-		return _mm_alignr_epi8(a, b, 15);
-	default:
-		return b;
 	}
 }
 
@@ -270,7 +218,7 @@ WillhalmScanner128::~WillhalmScanner128() {
 
 void WillhalmScanner128::writeToDest(__m128i result, int count) {
 	for (int i = 0; i < count; i++)
-		writeToDest(extract(result, i));
+		writeToDest(mm_extract_epi32(result, i));
 }
 
 void WillhalmScanner128::writeToDest(int result) {
@@ -329,7 +277,7 @@ void WillhalmScanner128::scanUnaligned() {
 					&mask);
 			// Compare the aligned data with predicate
 			__m128i result;
-			__m128i shifted = _mm_srlv_epi32(shuffled,shift);
+			__m128i shifted = _mm_srlv_epi32(shuffled, shift);
 			switch (p->getOpr()) {
 			case opr_eq:
 			case opr_neq:
@@ -387,7 +335,7 @@ void WillhalmScanner128::scanAligned() {
 		if (remain) {
 			int remainByte = remain / BYTE_LEN + remain % BYTE_LEN ? 1 : 0;
 			int alignByte = SIMD_LEN / BYTE_LEN - remainByte;
-			__m128i aligned = align(prev, current, alignByte);
+			__m128i aligned = mm_align_epi8(prev, current, alignByte);
 
 			// Read the cross-boundary entry
 			int64_t data = _mm_extract_epi64(aligned, 0);
