@@ -24,6 +24,24 @@ __m128i mm_cmpgt_epu64(__m128i a, __m128i b) {
 	return _mm_or_si128(_mm_and_si128(ahebh, algbl), ahgbh);
 }
 
+__m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
+	__m256i hmask = _mm256_setr_epi32(0, 0x80000000, 0, 0x80000000, 0,
+			0x80000000, 0, 0x80000000);
+	__m256i zero = _mm256_set1_epi32(0);
+	__m256i lmask = _mm256_setr_epi32(-1, 0x7fffffff, -1, 0x7fffffff, -1,
+			0x7fffffff, -1, 0x7fffffff);
+	__m256i ah = _mm256_and_si256(a, hmask);
+	__m256i al = _mm256_and_si256(a, lmask);
+	__m256i bh = _mm256_and_si256(b, hmask);
+	__m256i bl = _mm256_and_si256(b, lmask);
+
+	__m256i ahebh = _mm256_cmpeq_epi64(ah, bh);
+	__m256i algbl = _mm256_cmpgt_epi64(al, bl);
+	__m256i ahgbh = _mm256_and_si256(_mm256_cmpeq_epi64(ah, hmask),
+			_mm256_cmpeq_epi64(bh, zero));
+	return _mm256_or_si256(_mm256_and_si256(ahebh, algbl), ahgbh);
+}
+
 __m128i mm_add_epi128(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
 	__m128i carry = mm_cmpgt_epu64(a, result);
