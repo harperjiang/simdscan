@@ -8,12 +8,28 @@
 #include <immintrin.h>
 #include "template.h"
 
+__m128i mm_cmpgt_epu64(__m128i a, __m128i b) {
+	__m128i hmask = _mm_setr_epi32(0, 0x80000000, 0, 0x80000000);
+	__m128i zero = _mm_set1_epi32(0);
+	__m128i lmask = _mm_setr_epi32(-1, 0x7fffffff, -1, 0x7fffffff);
+	__m128i ah = _mm_and_si128(a, hmask);
+	__m128i al = _mm_and_si128(a, lmask);
+	__m128i bh = _mm_and_si128(b, hmask);
+	__m128i bl = _mm_and_si128(b, lmask);
+
+	__m128i ahebh = _mm_cmpeq_epi64(ah, bh);
+	__m128i algbl = _mm_cmpgt_epi64(al, bl);
+	__m128i ahgbh = _mm_and_si128(_mm_cmpeq_epi64(ah, hmask),
+			_mm_cmpeq_epi64(bh, zero));
+	return _mm_or_si128(_mm_and_si128(ahebh, algbl), ahgbh);
+}
+
 __m128i mm_add_epi128(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
-	__m128i carry = _mm_cmpgt_epi64(a, result);
+	__m128i carry = mm_cmpgt_epu64(a, result);
 	carry = _mm_and_si128(carry,
 			_mm_setr_epi64(_mm_set_pi64x(1), _mm_set_pi64x(0)));
-	carry = (__m128i ) _mm_permute_pd(carry, 2);
+	carry = (__m128i ) _mm_permute_pd(carry, 1);
 	result = _mm_add_epi64(result, carry);
 	return result;
 }
