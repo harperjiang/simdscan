@@ -8,37 +8,39 @@
 #include <immintrin.h>
 #include "template.h"
 
+const __m128i hmask128 = _mm_setr_epi32(0, 0x80000000, 0, 0x80000000);
+const __m128i zero128 = _mm_set1_epi32(0);
+const __m128i lmask128 = _mm_setr_epi32(-1, 0x7fffffff, -1, 0x7fffffff);
+
+const __m256i hmask256 = _mm256_setr_epi32(0, 0x80000000, 0, 0x80000000, 0,
+		0x80000000, 0, 0x80000000);
+const __m256i zero256 = _mm256_set1_epi32(0);
+const __m256i lmask256 = _mm256_setr_epi32(-1, 0x7fffffff, -1, 0x7fffffff, -1,
+		0x7fffffff, -1, 0x7fffffff);
+
 __m128i mm_cmpgt_epu64(__m128i a, __m128i b) {
-	__m128i hmask = _mm_setr_epi32(0, 0x80000000, 0, 0x80000000);
-	__m128i zero = _mm_set1_epi32(0);
-	__m128i lmask = _mm_setr_epi32(-1, 0x7fffffff, -1, 0x7fffffff);
-	__m128i ah = _mm_and_si128(a, hmask);
-	__m128i al = _mm_and_si128(a, lmask);
-	__m128i bh = _mm_and_si128(b, hmask);
-	__m128i bl = _mm_and_si128(b, lmask);
+	__m128i ah = _mm_and_si128(a, hmask128);
+	__m128i al = _mm_and_si128(a, lmask128);
+	__m128i bh = _mm_and_si128(b, hmask128);
+	__m128i bl = _mm_and_si128(b, lmask128);
 
 	__m128i ahebh = _mm_cmpeq_epi64(ah, bh);
 	__m128i algbl = _mm_cmpgt_epi64(al, bl);
-	__m128i ahgbh = _mm_and_si128(_mm_cmpeq_epi64(ah, hmask),
-			_mm_cmpeq_epi64(bh, zero));
+	__m128i ahgbh = _mm_and_si128(_mm_cmpeq_epi64(ah, hmask128),
+			_mm_cmpeq_epi64(bh, zero128));
 	return _mm_or_si128(_mm_and_si128(ahebh, algbl), ahgbh);
 }
 
 __m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
-	__m256i hmask = _mm256_setr_epi32(0, 0x80000000, 0, 0x80000000, 0,
-			0x80000000, 0, 0x80000000);
-	__m256i zero = _mm256_set1_epi32(0);
-	__m256i lmask = _mm256_setr_epi32(-1, 0x7fffffff, -1, 0x7fffffff, -1,
-			0x7fffffff, -1, 0x7fffffff);
-	__m256i ah = _mm256_and_si256(a, hmask);
-	__m256i al = _mm256_and_si256(a, lmask);
-	__m256i bh = _mm256_and_si256(b, hmask);
-	__m256i bl = _mm256_and_si256(b, lmask);
+	__m256i ah = _mm256_and_si256(a, hmask256);
+	__m256i al = _mm256_and_si256(a, lmask256);
+	__m256i bh = _mm256_and_si256(b, hmask256);
+	__m256i bl = _mm256_and_si256(b, lmask256);
 
 	__m256i ahebh = _mm256_cmpeq_epi64(ah, bh);
 	__m256i algbl = _mm256_cmpgt_epi64(al, bl);
-	__m256i ahgbh = _mm256_and_si256(_mm256_cmpeq_epi64(ah, hmask),
-			_mm256_cmpeq_epi64(bh, zero));
+	__m256i ahgbh = _mm256_and_si256(_mm256_cmpeq_epi64(ah, hmask256),
+			_mm256_cmpeq_epi64(bh, zero256));
 	return _mm256_or_si256(_mm256_and_si256(ahebh, algbl), ahgbh);
 }
 
@@ -55,7 +57,7 @@ __m128i mm_add_epi128(__m128i a, __m128i b) {
 __m128i mm_add_epi128_2(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
 	__m128i result1 = _mm_add_epi64(result, _mm_setr_epi32(0, 0, 1, 0));
-	__m128i carry = _mm_cmpgt_epi64(a, result);
+	__m128i carry = mm_cmpgt_epu64(a, result);
 	carry = (__m128i ) _mm_permute_pd(carry, 2);
 	result = _mm_blendv_epi8(result, result1, carry);
 	return result;
