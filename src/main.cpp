@@ -72,7 +72,7 @@ void loadvsshift() {
 	// Load entire 128 bit and shift
 	for(int i = 0 ; i < 10000000;i++) {
 		__m128i loaded = _mm_loadu_si128((__m128i*)(data+i));
-		__m128i shift =
+		//__m128i shift =
 	}
 
 }
