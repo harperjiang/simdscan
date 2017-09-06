@@ -58,17 +58,17 @@ __m128i mm_add_epi128_2(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
 	__m128i result1 = _mm_add_epi64(result, _mm_setr_epi32(0, 0, 1, 0));
 	__m128i carry = mm_cmpgt_epu64(a, result);
-	carry = (__m128i ) _mm_permute_pd(carry, 2);
+	carry = (__m128i ) _mm_permute_pd(carry, 1);
 	result = _mm_blendv_epi8(result, result1, carry);
 	return result;
 }
 
 __m128i mm_sub_epi128(__m128i a, __m128i b) {
 	__m128i result = _mm_sub_epi64(a, b);
-	__m128i carry = _mm_cmpgt_epi64(result, a);
+	__m128i carry = mm_cmpgt_epu64(result, a);
 	carry = _mm_and_si128(carry,
 			_mm_setr_epi64(_mm_set_pi64x(1), _mm_set_pi64x(0)));
-	carry = (__m128i ) _mm_permute_pd(carry, 2);
+	carry = (__m128i ) _mm_permute_pd(carry, 1);
 	result = _mm_sub_epi64(result, carry);
 	return result;
 }
