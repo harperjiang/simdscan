@@ -7,6 +7,7 @@
 
 #include <immintrin.h>
 #include "template.h"
+#include "math_util.h"
 
 const __m128i hmask128 = _mm_setr_epi32(0, 0x80000000, 0, 0x80000000);
 const __m128i zero128 = _mm_set1_epi32(0);
@@ -63,6 +64,17 @@ __m128i mm_add_epi128_2(__m128i a, __m128i b) {
 	return result;
 }
 
+const int BLEND_TABLE_128[] = { 0, 2 };
+
+__m128i mm_add_epi128_3(__m128i a, __m128i b) {
+	__m128i result = _mm_add_epi64(a, b);
+	__m128i result1 = _mm_add_epi64(result, _mm_setr_epi32(0, 0, 1, 0));
+	__m128i carry = mm_cmpgt_epu64(a, result);
+	int cbit = (_mm_extract_epi32(carry,1) & 1);
+	int blend = BLEND_TABLE_128[cbit];
+	return (__m128i ) mm_blend_pd((__m128d )result, (__m128d )result1, blend);
+}
+
 __m128i mm_sub_epi128(__m128i a, __m128i b) {
 	__m128i result = _mm_sub_epi64(a, b);
 	__m128i carry = mm_cmpgt_epu64(result, a);
@@ -73,8 +85,8 @@ __m128i mm_sub_epi128(__m128i a, __m128i b) {
 	return result;
 }
 
-int BLEND_TABLE[] = { 0, 2, 4, 2, 8, 10, 8, 12, 0, 6, 4, 6, 8, 6, 8, 6, 0, 2,
-		12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14 };
+const int BLEND_TABLE_256[] = { 0, 2, 4, 2, 8, 10, 8, 12, 0, 6, 4, 6, 8, 6, 8,
+		6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14 };
 
 __m256i mm_add_epi256_trivial(__m256i a, __m256i b) {
 	__m256i result = _mm256_add_epi64(a, b);
@@ -93,7 +105,7 @@ __m256i mm_add_epi256_trivial(__m256i a, __m256i b) {
 	int blendIdx = (c21 & (1 << 5)) | (c31 & (1 << 4)) | (c2 & (1 << 3))
 			| (c3 & (1 << 2)) | (c4 & 1);
 
-	int blend = BLEND_TABLE[blendIdx];
+	int blend = BLEND_TABLE_256[blendIdx];
 	return (__m256i ) mm256_blend_pd((__m256d ) result, (__m256d ) result1,
 			blend);
 }
@@ -121,7 +133,7 @@ __m256i mm_add_epi256(__m256i a, __m256i b) {
 
 	int blendIdx = _mm256_extract_epi32(shuffle, 0);
 	blendIdx = (blendIdx | (blendIdx >> 8) | (blendIdx >> 16)) & 0xff;
-	int blend = BLEND_TABLE[blendIdx];
+	int blend = BLEND_TABLE_256[blendIdx];
 	return (__m256i ) mm256_blend_pd((__m256d ) result, (__m256d ) result1,
 			blend);
 }

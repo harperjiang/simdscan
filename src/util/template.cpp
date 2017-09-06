@@ -60,6 +60,21 @@ __m128i mm_align_epi8(__m128i a, __m128i b, int offset) {
 	}
 }
 
+__m128d mm_blend_pd(__m128d a, __m128d b, int imm) {
+	switch (imm) {
+	case 0:
+		return _mm_blend_pd(a, b, 0);
+	case 1:
+		return _mm_blend_pd(a, b, 1);
+	case 2:
+		return _mm_blend_pd(a, b, 2);
+	case 3:
+		return _mm_blend_pd(a, b, 3);
+	default:
+		return _mm_blend_pd(a, b, 0);
+	}
+}
+
 __m256d mm256_blend_pd(__m256d a, __m256d b, int imm) {
 	switch (imm) {
 	case 0:

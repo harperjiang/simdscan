@@ -74,6 +74,9 @@ void loadvsshift() {
 		__m128i loaded = _mm_loadu_si128((__m128i*)(data+i));
 		//__m128i shift =
 	}
+}
+
+void addperf() {
 
 }
 
