@@ -76,9 +76,6 @@ void loadvsshift() {
 	}
 }
 
-void addperf() {
-
-}
 
 int main(int argc, char** argv) {
 	loadalign();

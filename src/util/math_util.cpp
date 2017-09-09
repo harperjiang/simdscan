@@ -45,7 +45,7 @@ __m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
 	return _mm256_or_si256(_mm256_and_si256(ahebh, algbl), ahgbh);
 }
 
-__m128i mm_add_epi128(__m128i a, __m128i b) {
+__m128i mm_add_epi128_1(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
 	__m128i carry = mm_cmpgt_epu64(a, result);
 	carry = _mm_and_si128(carry,
@@ -66,7 +66,7 @@ __m128i mm_add_epi128_2(__m128i a, __m128i b) {
 
 const int BLEND_TABLE_128[] = { 0, 2 };
 
-__m128i mm_add_epi128_3(__m128i a, __m128i b) {
+__m128i mm_add_epi128(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
 	__m128i result1 = _mm_add_epi64(result, _mm_setr_epi32(0, 0, 1, 0));
 	__m128i carry = mm_cmpgt_epu64(a, result);
@@ -74,6 +74,7 @@ __m128i mm_add_epi128_3(__m128i a, __m128i b) {
 	int blend = BLEND_TABLE_128[cbit];
 	return (__m128i ) mm_blend_pd((__m128d )result, (__m128d )result1, blend);
 }
+
 
 __m128i mm_sub_epi128(__m128i a, __m128i b) {
 	__m128i result = _mm_sub_epi64(a, b);
