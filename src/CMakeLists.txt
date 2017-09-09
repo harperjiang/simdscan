@@ -1,13 +1,6 @@
-file(GLOB SOURCE_FILES
-        *.h
-        *.cpp
-)
-
-set(UTIL_SOURCE
-        "util/encode.cpp"
-        "util/math.cpp"
-        "util/template.h"
-        "util/template.cpp"
+file(GLOB_RECURSE UTIL_SOURCE
+        "util/*.cpp"
+        "util/*.h"
         )
 
 file(GLOB_RECURSE SCAN_SOURCE

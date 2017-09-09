@@ -5,6 +5,8 @@
  *      Author: harper
  */
 
+#include "encode.h"
+
 void encode(int* input, int* output, int length, int entrySize) {
 
 	int bitCounter = 0;
