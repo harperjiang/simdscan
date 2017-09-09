@@ -45,7 +45,7 @@ __m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
 	return _mm256_or_si256(_mm256_and_si256(ahebh, algbl), ahgbh);
 }
 
-__m128i mm_add_epi128_1(__m128i a, __m128i b) {
+__m128i mm_add_epi128_3(__m128i a, __m128i b) {
 	__m128i result = _mm_add_epi64(a, b);
 	__m128i carry = mm_cmpgt_epu64(a, result);
 	carry = _mm_and_si128(carry,

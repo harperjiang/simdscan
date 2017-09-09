@@ -11,6 +11,9 @@
 #include <sys/time.h>
 #include "../../src/util/math_util.h"
 
+__m128i mm_add_epi128_3(__m128i a, __m128i b);
+__m128i mm_add_epi128_2(__m128i a, __m128i b);
+
 TEST(Math, TestAddEpi128Perf) {
 
 	int repeat = 10000000;
