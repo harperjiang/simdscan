@@ -7,6 +7,7 @@
 
 #include <immintrin.h>
 #include <assert.h>
+#include "../util/math_util.h"
 #include "HaoScanner128.h"
 
 #define INT_LEN 32
@@ -89,7 +90,7 @@ void HaoScanner128::eq() {
 		current = _mm_loadu_si128((__m128i *) (byteData + byteOffset));
 		__m128i d = _mm_xor_si128(current, eqnum);
 		__m128i result = _mm_or_si128(
-				_mm_add_epi32(_mm_and_si128(d, notmask), notmask), d);
+				mm_add_epi128(_mm_and_si128(d, notmask), notmask), d);
 		__m128i existMask = _mm_setr_epi32(-1 << bitOffset, -1, -1, -1);
 		__m128i exist = _mm_setr_epi32((int)*((char*)(byteDest+byteOffset)), 0, 0, 0);
 
@@ -133,8 +134,8 @@ void HaoScanner128::in() {
 	while (entryCounter < length) {
 		current = _mm_loadu_si128((__m128i *) (byteData + byteOffset));
 		__m128i xorm = _mm_or_si128(current, mask);
-		__m128i l = _mm_sub_epi32(xorm, aornm);
-		__m128i h = _mm_sub_epi32(xorm, bornm);
+		__m128i l = mm_sub_epi128(xorm, aornm);
+		__m128i h = mm_sub_epi128(xorm, bornm);
 		__m128i el = _mm_and_si128(_mm_or_si128(current, na),
 				_mm_or_si128(_mm_and_si128(current, na), l));
 		__m128i eh = _mm_and_si128(_mm_or_si128(current, nb),

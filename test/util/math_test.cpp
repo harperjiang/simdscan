@@ -11,9 +11,13 @@
 #include <sys/time.h>
 #include "../../src/util/math_util.h"
 
-__m128i mm_add_epi128_3(__m128i a, __m128i b);
+extern __m128i mm_add_epi128_3(__m128i a, __m128i b);
 
-__m128i mm_sub_epi128_1(__m128i a, __m128i b);
+extern __m128i mm_sub_epi128_1(__m128i a, __m128i b);
+
+extern __m256i mm256_add_epi256_1(__m256i a, __m256i b);
+
+extern __m256i mm256_add_epi256_2(__m256i a, __m256i b);
 
 TEST(Math, TestAddEpi128Perf) {
 
@@ -322,17 +326,17 @@ TEST(Math, TestAddEpi256Perf) {
     int repeat = 10000000;
     long start, elapse;
 
-    __m256i *a0 = new __m256i[repeat];
-    __m256i *b0 = new __m256i[repeat];
+    __m256i *a0 = (__m256i *) aligned_alloc(32, repeat * 32);
+    __m256i *b0 = (__m256i *) aligned_alloc(32, repeat * 32);
 
-    __m256i *a1 = new __m256i[repeat];
-    __m256i *b1 = new __m256i[repeat];
+    __m256i *a1 = (__m256i *) aligned_alloc(32, repeat * 32);
+    __m256i *b1 = (__m256i *) aligned_alloc(32, repeat * 32);
 
-    __m256i *a2 = new __m256i[repeat];
-    __m256i *b2 = new __m256i[repeat];
+    __m256i *a2 = (__m256i *) aligned_alloc(32, repeat * 32);
+    __m256i *b2 = (__m256i *) aligned_alloc(32, repeat * 32);
 
-    __m256i *a3 = new __m256i[repeat];
-    __m256i *b3 = new __m256i[repeat];
+    __m256i *a3 = (__m256i *) aligned_alloc(32, repeat * 32);
+    __m256i *b3 = (__m256i *) aligned_alloc(32, repeat * 32);
 
     for (int i = 0; i < repeat; i++) {
         a0[i] = _mm256_setr_epi64x(i, 0, 0, 0);
@@ -349,9 +353,9 @@ TEST(Math, TestAddEpi256Perf) {
     }
 
     struct timeval tp;
+
     gettimeofday(&tp, NULL);
     start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-
 
     for (int i = 0; i < repeat; i++) {
         __m256i r1 = mm256_add_epi256(a0[i], b0[i]);
@@ -382,20 +386,121 @@ TEST(Math, TestAddEpi256Perf) {
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
     std::cout << "perf of add256:" << elapse << std::endl;
+    gettimeofday(&tp, NULL);
+    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
-    delete[] a0;
-    delete[] a1;
-    delete[] a2;
-    delete[] a3;
-    delete[] b0;
-    delete[] b1;
-    delete[] b2;
-    delete[] b3;
+    for (int i = 0; i < repeat; i++) {
+        __m256i r1 = mm256_add_epi256_1(a0[i], b0[i]);
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(r1, 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 3)) << i;
 
+        __m256i r2 = mm256_add_epi256_1(a1[i], b1[i]);
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(r2, 0)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(r2, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 3)) << i;
+
+        __m256i r3 = mm256_add_epi256_1(a2[i], b2[i]);
+        EXPECT_EQ(8 * i, _mm256_extract_epi64(r3, 0)) << i;
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(r3, 1)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(r3, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r3, 3)) << i;
+
+        __m256i r4 = mm256_add_epi256_1(a3[i], b3[i]);
+        EXPECT_EQ(8 * i, _mm256_extract_epi64(r4, 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r4, 1)) << i;
+        EXPECT_EQ(3 * i + 1, _mm256_extract_epi64(r4, 2)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(r4, 3)) << i;
+    }
+
+    gettimeofday(&tp, NULL);
+    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+    std::cout << "perf of add256 cand1:" << elapse << std::endl;
+    gettimeofday(&tp, NULL);
+    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+
+    for (int i = 0; i < repeat; i++) {
+        __m256i r1 = mm256_add_epi256_2(a0[i], b0[i]);
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(r1, 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 3)) << i;
+
+        __m256i r2 = mm256_add_epi256_2(a1[i], b1[i]);
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(r2, 0)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(r2, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 3)) << i;
+
+        __m256i r3 = mm256_add_epi256_2(a2[i], b2[i]);
+        EXPECT_EQ(8 * i, _mm256_extract_epi64(r3, 0)) << i;
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(r3, 1)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(r3, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r3, 3)) << i;
+
+        __m256i r4 = mm256_add_epi256_2(a3[i], b3[i]);
+        EXPECT_EQ(8 * i, _mm256_extract_epi64(r4, 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r4, 1)) << i;
+        EXPECT_EQ(3 * i + 1, _mm256_extract_epi64(r4, 2)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(r4, 3)) << i;
+    }
+
+    gettimeofday(&tp, NULL);
+    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+    std::cout << "perf of add256 cand2:" << elapse << std::endl;
+
+    free(a0);
+    free(a1);
+    free(a2);
+    free(a3);
+    free(b0);
+    free(b1);
+    free(b2);
+    free(b3);
 }
 
 TEST(Math, TestSubEpi256) {
+    long top = 0x8000000000000000;
 
+    for (int i = 1; i < 1000; i++) {
+        __m256i a = _mm256_setr_epi64x(2 * i, 0, 0, 0);
+        __m256i b = _mm256_setr_epi64x(i, 0, 0, 0);
+
+        __m256i r1 = mm256_sub_epi256(a, b);
+        EXPECT_EQ(i, _mm256_extract_epi64(r1, 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r1, 3)) << i;
+
+        a = _mm256_setr_epi64x(0, 1, 0, 0);
+        b = _mm256_setr_epi64x(i, 0, 0, 0);
+
+        __m256i r2 = mm256_sub_epi256(a, b);
+        EXPECT_EQ(-i, _mm256_extract_epi64(r2, 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r2, 3)) << i;
+
+        a = _mm256_setr_epi64x(0, 0, 1, 0);
+        b = _mm256_setr_epi64x(i, 0, 0, 0);
+
+        __m256i r3 = mm256_sub_epi256(a, b);
+        EXPECT_EQ(-i, _mm256_extract_epi64(r3, 0)) << i;
+        EXPECT_EQ(-1, _mm256_extract_epi64(r3, 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r3, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r3, 3)) << i;
+
+        a = _mm256_setr_epi64x(i, 3 * i, i, 1);
+        b = _mm256_setr_epi64x(2 * i, 5 * i, 3 * i, 0);
+
+        __m256i r4 = mm256_sub_epi256(a, b);
+        EXPECT_EQ(-i, _mm256_extract_epi64(r4, 0)) << i;
+        EXPECT_EQ(-2 * i - 1, _mm256_extract_epi64(r4, 1)) << i;
+        EXPECT_EQ(-2 * i - 1, _mm256_extract_epi64(r4, 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(r4, 3)) << i;
+    }
 }
 
 TEST(Math, TestSubEpi256Perf) {
