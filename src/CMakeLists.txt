@@ -21,4 +21,5 @@ add_executable(main
     ${SOURCE_FILES}
 )
 
+target_link_libraries(scan util)
 target_link_libraries(main util scan)

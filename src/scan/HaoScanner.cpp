@@ -39,9 +39,9 @@ __m256i buildMask(int bitLength, int offset) {
 	return build(1 << (bitLength - 1), bitLength, offset);
 }
 
-HaoScanner::HaoScanner(int bs) {
-	assert(entrySize < 32 && entrySize > 0);
-	this->entrySize = bs;
+HaoScanner::HaoScanner(int es) {
+	assert(es < 32 && es > 0);
+	this->entrySize = es;
 
 	int ALIGN = SIMD_LEN / BYTE_LEN;
 	int LEN = 8 * ALIGN;
