@@ -22,6 +22,7 @@ private:
     int *data = NULL;
     int *dest = NULL;
     int length = 0;
+    Predicate* predicate;
 
     __m128i *val1s = NULL;
     __m128i *val2s = NULL;
@@ -39,9 +40,12 @@ public:
     void scan(int *, int, int *, Predicate *);
 
 protected:
-    void eq();
+    void alignedEq();
+    void unalignedEq();
 
-    void in();
+    void alignedIn();
+    void unalignedIn();
 };
+
 
 #endif /* SRC_SCAN_HAOSCANNER128_H_ */

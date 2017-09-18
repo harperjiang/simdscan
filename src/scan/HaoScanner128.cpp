@@ -7,7 +7,6 @@
 
 #include <immintrin.h>
 #include <assert.h>
-#include <stdlib.h>
 #include "../util/math_util.h"
 #include "HaoScanner128.h"
 
@@ -40,13 +39,23 @@ __m128i buildMask128(int bitLength, int offset) {
     return build128(1 << (bitLength - 1), bitLength, offset);
 }
 
+int buildPiece128(__m128i prev, __m128i current, int entrySize, int bitOffset) {
+    int piece1 = _mm_extract_epi32(prev, 3);
+    int piece2 = _mm_extract_epi32(current, 0);
+    int s1 = entrySize - bitOffset;
+    int num = piece1 >> s1 & ((1 << s1) - 1);
+    num |= (piece2 << s1) & (((1 << bitOffset) - 1) << s1);
+    return num;
+}
+
 HaoScanner128::HaoScanner128(int es, bool aligned) {
     this->entrySize = es;
-    this->aligned = aligned;
     assert(entrySize < 32 && entrySize > 0);
 
+    this->aligned = aligned;
+
     int ALIGN = SIMD_LEN / BYTE_LEN;
-    int LEN = 8 * ALIGN;
+    int LEN = entrySize * ALIGN;
 
     this->val1s = (__m128i *) aligned_alloc(ALIGN, LEN);
     this->val2s = (__m128i *) aligned_alloc(ALIGN, LEN);
@@ -57,7 +66,7 @@ HaoScanner128::HaoScanner128(int es, bool aligned) {
     this->nmval1s = (__m128i *) aligned_alloc(ALIGN, LEN);
     this->nmval2s = (__m128i *) aligned_alloc(ALIGN, LEN);
 
-    for (int i = 0; i < BYTE_LEN; i++) {
+    for (int i = 0; i < entrySize; i++) {
         this->msbmasks[i] = buildMask128(entrySize, i);
         this->notmasks[i] = _mm_xor_si128(this->msbmasks[i], one);
     }
@@ -81,8 +90,9 @@ void HaoScanner128::scan(int *data, int length, int *dest, Predicate *p) {
     this->data = data;
     this->dest = dest;
     this->length = length;
+    this->predicate = p;
 
-    for (int i = 0; i < BYTE_LEN; i++) {
+    for (int i = 0; i < entrySize; i++) {
         this->val1s[i] = build128(p->getVal1(), entrySize, i);
         this->val2s[i] = build128(p->getVal2(), entrySize, i);
         this->nval1s[i] = _mm_xor_si128(this->val1s[i], one);
@@ -94,35 +104,74 @@ void HaoScanner128::scan(int *data, int length, int *dest, Predicate *p) {
     switch (p->getOpr()) {
         case opr_eq:
         case opr_neq:
-            eq();
+            if (aligned) {
+                alignedEq();
+            } else {
+                unalignedEq();
+            }
             break;
         case opr_in:
-            in();
+            if (aligned) {
+                alignedIn();
+            } else {
+                unalignedIn();
+            }
             break;
         default:
             break;
     }
 }
 
-void HaoScanner128::eq() {
+void HaoScanner128::alignedEq() {
+    __m128i *mdata = (__m128i *) data;
+    __m128i *mdest = (__m128i *) dest;
 
-    __m128i *byteData = (__m128i *) data;
-    __m128i *byteDest = (__m128i *) dest;
+    int bitOffset = 0;
+
+    int numBit = entrySize * length;
+    int numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN) ? 1 : 0;
+
+    int laneCounter = 0;
+
+    __m128i prev;
+
+    while (laneCounter < numLane) {
+        __m128i eqnum = this->val1s[bitOffset];
+        __m128i notmask = this->notmasks[bitOffset];
+
+        __m128i current = _mm_stream_load_si128(mdata + laneCounter);
+
+        __m128i d = _mm_xor_si128(current, eqnum);
+        __m128i result = _mm_or_si128(
+                mm_add_epi128(_mm_and_si128(d, notmask), notmask), d);
+
+        if (bitOffset != 0) {
+            // Has remain to process
+            int num = buildPiece128(prev, current, entrySize, bitOffset);
+            __m128i remain = _mm_setr_epi32((num == predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
+            result = _mm_or_si128(result, remain);
+        }
+        _mm_stream_si128(mdest + (laneCounter++), result);
+
+        bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
+
+        prev = current;
+    }
+}
+
+void HaoScanner128::unalignedEq() {
+    void *byteData = data;
+    void *byteDest = dest;
     int byteOffset = 0;
     int bitOffset = 0;
 
     int entryCounter = 0;
 
-    int bitSize = entrySize * length;
-    int numx = bitSize / SIMD_LEN + (bitSize % SIMD_LEN) ? 1 : 0;
-
-    int counter = 0;
-    while (counter < numx) {
+    while (entryCounter < length) {
         __m128i eqnum = this->val1s[bitOffset];
         __m128i notmask = this->notmasks[bitOffset];
 
-//		__m128i current = _mm_loadu_si128((__m128i *) (byteData + byteOffset));
-        __m128i current = _mm_stream_load_si128(byteData + counter);
+        __m128i current = _mm_loadu_si128((__m128i *) (byteData + byteOffset));
         __m128i d = _mm_xor_si128(current, eqnum);
         __m128i result = _mm_or_si128(
                 mm_add_epi128(_mm_and_si128(d, notmask), notmask), d);
@@ -133,9 +182,7 @@ void HaoScanner128::eq() {
         __m128i joined = _mm_xor_si128(_mm_and_si128(resmask, result),
                                        _mm_setr_epi32(existMask & exist, 0, 0, 0));
 
-//		_mm_storeu_si128((__m128i *) (byteDest + byteOffset), joined);
-        _mm_stream_si128(byteDest + (counter++), joined);
-
+        _mm_storeu_si128((__m128i *) (byteDest + byteOffset), joined);
 
         int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
         entryCounter += numFullEntry;
@@ -143,11 +190,55 @@ void HaoScanner128::eq() {
         int byteAdvance = bitAdvance / BYTE_LEN;
         byteOffset += byteAdvance;
         bitOffset = bitAdvance % BYTE_LEN;
-
     }
 }
 
-void HaoScanner128::in() {
+void HaoScanner128::alignedIn() {
+    __m128i *mdata = (__m128i *) data;
+    __m128i *mdest = (__m128i *) dest;
+
+    int bitOffset = 0;
+
+    int numBit = entrySize * length;
+    int numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN) ? 1 : 0;
+
+    int laneCounter = 0;
+
+    __m128i prev;
+
+    while (laneCounter < numLane) {
+        __m128i mask = this->msbmasks[bitOffset];
+        __m128i aornm = this->nmval1s[bitOffset];
+        __m128i bornm = this->nmval2s[bitOffset];
+        __m128i na = this->nval1s[bitOffset];
+        __m128i nb = this->nval2s[bitOffset];
+
+        __m128i current = _mm_stream_load_si128(mdata + laneCounter);
+
+        __m128i xorm = _mm_or_si128(current, mask);
+        __m128i l = mm_sub_epi128(xorm, aornm);
+        __m128i h = mm_sub_epi128(xorm, bornm);
+        __m128i el = _mm_and_si128(_mm_or_si128(current, na),
+                                   _mm_or_si128(_mm_and_si128(current, na), l));
+        __m128i eh = _mm_and_si128(_mm_or_si128(current, nb),
+                                   _mm_or_si128(_mm_and_si128(current, nb), h));
+        __m128i result = _mm_xor_si128(el, eh);
+        if (bitOffset != 0) {
+            // Has remain to process
+            int num = buildPiece128(prev, current, entrySize, bitOffset);
+            __m128i remain = _mm_setr_epi32(
+                    (num >= predicate->getVal1() && num < predicate->getVal2()) << (bitOffset - 1), 0, 0, 0);
+            result = _mm_or_si128(result, remain);
+        }
+        _mm_stream_si128(mdest + (laneCounter++), result);
+
+        bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
+
+        prev = current;
+    }
+}
+
+void HaoScanner128::unalignedIn() {
     void *byteData = data;
     void *byteDest = dest;
     int byteOffset = 0;
@@ -187,6 +278,5 @@ void HaoScanner128::in() {
         byteOffset += byteAdvance;
         bitOffset = bitAdvance % BYTE_LEN;
     }
-
 }
 

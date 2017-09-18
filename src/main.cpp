@@ -84,23 +84,23 @@ int throughput(Scanner *scanner, int num, int entrySize) {
         input[i] = dist(rng);
     }
 
-    int encodedSize = (num * entrySize / 32) + 1;
-    int *encoded = new int[encodedSize];
+    int encodedSize = ((num * entrySize / 256) + 1) * 8;
+    int *encoded = (int *) aligned_alloc(32, sizeof(int) * encodedSize);
 
     encode(input, encoded, num, entrySize);
 
     // Large enough
-    int *output = new int[num];
+    int *output = (int *) aligned_alloc(32, sizeof(int) * num);
 
     auto x = dist(rng);
 //    Predicate p(opr_in, x / 2, x);
-    Predicate p(opr_eq, x,0);
+    Predicate p(opr_eq, x, 0);
 
     struct timeval tp;
 
     gettimeofday(&tp, NULL);
     long start, elapse;
-    start = tp.tv_sec * 1000000 + tp.tv_usec ;
+    start = tp.tv_sec * 1000000 + tp.tv_usec;
 
     scanner->scan(encoded, num, output, &p);
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
     for (int es = 5; es < 30; es++) {
         int hs = throughput(new HaoScanner128(es, true), repeat, es);
         int hs256 = throughput(new HaoScanner(es), repeat, es);
-        int ws = throughput(new WillhalmScanner128(es,true), repeat, es);
+        int ws = throughput(new WillhalmScanner128(es, true), repeat, es);
         std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << ws << std::endl;
     }
 }
