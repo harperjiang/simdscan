@@ -8,6 +8,7 @@
 #include <immintrin.h>
 #include <assert.h>
 #include "HaoScanner.h"
+#include "../util/math_util.h"
 
 #define INT_LEN 32
 #define SIMD_LEN 256
@@ -55,8 +56,8 @@ HaoScanner::HaoScanner(int bs) {
 	this->nmval2s = (__m256i *) aligned_alloc(ALIGN, LEN);
 
 	for (int i = 0; i < BYTE_LEN; i++) {
-		this->msbmasks[i] = buildMask128(entrySize, i);
-		this->notmasks[i] = _mm_xor_si128(this->msbmasks[i], one);
+		this->msbmasks[i] = buildMask(entrySize, i);
+		this->notmasks[i] = _mm256_xor_si256(this->msbmasks[i], one);
 	}
 }
 
@@ -118,13 +119,12 @@ void HaoScanner::eq() {
 		__m256i d = _mm256_xor_si256(current, eqnum);
 		__m256i result = _mm256_or_si256(
 				mm256_add_epi256(_mm256_and_si256(d, notmask), notmask), d);
-		__m256i mask = _mm256_setr_epi32(-1 << bitOffset, -1, -1, -1, -1, -1,
-				-1, -1);
-		__m256i exist = _mm256_setr_epi32(
-				(int) *((char*) (byteData + byteOffset)), 0, 0, 0, 0, 0, 0, 0);
+		__m256i resmask = _mm256_setr_epi64x(-1 << bitOffset, -1, -1, -1);
+		int existMask = (1 << bitOffset) - 1;
+		int exist = (int) *((char*) (byteDest + byteOffset));
 
-		__m256i joined = _mm256_xor_si256(_mm256_and_si256(mask, result),
-				exist);
+		__m256i joined = _mm256_xor_si256(_mm256_and_si256(resmask, result),
+				_mm256_setr_epi64x(existMask & exist, 0, 0, 0));
 
 		_mm256_storeu_si256((__m256i *) (byteDest + byteOffset), joined);
 
@@ -164,13 +164,12 @@ void HaoScanner::in() {
 				_mm256_or_si256(_mm256_and_si256(current, nb), h));
 		__m256i result = _mm256_xor_si256(el, eh);
 
-		__m256i mask = _mm256_setr_epi32(-1 << bitOffset, -1, -1, -1, -1, -1,
-				-1, -1);
-		__m256i exist = _mm256_setr_epi32(
-				(int) *((char*) (byteData + byteOffset)), 0, 0, 0, 0, 0, 0, 0);
+		__m256i resmask = _mm256_setr_epi64x(-1 << bitOffset, -1, -1, -1);
+		int existMask = (1 << bitOffset) - 1;
+		int exist = (int) *((char*) (byteDest + byteOffset));
 
-		__m256i joined = _mm256_xor_si256(_mm256_and_si256(mask, result),
-				exist);
+		__m256i joined = _mm256_xor_si256(_mm256_and_si256(resmask, result),
+				_mm256_setr_epi64x(existMask & exist, 0, 0, 0));
 
 		_mm256_storeu_si256((__m256i *) (byteDest + byteOffset), joined);
 

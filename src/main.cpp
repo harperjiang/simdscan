@@ -1,5 +1,6 @@
 #include <immintrin.h>
-#include <stdio.h>
+#include <random>
+#include <iostream>
 #include <sys/time.h>
 
 void storeSpeed() {
@@ -58,24 +59,25 @@ void uloadSpeed() {
 void loadalign() {
 	int data[] = { 2, 4, 8, 16, 0 };
 	void* d = data;
-	__m128i x0 = _mm_loadu_si128((__m128i*) d);
+	__m128i x0 = _mm_loadu_si128((__m128i *) d);
 	__m128i x = _mm_loadu_si128((__m128i *) (d + 1));
 
 	printf("%d,%d,%d,%d", _mm_extract_epi32(x, 0), _mm_extract_epi32(x, 1),
 			_mm_extract_epi32(x, 2), _mm_extract_epi32(x, 3));
 }
 
+void throughput(Scanner* scanner, int num, int entrySize) {
+	int* input = (int*) aligned_alloc(32, sizeof(int) * num);
+	// Prepare random numbers
+	int max = (1 << entrySize) - 1;
 
-void loadvsshift() {
-	int data[10000003];
 
-	// Load entire 128 bit and shift
-	for(int i = 0 ; i < 10000000;i++) {
-		__m128i loaded = _mm_loadu_si128((__m128i*)(data+i));
-		//__m128i shift =
-	}
+	std::mt19937 rng;
+	rng.seed(std::random_device()());
+	std::uniform_int_distribution < std::mt19937::result_type > dist6(1, 6); // distribution in range [1, 6]
+
+	std::cout << dist6(rng) << std::endl;
 }
-
 
 int main(int argc, char** argv) {
 	loadalign();

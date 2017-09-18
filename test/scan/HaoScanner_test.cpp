@@ -9,12 +9,12 @@
 #include <immintrin.h>
 #include <gtest/gtest.h>
 
-extern __m256i build(int num, int bitLength);
-extern __m256i buildMask(int bitLength);
+extern __m256i build(int num, int bitLength, int);
+extern __m256i buildMask(int bitLength, int);
 
 TEST(HaoScanner, TestBuild) {
 #ifdef __AVX2__
-	__m256i b = build(3, 5);
+	__m256i b = build(3, 5,0);
 
 	ASSERT_EQ(0xc6318c63, _mm256_extract_epi32(b,0));
 	ASSERT_EQ(0x318c6318, _mm256_extract_epi32(b,1));
@@ -25,7 +25,7 @@ TEST(HaoScanner, TestBuild) {
 	ASSERT_EQ(0x318c6318, _mm256_extract_epi32(b,6));
 	ASSERT_EQ(0x8c6318c6, _mm256_extract_epi32(b,7));
 
-	b = build(26, 5);
+	b = build(26, 5,0);
 
 	ASSERT_EQ(0xb5ad6b5a, _mm256_extract_epi32(b,0));
 	ASSERT_EQ(0xad6b5ad6, _mm256_extract_epi32(b,1));
@@ -40,7 +40,7 @@ TEST(HaoScanner, TestBuild) {
 
 TEST(HaoScanner, TestBuildMask) {
 #ifdef __AVX2__
-	__m256i b = buildMask(5);
+	__m256i b = buildMask(5,0);
 
 	ASSERT_EQ(0x21084210, _mm256_extract_epi32(b,0));
 	ASSERT_EQ(0x08421084, _mm256_extract_epi32(b,1));
