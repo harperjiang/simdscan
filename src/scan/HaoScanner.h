@@ -17,11 +17,13 @@
 class HaoScanner: public Scanner {
 private:
 	int entrySize;
-	bool uload = true;
+	bool aligned = true;
 
 	int* data = NULL;
 	int* dest = NULL;
 	int length = 0;
+
+	Predicate* predicate;
 
 	__m256i* val1s = NULL;
 	__m256i* val2s = NULL;
@@ -32,14 +34,17 @@ private:
 	__m256i* msbmasks = NULL;
 	__m256i* notmasks = NULL;
 public:
-	HaoScanner(int);
+	HaoScanner(int, bool);
 	virtual ~HaoScanner();
 
 	void scan(int*, int, int*, Predicate*);
 
 protected:
-	void eq();
-	void in();
+	void alignedEq();
+	void alignedIn();
+
+	void unalignedEq();
+	void unalignedIn();
 };
 
 #endif /* SRC_SCAN_HAOSCANNER_H_ */

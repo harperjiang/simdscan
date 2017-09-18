@@ -13,6 +13,8 @@ extern __m128i build128(int num, int bitLength, int);
 
 extern __m128i buildMask128(int bitLength, int);
 
+extern int buildPiece128(__m128i, __m128i, int, int);
+
 extern void encode(int *, int *, int, int);
 
 TEST(HaoScanner128, TestBuild128) {
@@ -47,6 +49,15 @@ TEST(HaoScanner128, TestBuildMask128) {
     ASSERT_EQ(0x10842108, _mm_extract_epi32(b, 3));
 }
 
+TEST(HaoScanner128, TestBuildPiece128) {
+    __m128i prev = _mm_setr_epi32(0x323423aa, 0x214424aa, 0x4ba3d319, 0xd7235273);
+    __m128i current = _mm_setr_epi32(0x32342a4a, 0x234abcd1, 0x12312341, 0x11ddaad5);
+    int entrySize = 9;
+    int bitOffset = 4;
+
+    EXPECT_EQ(346, buildPiece128(prev, current, entrySize, bitOffset));
+}
+
 TEST(HaoScanner128, TestUnalignedEq) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
@@ -76,8 +87,8 @@ TEST(HaoScanner128, TestAlignedEq) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                   18, 19, 20};
-    int *encoded = (int *) aligned_alloc(16, 6 * sizeof(int));
-    int *output = (int *) aligned_alloc(16, 6 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(16, 8 * sizeof(int));
+    int *output = (int *) aligned_alloc(16, 8 * sizeof(int));
     encode(data, encoded, 20, entrySize);
 
     HaoScanner128 *scanner = new HaoScanner128(entrySize, true);
@@ -95,6 +106,8 @@ TEST(HaoScanner128, TestAlignedEq) {
             EXPECT_EQ(1 << bitIdx, output[intIdx] & (1 << bitIdx)) << i;
         }
     }
+    free(encoded);
+    free(output);
 }
 
 TEST(HaoScanner128, TestUnalignedRange) {

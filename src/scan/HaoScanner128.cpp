@@ -43,7 +43,7 @@ int buildPiece128(__m128i prev, __m128i current, int entrySize, int bitOffset) {
     int piece1 = _mm_extract_epi32(prev, 3);
     int piece2 = _mm_extract_epi32(current, 0);
     int s1 = entrySize - bitOffset;
-    int num = piece1 >> s1 & ((1 << s1) - 1);
+    int num = piece1 >> (INT_LEN - s1) & ((1 << s1) - 1);
     num |= (piece2 << s1) & (((1 << bitOffset) - 1) << s1);
     return num;
 }
@@ -129,7 +129,7 @@ void HaoScanner128::alignedEq() {
     int bitOffset = 0;
 
     int numBit = entrySize * length;
-    int numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN) ? 1 : 0;
+    int numLane = numBit / SIMD_LEN + ((numBit % SIMD_LEN) ? 1 : 0);
 
     int laneCounter = 0;
 
@@ -148,7 +148,7 @@ void HaoScanner128::alignedEq() {
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece128(prev, current, entrySize, bitOffset);
-            __m128i remain = _mm_setr_epi32((num == predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
+            __m128i remain = _mm_setr_epi32((num != predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
             result = _mm_or_si128(result, remain);
         }
         _mm_stream_si128(mdest + (laneCounter++), result);
@@ -200,7 +200,7 @@ void HaoScanner128::alignedIn() {
     int bitOffset = 0;
 
     int numBit = entrySize * length;
-    int numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN) ? 1 : 0;
+    int numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN ? 1 : 0);
 
     int laneCounter = 0;
 
