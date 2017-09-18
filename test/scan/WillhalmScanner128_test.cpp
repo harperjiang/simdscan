@@ -185,7 +185,7 @@ TEST(WillhalmScanner128, TestScanUnaligned) {
 	int output[30];
 	encode(data, result, 20, entrySize);
 
-	WillhalmScanner128* scanner = new WillhalmScanner128(entrySize);
+	WillhalmScanner128* scanner = new WillhalmScanner128(entrySize, false);
 
 	Predicate p(opr_eq, 18, 0);
 

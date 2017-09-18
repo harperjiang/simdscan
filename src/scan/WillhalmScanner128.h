@@ -14,7 +14,7 @@
 class WillhalmScanner128: public Scanner {
 private:
 	int entrySize;
-	bool aligned = false;
+	bool aligned = true;
 
 	int* data;
 	int* dest;
@@ -32,7 +32,7 @@ protected:
 	void scanAligned();
 	void scanUnaligned();
 public:
-	WillhalmScanner128(int);
+	WillhalmScanner128(int, bool);
 	virtual ~WillhalmScanner128();
 
 	void scan(int*, int, int*, Predicate*);

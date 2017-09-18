@@ -201,11 +201,12 @@ __m128i shuffle(__m128i data, int* offset, int entrySize, __m128i* shift, __m128
 	}
 }
 
-WillhalmScanner128::WillhalmScanner128(int entrySize) {
+WillhalmScanner128::WillhalmScanner128(int entrySize,bool aligned = false) {
 	assert(entrySize < INT_LEN && entrySize > 0);
 	this->entrySize = entrySize;
 	this->data = NULL;
 	this->length = 0;
+	this->aligned = aligned;
 	this->p = NULL;
 	this->dest = NULL;
 	this->destCounter = 0;

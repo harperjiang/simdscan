@@ -93,19 +93,19 @@ int throughput(Scanner *scanner, int num, int entrySize) {
     int *output = new int[num];
 
     auto x = dist(rng);
-    Predicate p(opr_in, x / 2, x);
-
+//    Predicate p(opr_in, x / 2, x);
+    Predicate p(opr_eq, x,0);
 
     struct timeval tp;
 
     gettimeofday(&tp, NULL);
     long start, elapse;
-    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    start = tp.tv_sec * 1000000 + tp.tv_usec ;
 
     scanner->scan(encoded, num, output, &p);
 
     gettimeofday(&tp, NULL);
-    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+    elapse = tp.tv_sec * 1000000 + tp.tv_usec - start;
 
     delete[] input;
     delete[] encoded;
@@ -117,9 +117,9 @@ int throughput(Scanner *scanner, int num, int entrySize) {
 int main(int argc, char **argv) {
     int repeat = 10000000;
     for (int es = 5; es < 30; es++) {
-        int hs = throughput(new HaoScanner128(es), repeat, es);
+        int hs = throughput(new HaoScanner128(es, true), repeat, es);
         int hs256 = throughput(new HaoScanner(es), repeat, es);
-        int ws = throughput(new WillhalmScanner128(es), repeat, es);
+        int ws = throughput(new WillhalmScanner128(es,true), repeat, es);
         std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << ws << std::endl;
     }
 }
