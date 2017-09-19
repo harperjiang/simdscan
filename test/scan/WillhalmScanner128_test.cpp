@@ -13,12 +13,12 @@ extern __m128i shift_64(__m128i, int, int);
 
 extern int checkLargeEntry(int, int);
 
-extern __m128i shuffle64Lane(__m128i data, int *offset, int entrySize, __m128i *shift, __m128i *mask);
+extern __m128i shuffle64Lane(__m128i data, int offset, int entrySize, __m128i *shift, __m128i *mask);
 
-extern __m128i shuffleShift32Lane(__m128i data, int *offset, int entrySize,
+extern __m128i shuffleShift32Lane(__m128i data, int offset, int entrySize,
                                   __m128i *shift, __m128i *mask);
 
-extern __m128i shuffle32Lane(__m128i data, int *offset, int entrySize, __m128i *shift, __m128i *mask);
+extern __m128i shuffle32Lane(__m128i data, int offset, int entrySize, __m128i *shift, __m128i *mask);
 
 extern void encode(int *input, int *output, int length, int entrySize);
 
@@ -83,9 +83,9 @@ TEST(WillhalmScanner128, TestShuffle64Lane) {
     __m128i shift;
     __m128i mask;
 
-    __m128i processed = shuffle64Lane(data, &offset, entrySize, &shift, &mask);
+    __m128i processed = shuffle64Lane(data, offset, entrySize, &shift, &mask);
 
-    EXPECT_EQ(offset, 120);
+    EXPECT_EQ(offset, 0);
 
     EXPECT_EQ(0x613d2, _mm_extract_epi32(processed, 0));
     EXPECT_EQ(0x8bce0, _mm_extract_epi32(processed, 1));
@@ -105,9 +105,8 @@ TEST(WillhalmScanner128, TestShuffle64Lane) {
     offset = 7;
     __m128i data2 = _mm_setr_epi64(_mm_set_pi64x(0x01179c000309e900),
                                    _mm_set_pi64x(0x25d2c3200eaa0d0));
-    processed = shuffle64Lane(data2, &offset, entrySize, &shift, &mask);
+    processed = shuffle64Lane(data2, offset, entrySize, &shift, &mask);
 
-    EXPECT_EQ(offset, 127);
 
     EXPECT_EQ(0x613d2, _mm_extract_epi32(processed, 0));
     EXPECT_EQ(0x8bce0, _mm_extract_epi32(processed, 1));
@@ -132,10 +131,9 @@ TEST(WillhalmScanner128, TestShuffleShift32Lane) {
     __m128i shift;
     __m128i mask;
 
-    __m128i processed = shuffleShift32Lane(data, &offset, entrySize, &shift,
+    __m128i processed = shuffleShift32Lane(data, offset, entrySize, &shift,
                                            &mask);
 
-    EXPECT_EQ(offset, 111);
 
     EXPECT_EQ(0x613d2 << 6, _mm_extract_epi32(processed, 0));
     EXPECT_EQ(0x8bce0, _mm_extract_epi32(processed, 1));
@@ -160,9 +158,8 @@ TEST(WillhalmScanner128, TestShuffle32Lane) {
     __m128i shift;
     __m128i mask;
 
-    __m128i processed = shuffle32Lane(data, &offset, entrySize, &shift, &mask);
+    __m128i processed = shuffle32Lane(data, offset, entrySize, &shift, &mask);
 
-    EXPECT_EQ(offset, 105);
 
     EXPECT_EQ(0x967e << 5, _mm_extract_epi32(processed, 0));
     EXPECT_EQ(0x16fb9 << 6, _mm_extract_epi32(processed, 1));
