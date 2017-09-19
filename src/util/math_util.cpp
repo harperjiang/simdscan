@@ -106,7 +106,7 @@ __m128i mm_sub_epi128(__m128i a, __m128i b) {
            _mm_sub_epi64(result, carry128) : result;
 }
 
-const int BLEND_ADD_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4,
+const int BLEND_TABLE_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4,
                              6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14};
 
 __m256i mm256_add_epi256(__m256i a, __m256i b) {
@@ -124,7 +124,28 @@ __m256i mm256_add_epi256(__m256i a, __m256i b) {
     int c4 = a4 > (uint64_t) _mm256_extract_epi64(result, 0);
     // The sequence is c2^1, c3^1, c2, c3, c4
     int blendIdx = c21 << 4 | c31 << 3 | c2 << 2 | c3 << 1 | c4;
-    int blend = BLEND_ADD_256[blendIdx];
+    int blend = BLEND_TABLE_256[blendIdx];
+    return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
+                                    blend);
+}
+
+__m256i mm256_add_epi256_1(__m256i a, __m256i b) {
+    __m256i result = _mm256_add_epi64(a, b);
+    __m256i result1 = _mm256_add_epi64(result, carry256);
+
+    __m256i carry = mm256_cmpgt_epu64(a, result);
+    __m256i carry1 = mm256_cmpgt_epu64(a, result1);
+
+    // The sequence is c2^1, c3^1, c2, c3, c4
+    int c21 = _mm256_extract_epi32(carry1, 4);
+    int c31 = _mm256_extract_epi32(carry1, 2);
+    int c2 = _mm256_extract_epi32(carry, 4);
+    int c3 = _mm256_extract_epi32(carry, 2);
+    int c4 = _mm256_extract_epi32(carry, 0);
+
+    int blendIdx = (c21 & 16) | (c31 & 8) | (c2 & 4) | (c3 & 2) | (c4 & 1);
+
+    int blend = BLEND_TABLE_256[blendIdx];
     return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
                                     blend);
 }
@@ -152,34 +173,15 @@ __m256i mm256_add_epi256_2(__m256i a, __m256i b) {
 
     int blendIdx = _mm256_extract_epi32(shuffle, 0);
     blendIdx = (blendIdx | (blendIdx >> 8) | (blendIdx >> 16)) & 0xff;
-    int blend = BLEND_ADD_256[blendIdx];
+    int blend = BLEND_TABLE_256[blendIdx];
     return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
                                     blend);
 }
 
-__m256i mm256_add_epi256_1(__m256i a, __m256i b) {
-    __m256i result = _mm256_add_epi64(a, b);
-    __m256i result1 = _mm256_add_epi64(result, carry256);
 
-    __m256i carry = mm256_cmpgt_epu64(a, result);
-    __m256i carry1 = mm256_cmpgt_epu64(a, result1);
 
-    // The sequence is c2^1, c3^1, c2, c3, c4
-    int c21 = _mm256_extract_epi32(carry1, 4);
-    int c31 = _mm256_extract_epi32(carry1, 2);
-    int c2 = _mm256_extract_epi32(carry, 4);
-    int c3 = _mm256_extract_epi32(carry, 2);
-    int c4 = _mm256_extract_epi32(carry, 0);
-
-    int blendIdx = (c21 & 16) | (c31 & 8) | (c2 & 4) | (c3 & 2) | (c4 & 1);
-
-    int blend = BLEND_ADD_256[blendIdx];
-    return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
-                                    blend);
-}
-
-const int BLEND_SUB_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4, 6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12,
-                             14, 8, 14, 12, 14};
+//const int BLEND_SUB_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4, 6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12,
+//                             14, 8, 14, 12, 14};
 
 __m256i mm256_sub_epi256(__m256i a, __m256i b) {
     __m256i result = _mm256_sub_epi64(a, b);
@@ -196,7 +198,7 @@ __m256i mm256_sub_epi256(__m256i a, __m256i b) {
     int c21 = ((uint64_t) _mm256_extract_epi64(result1, 2)) > a2;
 
     int blendIdx = c21 << 4 | c11 << 3 | c2 << 2 | c1 << 1 | c0;
-    int blend = BLEND_SUB_256[blendIdx];
+    int blend = BLEND_TABLE_256[blendIdx];
     return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
                                     blend);
 }

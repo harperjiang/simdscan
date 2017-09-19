@@ -1,5 +1,5 @@
 /*
- * HaoScanner.h
+ * HaoScanner256.h
  *
  * Use AVX2 to perform scanning
  *
@@ -7,14 +7,14 @@
  *      Author: harper
  */
 
-#ifndef SRC_SCAN_HAOSCANNER_H_
-#define SRC_SCAN_HAOSCANNER_H_
+#ifndef SRC_SCAN_HAOSCANNER256_H_
+#define SRC_SCAN_HAOSCANNER256_H_
 
 #include <stdlib.h>
 #include <immintrin.h>
 #include "Scanner.h"
 
-class HaoScanner: public Scanner {
+class HaoScanner256: public Scanner {
 private:
 	int entrySize;
 	bool aligned = true;
@@ -34,8 +34,8 @@ private:
 	__m256i* msbmasks = NULL;
 	__m256i* notmasks = NULL;
 public:
-	HaoScanner(int, bool);
-	virtual ~HaoScanner();
+	HaoScanner256(int, bool);
+	virtual ~HaoScanner256();
 
 	void scan(int*, uint64_t, int*, Predicate*);
 
@@ -47,4 +47,4 @@ protected:
 	void unalignedIn();
 };
 
-#endif /* SRC_SCAN_HAOSCANNER_H_ */
+#endif /* SRC_SCAN_HAOSCANNER256_H_ */

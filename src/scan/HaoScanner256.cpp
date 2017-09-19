@@ -1,5 +1,5 @@
 /*
- * HaoScanner.cpp
+ * HaoScanner256.cpp
  *
  *  Created on: Aug 25, 2017
  *      Author: harper
@@ -7,7 +7,7 @@
 
 #include <immintrin.h>
 #include <assert.h>
-#include "HaoScanner.h"
+#include "HaoScanner256.h"
 #include "../util/math_util.h"
 
 #define INT_LEN 32
@@ -48,7 +48,7 @@ int buildPiece(__m256i prev, __m256i current, int entrySize, int bitOffset) {
     return num;
 }
 
-HaoScanner::HaoScanner(int es, bool aligned) {
+HaoScanner256::HaoScanner256(int es, bool aligned) {
     assert(es < 32 && es > 0);
     this->entrySize = es;
 
@@ -74,7 +74,7 @@ HaoScanner::HaoScanner(int es, bool aligned) {
     }
 }
 
-HaoScanner::~HaoScanner() {
+HaoScanner256::~HaoScanner256() {
     free(this->val1s);
     free(this->val2s);
     free(this->nval1s);
@@ -85,10 +85,7 @@ HaoScanner::~HaoScanner() {
     free(this->notmasks);
 }
 
-void HaoScanner::scan(int *data, uint64_t length, int *dest, Predicate *p) {
-    // XXX For experimental purpose, assume data is aligned for now
-    assert(length % (SIMD_LEN / INT_LEN) == 0);
-
+void HaoScanner256::scan(int *data, uint64_t length, int *dest, Predicate *p) {
     this->data = data;
     this->dest = dest;
     this->length = length;
@@ -122,7 +119,7 @@ void HaoScanner::scan(int *data, uint64_t length, int *dest, Predicate *p) {
     }
 }
 
-void HaoScanner::alignedEq() {
+void HaoScanner256::alignedEq() {
     __m256i *mdata = (__m256i *) data;
     __m256i *mdest = (__m256i *) dest;
 
@@ -159,7 +156,7 @@ void HaoScanner::alignedEq() {
     }
 }
 
-void HaoScanner::alignedIn() {
+void HaoScanner256::alignedIn() {
     __m256i *mdata = (__m256i *) data;
     __m256i *mdest = (__m256i *) dest;
 
@@ -185,9 +182,9 @@ void HaoScanner::alignedIn() {
         __m256i l = mm256_sub_epi256(xorm, aornm);
         __m256i h = mm256_sub_epi256(xorm, bornm);
         __m256i el = _mm256_and_si256(_mm256_or_si256(current, na),
-                                   _mm256_or_si256(_mm256_and_si256(current, na), l));
+                                      _mm256_or_si256(_mm256_and_si256(current, na), l));
         __m256i eh = _mm256_and_si256(_mm256_or_si256(current, nb),
-                                   _mm256_or_si256(_mm256_and_si256(current, nb), h));
+                                      _mm256_or_si256(_mm256_and_si256(current, nb), h));
         __m256i result = _mm256_xor_si256(el, eh);
         if (bitOffset != 0) {
             // Has remain to process
@@ -204,7 +201,7 @@ void HaoScanner::alignedIn() {
     }
 }
 
-void HaoScanner::unalignedEq() {
+void HaoScanner256::unalignedEq() {
     void *byteData = data;
     void *byteDest = dest;
     int byteOffset = 0;
@@ -239,7 +236,7 @@ void HaoScanner::unalignedEq() {
     }
 }
 
-void HaoScanner::unalignedIn() {
+void HaoScanner256::unalignedIn() {
 
     void *byteData = data;
     void *byteDest = dest;

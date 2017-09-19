@@ -7,7 +7,7 @@
 #include "util/encode.h"
 #include "scan/WillhalmScanner128.h"
 #include "scan/HaoScanner128.h"
-#include "scan/HaoScanner.h"
+#include "scan/HaoScanner256.h"
 
 void storeSpeed() {
     struct timeval tp;
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
     uint64_t repeat = 100000000;
     for (int es = 5; es < 30; es++) {
         int hs = throughput(new HaoScanner128(es, true), repeat, es);
-        int hs256 = throughput(new HaoScanner(es, true), repeat, es);
+        int hs256 = throughput(new HaoScanner256(es, true), repeat, es);
         int ws = throughput(new WillhalmScanner128(es, true), repeat, es);
         std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << hs << "," << hs256 << ","
                   << ws << std::endl;
