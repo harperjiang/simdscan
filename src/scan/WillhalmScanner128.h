@@ -18,7 +18,7 @@ private:
 
     int *data;
     int *dest;
-    int length;
+    uint64_t length;
     Predicate *p;
 
     int destCounter;
@@ -41,7 +41,7 @@ public:
 
     virtual ~WillhalmScanner128();
 
-    void scan(int *, int, int *, Predicate *);
+    void scan(int *, uint64_t, int *, Predicate *);
 };
 
 #endif /* SRC_SCAN_WILLHALMSCANNER_H_ */

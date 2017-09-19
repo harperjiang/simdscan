@@ -8,14 +8,16 @@
 #ifndef SCANNER_H_
 #define SCANNER_H_
 
+#include <cstdint>
 #include "../predicate/Predicate.h"
+
 
 class Scanner {
 public:
 	Scanner();
 	virtual ~Scanner();
 
-	virtual void scan(int*, int, int*, Predicate*) = 0;
+	virtual void scan(int*, uint64_t, int*, Predicate*) = 0;
 };
 
 #endif /* SCANNER_H_ */

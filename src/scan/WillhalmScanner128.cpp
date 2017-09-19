@@ -231,7 +231,7 @@ void WillhalmScanner128::writeToDest(int result) {
     }
 }
 
-void WillhalmScanner128::scan(int *data, int length, int *dest, Predicate *p) {
+void WillhalmScanner128::scan(int *data, uint64_t length, int *dest, Predicate *p) {
     this->data = data;
     this->length = length;
     this->p = p;
@@ -248,7 +248,7 @@ void WillhalmScanner128::scan(int *data, int length, int *dest, Predicate *p) {
 }
 
 void WillhalmScanner128::scanUnaligned() {
-    long entryCounter = 0;
+    uint64_t entryCounter = 0;
     int parallel = SIMD_LEN / INT_LEN;
 
     void *byteData = (void *) data;
@@ -345,8 +345,8 @@ void WillhalmScanner128::scanAligned() {
     __m128i prev = _mm_set1_epi32(0);
     __m128i current;
 
-    int laneCounter = 0;
-    int numLane = length * entrySize / SIMD_LEN
+    uint64_t laneCounter = 0;
+    uint64_t numLane = length * entrySize / SIMD_LEN
                   + (length * entrySize % SIMD_LEN ? 1 : 0);
     int offset = 0;
 

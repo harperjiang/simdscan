@@ -1,6 +1,7 @@
 #include <immintrin.h>
 #include <random>
 #include <iostream>
+#include <stdint.h>
 #include <sys/time.h>
 #include "scan/Scanner.h"
 #include "util/encode.h"
@@ -71,7 +72,10 @@ void loadalign() {
            _mm_extract_epi32(x, 2), _mm_extract_epi32(x, 3));
 }
 
-int throughput(Scanner *scanner, int num, int entrySize) {
+
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+int throughput(Scanner *scanner, uint64_t num, int entrySize) {
     int *input = new int[num];
     // Prepare random numbers
     int max = (1 << entrySize) - 1;
@@ -84,7 +88,7 @@ int throughput(Scanner *scanner, int num, int entrySize) {
         input[i] = dist(rng);
     }
 
-    int encodedSize = ((num * entrySize / 256) + 1) * 8;
+    uint64_t encodedSize = ((num * entrySize / 256) + 1) * 8;
     int *encoded = (int *) aligned_alloc(32, sizeof(int) * encodedSize);
 
     encode(input, encoded, num, entrySize);
@@ -108,14 +112,15 @@ int throughput(Scanner *scanner, int num, int entrySize) {
     elapse = tp.tv_sec * 1000 + tp.tv_usec/1000 - start;
 
     delete[] input;
-    delete[] encoded;
-    delete[] output;
+    free(encoded);
+    free(output);
 
     return num / elapse;
 }
+#pragma GCC pop_options
 
 int main(int argc, char **argv) {
-    int repeat = 100000000;
+    uint64_t repeat = 100000000;
     for (int es = 5; es < 30; es++) {
         int hs = throughput(new HaoScanner128(es, true), repeat, es);
         int hs256 = throughput(new HaoScanner(es, true), repeat, es);

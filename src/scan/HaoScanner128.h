@@ -21,7 +21,7 @@ private:
 
     int *data = NULL;
     int *dest = NULL;
-    int length = 0;
+    uint64_t length = 0;
     Predicate* predicate;
 
     __m128i *val1s = NULL;
@@ -37,7 +37,7 @@ public:
 
     virtual ~HaoScanner128();
 
-    void scan(int *, int, int *, Predicate *);
+    void scan(int *, uint64_t, int *, Predicate *);
 
 protected:
     void alignedEq();

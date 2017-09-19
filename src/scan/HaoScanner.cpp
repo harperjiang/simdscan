@@ -85,7 +85,7 @@ HaoScanner::~HaoScanner() {
     free(this->notmasks);
 }
 
-void HaoScanner::scan(int *data, int length, int *dest, Predicate *p) {
+void HaoScanner::scan(int *data, uint64_t length, int *dest, Predicate *p) {
     // XXX For experimental purpose, assume data is aligned for now
     assert(length % (SIMD_LEN / INT_LEN) == 0);
 
@@ -128,10 +128,10 @@ void HaoScanner::alignedEq() {
 
     int bitOffset = 0;
 
-    int numBit = entrySize * length;
-    int numLane = numBit / SIMD_LEN + ((numBit % SIMD_LEN) ? 1 : 0);
+    uint64_t numBit = entrySize * length;
+    uint64_t numLane = numBit / SIMD_LEN + ((numBit % SIMD_LEN) ? 1 : 0);
 
-    int laneCounter = 0;
+    uint64_t laneCounter = 0;
 
     __m256i prev;
 
@@ -165,10 +165,10 @@ void HaoScanner::alignedIn() {
 
     int bitOffset = 0;
 
-    int numBit = entrySize * length;
-    int numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN ? 1 : 0);
+    uint64_t numBit = entrySize * length;
+    uint64_t numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN ? 1 : 0);
 
-    int laneCounter = 0;
+    uint64_t laneCounter = 0;
 
     __m256i prev;
 
@@ -210,7 +210,7 @@ void HaoScanner::unalignedEq() {
     int byteOffset = 0;
     int bitOffset = 0;
 
-    int entryCounter = 0;
+    uint64_t entryCounter = 0;
 
     while (entryCounter < length) {
         __m256i eqnum = this->val1s[bitOffset];
@@ -246,7 +246,7 @@ void HaoScanner::unalignedIn() {
     int byteOffset = 0;
     int bitOffset = 0;
 
-    int entryCounter = 0;
+    uint64_t entryCounter = 0;
 
     while (entryCounter < length) {
         __m256i mask = this->msbmasks[bitOffset];
