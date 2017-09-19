@@ -182,7 +182,7 @@ TEST(WillhalmScanner128, TestScanUnaligned) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                   18, 19, 20};
-    int result[3];
+    int result[8];
     int output[30];
     encode(data, result, 20, entrySize);
 
@@ -239,4 +239,6 @@ TEST(WillhalmScanner128, TestScanAligned) {
         else
             EXPECT_EQ(0, output[i]) << i;
     }
+    free(encoded);
+    free(output);
 }
