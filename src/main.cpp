@@ -75,6 +75,7 @@ void loadalign() {
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
+
 int throughput(Scanner *scanner, uint64_t num, int entrySize) {
     int *input = new int[num];
     // Prepare random numbers
@@ -104,12 +105,12 @@ int throughput(Scanner *scanner, uint64_t num, int entrySize) {
 
     gettimeofday(&tp, NULL);
     long start, elapse;
-    start = tp.tv_sec * 1000 + tp.tv_usec/1000;
+    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
     scanner->scan(encoded, num, output, &p);
 
     gettimeofday(&tp, NULL);
-    elapse = tp.tv_sec * 1000 + tp.tv_usec/1000 - start;
+    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
     delete[] input;
     free(encoded);
@@ -117,6 +118,7 @@ int throughput(Scanner *scanner, uint64_t num, int entrySize) {
 
     return num / elapse;
 }
+
 #pragma GCC pop_options
 
 int main(int argc, char **argv) {
@@ -125,7 +127,8 @@ int main(int argc, char **argv) {
         int hs = throughput(new HaoScanner128(es, true), repeat, es);
         int hs256 = throughput(new HaoScanner(es, true), repeat, es);
         int ws = throughput(new WillhalmScanner128(es, true), repeat, es);
-        std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << ws << std::endl;
+        std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << hs << "," << hs256 << ","
+                  << ws << std::endl;
     }
 }
 
