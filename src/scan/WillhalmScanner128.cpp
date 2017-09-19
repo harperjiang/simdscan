@@ -360,7 +360,7 @@ void WillhalmScanner128::scanAligned() {
             int inprev = entrySize - offset;
             int inprevByte = inprev / BYTE_LEN + (inprev % BYTE_LEN ? 1 : 0);
             int alignByte = SIMD_LEN / BYTE_LEN - inprevByte;
-            __m128i aligned = mm_align_epi8(prev, current, alignByte);
+            __m128i aligned = mm_align_epi8(current, prev, alignByte);
 
             // Read entries from aligned lane
             int alignedOffset = BYTE_LEN - inprev % BYTE_LEN;
