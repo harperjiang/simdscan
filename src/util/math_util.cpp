@@ -105,7 +105,7 @@ __m128i mm_sub_epi128(__m128i a, __m128i b) {
 const int BLEND_TABLE_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4,
                                6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14};
 
-__m256i mm256_add_epi256_1(__m256i a, __m256i b) {
+__m256i mm256_add_epi256_base(__m256i a, __m256i b) {
     __m256i result = _mm256_add_epi64(a, b);
     __m256i result1 = _mm256_add_epi64(result, carry256);
 
@@ -133,7 +133,7 @@ __m256i mm256_add_epi256(__m256i a, __m256i b) {
     int carry1 = _mm256_cmp_epu64_mask(a, result1, _MM_CMPINT_NLE);
 
     // The sequence is c2^1, c3^1, c2, c3, c4
-    int blendIdx = ((carry1 & 0x6) << 3) | (carry & 0x7);
+    int blendIdx = ((carry1 & 0x6) << 2) | (carry & 0x7);
 
     int blend = BLEND_TABLE_256[blendIdx];
     return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
