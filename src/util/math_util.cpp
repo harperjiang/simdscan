@@ -49,7 +49,7 @@ __m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
     return _mm256_or_si256(_mm256_and_si256(ahebh, algbl), ahgbh);
 }
 
-__m128i mm_add_epi128_1(__m128i a, __m128i b) {
+__m128i mm_add_epi128(__m128i a, __m128i b) {
     __m128i result = _mm_add_epi64(a, b);
     int carry = _mm_cmp_epu64_mask(a, result, _MM_CMPINT_NLE);
     return (carry & 1) ? _mm_add_epi64(result, carry128) : result;
@@ -75,7 +75,7 @@ __m128i mm_add_epi128_3(__m128i a, __m128i b) {
     return (__m128i) mm_blend_pd((__m128d) result, (__m128d) result1, blend);
 }
 
-__m128i mm_add_epi128(__m128i a, __m128i b) {
+__m128i mm_add_epi128_base(__m128i a, __m128i b) {
     __m128i result = _mm_add_epi64(a, b);
     uint64_t r0 = (uint64_t) _mm_extract_epi64(result, 0);
     uint64_t a0 = (uint64_t) _mm_extract_epi64(a, 0);
