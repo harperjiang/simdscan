@@ -52,7 +52,7 @@ __m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
 __m128i mm_add_epi128_1(__m128i a, __m128i b) {
     __m128i result = _mm_add_epi64(a, b);
     int carry = _mm_cmp_epu64_mask(a, result, _MM_CMPINT_NLE);
-    return (carry & 1) ? _mm_add_epi64(result, carry128) : result;-;
+    return (carry & 1) ? _mm_add_epi64(result, carry128) : result;
 }
 
 __m128i mm_add_epi128_2(__m128i a, __m128i b) {
