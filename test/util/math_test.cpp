@@ -319,7 +319,7 @@ TEST(Math, TestAddEpi256) {
         EXPECT_EQ(1, _mm256_extract_epi64(r4, 3)) << i;
     }
 }
-
+/*
 TEST(Math, TestAddEpi256Perf) {
     long top = 0x8000000000000000;
 
@@ -460,7 +460,7 @@ TEST(Math, TestAddEpi256Perf) {
     free(b2);
     free(b3);
 }
-
+*/
 TEST(Math, TestSubEpi256) {
     long top = 0x8000000000000000;
 
