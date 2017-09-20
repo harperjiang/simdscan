@@ -75,7 +75,7 @@ __m128i mm_add_epi128_3(__m128i a, __m128i b) {
     return (__m128i) mm_blend_pd((__m128d) result, (__m128d) result1, blend);
 }
 
-__m128i mm_add_epi128_base(__m128i a, __m128i b) {
+__m128i mm_add_epi128_1(__m128i a, __m128i b) {
     __m128i result = _mm_add_epi64(a, b);
     uint64_t r0 = (uint64_t) _mm_extract_epi64(result, 0);
     uint64_t a0 = (uint64_t) _mm_extract_epi64(a, 0);
@@ -105,7 +105,7 @@ __m128i mm_sub_epi128(__m128i a, __m128i b) {
 const int BLEND_TABLE_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4,
                                6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14};
 
-__m256i mm256_add_epi256_base(__m256i a, __m256i b) {
+__m256i mm256_add_epi256_1(__m256i a, __m256i b) {
     __m256i result = _mm256_add_epi64(a, b);
     __m256i result1 = _mm256_add_epi64(result, carry256);
 

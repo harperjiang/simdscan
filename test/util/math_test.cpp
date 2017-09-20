@@ -11,7 +11,7 @@
 #include <sys/time.h>
 #include "../../src/util/math_util.h"
 
-extern __m128i mm_add_epi128_3(__m128i a, __m128i b);
+extern __m128i mm_add_epi128_1(__m128i a, __m128i b);
 
 extern __m128i mm_sub_epi128_1(__m128i a, __m128i b);
 
@@ -79,21 +79,21 @@ TEST(Math, TestAddEpi128Perf) {
     start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
     for (int i = 0; i < repeat; i++) {
-        __m128i r0 = mm_add_epi128_3(a0[i], b0[i]);
+        __m128i r0 = mm_add_epi128_1(a0[i], b0[i]);
 
         EXPECT_EQ(i, _mm_extract_epi32(r0, 0)) << i;
         EXPECT_EQ(3 * i, _mm_extract_epi32(r0, 1)) << i;
         EXPECT_EQ(0, _mm_extract_epi32(r0, 2)) << i;
         EXPECT_EQ(3 * i, _mm_extract_epi32(r0, 3)) << i;
 
-        __m128i r1 = mm_add_epi128_3(a1[i], b1[i]);
+        __m128i r1 = mm_add_epi128_1(a1[i], b1[i]);
 
         EXPECT_EQ(2 * i, _mm_extract_epi32(r1, 0)) << i;
         EXPECT_EQ(i, _mm_extract_epi32(r1, 1)) << i;
         EXPECT_EQ(3 * i, _mm_extract_epi32(r1, 2)) << i;
         EXPECT_EQ(3 * i, _mm_extract_epi32(r1, 3)) << i;
 
-        __m128i r2 = mm_add_epi128_3(a2[i], b2[i]);
+        __m128i r2 = mm_add_epi128_1(a2[i], b2[i]);
 
         EXPECT_EQ(0, _mm_extract_epi32(r2, 0)) << i;
         EXPECT_EQ(3 * i, _mm_extract_epi32(r2, 1)) << i;
@@ -319,7 +319,7 @@ TEST(Math, TestAddEpi256) {
         EXPECT_EQ(1, _mm256_extract_epi64(r4, 3)) << i;
     }
 }
-/*
+
 TEST(Math, TestAddEpi256Perf) {
     long top = 0x8000000000000000;
 
@@ -460,7 +460,7 @@ TEST(Math, TestAddEpi256Perf) {
     free(b2);
     free(b3);
 }
-*/
+
 TEST(Math, TestSubEpi256) {
     long top = 0x8000000000000000;
 
