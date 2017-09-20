@@ -8,6 +8,7 @@
 #include "scan/WillhalmScanner128.h"
 #include "scan/HaoScanner128.h"
 #include "scan/HaoScanner256.h"
+#include "scan/HaoScanner512.h"
 
 void storeSpeed() {
     struct timeval tp;
@@ -89,13 +90,13 @@ int throughput(Scanner *scanner, uint64_t num, int entrySize) {
         input[i] = dist(rng);
     }
 
-    uint64_t encodedSize = ((num * entrySize / 256) + 1) * 8;
-    int *encoded = (int *) aligned_alloc(32, sizeof(int) * encodedSize);
+    uint64_t encodedSize = ((num * entrySize / 512) + 1) * 16;
+    int *encoded = (int *) aligned_alloc(64, sizeof(int) * encodedSize);
 
     encode(input, encoded, num, entrySize);
 
     // Large enough
-    int *output = (int *) aligned_alloc(32, sizeof(int) * num);
+    int *output = (int *) aligned_alloc(64, sizeof(int) * num);
 
     auto x = dist(rng);
 //    Predicate p(opr_in, x / 2, x);
@@ -126,8 +127,10 @@ int main(int argc, char **argv) {
     for (int es = 5; es < 30; es++) {
         int hs = throughput(new HaoScanner128(es, true), repeat, es);
         int hs256 = throughput(new HaoScanner256(es, true), repeat, es);
+        int hs512 = throughput(new HaoScanner512(es, true), repeat, es);
         int ws = throughput(new WillhalmScanner128(es, true), repeat, es);
-        std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << hs << "," << hs256 << ","
+        std::cout << es << "," << ((double) hs / ws) << "," << ((double) hs256 / ws) << "," << ((double) hs512 / ws)
+                  << "," << hs << "," << hs256 << "," << hs512 << ","
                   << ws << std::endl;
     }
 }
