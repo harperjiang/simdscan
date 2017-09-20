@@ -311,21 +311,18 @@ void WillhalmScanner128::scanUnaligned() {
 
 void WillhalmScanner128::compareAndWrite(__m128i shuffled, __m128i mask, __m128i shift, __m128i val1, __m128i val2,
                                          int count) {
-    __m128i masked = _mm_and_si128(shuffled, mask);
-    __m128i shifted = _mm_srlv_epi32(masked,shift);
+    __m128i shifted = _mm_srlv_epi32(shuffled, shift);
     __m128i result;
     switch (p->getOpr()) {
         case opr_eq:
         case opr_neq:
-            result = _mm_cmpeq_epi32(shifted,val1);
+            result = _mm_cmpeq_epi32(shifted, val1);
             break;
         case opr_in: {
-            __m128i v1shift = _mm_sllv_epi32(val1, shift);
-            __m128i v2shift = _mm_sllv_epi32(val2, shift);
-            __m128i lower = _mm_cmpgt_epi32(masked, v1shift);
-            __m128i upper = _mm_cmpgt_epi32(masked, v2shift);
-            __m128i leq = _mm_cmpeq_epi32(masked, v1shift);
-            __m128i ueq = _mm_cmpeq_epi32(masked, v2shift);
+            __m128i lower = _mm_cmpgt_epi32(shifted, val1);
+            __m128i upper = _mm_cmpgt_epi32(shifted, val2);
+            __m128i leq = _mm_cmpeq_epi32(shifted, val1);
+            __m128i ueq = _mm_cmpeq_epi32(shifted, val2);
             result = _mm_or_si128(_mm_xor_si128(lower, upper),
                                   _mm_or_si128(leq, ueq));
         }
@@ -347,7 +344,7 @@ void WillhalmScanner128::scanAligned() {
 
     uint64_t laneCounter = 0;
     uint64_t numLane = length * entrySize / SIMD_LEN
-                  + (length * entrySize % SIMD_LEN ? 1 : 0);
+                       + (length * entrySize % SIMD_LEN ? 1 : 0);
     int offset = 0;
 
     while (laneCounter < numLane) {
