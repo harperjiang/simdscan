@@ -6,25 +6,25 @@
  */
 
 #include <immintrin.h>
-#include "WillhalmScanner.h"
+#include "WillhalmScanner256.h"
 #include <assert.h>
 
 #define INT_LEN 32
 #define SIMD_LEN 256
 
-int WillhalmScanner::computeShift(int counter) {
+int WillhalmScanner256::computeShift(int counter) {
 	return 0;
 }
 
-WillhalmScanner::WillhalmScanner(int bitSize) {
+WillhalmScanner256::WillhalmScanner256(int bitSize) {
 	this->bitSize = bitSize;
 }
 
-WillhalmScanner::~WillhalmScanner() {
+WillhalmScanner256::~WillhalmScanner256() {
 	// TODO Auto-generated destructor stub
 }
 
-void WillhalmScanner::scan(int* data, int length, int* dest, Predicate* p) {
+void WillhalmScanner256::scan(int* data, int length, int* dest, Predicate* p) {
 	int counter = 0;
 	int step = SIMD_LEN / INT_LEN;
 	// TODO For experimental purpose, assume data is aligned for now

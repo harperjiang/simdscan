@@ -51,19 +51,15 @@ __m256i mm256_cmpgt_epu64(__m256i a, __m256i b) {
 
 __m128i mm_add_epi128_1(__m128i a, __m128i b) {
     __m128i result = _mm_add_epi64(a, b);
-    __m128i carry = mm_cmpgt_epu64(a, result);
-    carry = _mm_and_si128(carry,
-                          _mm_setr_epi64(_mm_set_pi64x(1), _mm_set_pi64x(0)));
-    carry = (__m128i) _mm_permute_pd((__m128d)carry, 1);
-    result = _mm_add_epi64(result, carry);
-    return result;
+    int carry = _mm_cmp_epu64_mask(a, result, _MM_CMPINT_NLE);
+    return (carry & 1) ? _mm_add_epi64(result, carry128) : result;-;
 }
 
 __m128i mm_add_epi128_2(__m128i a, __m128i b) {
     __m128i result = _mm_add_epi64(a, b);
     __m128i result1 = _mm_add_epi64(result, carry128);
     __m128i carry = mm_cmpgt_epu64(a, result);
-    carry = (__m128i) _mm_permute_pd((__m128d)carry, 1);
+    carry = (__m128i) _mm_permute_pd((__m128d) carry, 1);
     result = _mm_blendv_epi8(result, result1, carry);
     return result;
 }
@@ -93,7 +89,7 @@ __m128i mm_sub_epi128_1(__m128i a, __m128i b) {
     __m128i carry = mm_cmpgt_epu64(result, a);
     carry = _mm_and_si128(carry,
                           _mm_setr_epi64(_mm_set_pi64x(1), _mm_set_pi64x(0)));
-    carry = (__m128i) _mm_permute_pd((__m128d)carry, 1);
+    carry = (__m128i) _mm_permute_pd((__m128d) carry, 1);
     result = _mm_sub_epi64(result, carry);
     return result;
 }
@@ -107,9 +103,9 @@ __m128i mm_sub_epi128(__m128i a, __m128i b) {
 }
 
 const int BLEND_TABLE_256[] = {0, 2, 4, 2, 8, 10, 4, 10, 0, 6, 4, 6, 8, 6, 4,
-                             6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14};
+                               6, 0, 2, 12, 2, 8, 10, 12, 10, 0, 14, 12, 14, 8, 14, 12, 14};
 
-__m256i mm256_add_epi256(__m256i a, __m256i b) {
+__m256i mm256_add_epi256_1(__m256i a, __m256i b) {
     __m256i result = _mm256_add_epi64(a, b);
     __m256i result1 = _mm256_add_epi64(result, carry256);
 
@@ -129,21 +125,15 @@ __m256i mm256_add_epi256(__m256i a, __m256i b) {
                                     blend);
 }
 
-__m256i mm256_add_epi256_1(__m256i a, __m256i b) {
+__m256i mm256_add_epi256(__m256i a, __m256i b) {
     __m256i result = _mm256_add_epi64(a, b);
     __m256i result1 = _mm256_add_epi64(result, carry256);
 
-    __m256i carry = mm256_cmpgt_epu64(a, result);
-    __m256i carry1 = mm256_cmpgt_epu64(a, result1);
+    int carry = _mm256_cmp_epu64_mask(a, result, _MM_CMPINT_NLE);
+    int carry1 = _mm256_cmp_epu64_mask(a, result1, _MM_CMPINT_NLE);
 
     // The sequence is c2^1, c3^1, c2, c3, c4
-    int c21 = _mm256_extract_epi32(carry1, 4);
-    int c31 = _mm256_extract_epi32(carry1, 2);
-    int c2 = _mm256_extract_epi32(carry, 4);
-    int c3 = _mm256_extract_epi32(carry, 2);
-    int c4 = _mm256_extract_epi32(carry, 0);
-
-    int blendIdx = (c21 & 16) | (c31 & 8) | (c2 & 4) | (c3 & 2) | (c4 & 1);
+    int blendIdx = ((carry1 & 0x6) << 3) | (carry & 0x7);
 
     int blend = BLEND_TABLE_256[blendIdx];
     return (__m256i) mm256_blend_pd((__m256d) result, (__m256d) result1,
