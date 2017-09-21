@@ -101,8 +101,8 @@ __m256i shuffle64Lane256(__m256i data, int offset, int entrySize, __m256i *shift
     }
 
     *mask = _mm256_set1_epi32((1 << entrySize) - 1);
-    __m256i shuffle1 = _mm256_shuffle_epi8(data, mm256_setr_epi8(shuffle1Idx));
-    __m256i shuffle2 = _mm256_shuffle_epi8(data, mm256_setr_epi8(shuffle2Idx));
+    __m256i shuffle1 = _mm256_maskz_shuffle_epi8(0xffffffff, data, mm256_setr_epi8(shuffle1Idx));
+    __m256i shuffle2 = _mm256_maskz_shuffle_epi8(0xffffffff, data, mm256_setr_epi8(shuffle2Idx));
 
     __m256i shift1 = _mm256_srlv_epi64(shuffle1,
                                        _mm256_setr_epi64x(entryByteOffset[0], entryByteOffset[1], entryByteOffset[2],
@@ -136,7 +136,7 @@ __m256i shuffleShift32Lane256(__m256i data, int offset, int entrySize, __m256i *
     }
 
     __m256i shuffle = mm256_setr_epi8(shuffleIdx);
-    __m256i shuffled = _mm256_shuffle_epi8(data, shuffle);
+    __m256i shuffled = _mm256_maskz_shuffle_epi8(0xffffffff, data, shuffle);
 
     // shift for entries
 
@@ -184,7 +184,7 @@ __m256i shuffle32Lane256(__m256i data, int offset, int entrySize, __m256i *shift
     *shift = _mm256_setr_epi32(shiftIdx[0], shiftIdx[1], shiftIdx[2], shiftIdx[3], maskIdx[4], maskIdx[5], maskIdx[6],
                                maskIdx[7]);
 
-    return _mm256_and_si256(_mm256_shuffle_epi8(data, shuffle), *mask);
+    return _mm256_and_si256(_mm256_maskz_shuffle_epi8(0xffffffff, data, shuffle), *mask);
 }
 
 __m256i shuffle256(__m256i data, int offset, int entrySize, __m256i *shift, __m256i *mask) {
