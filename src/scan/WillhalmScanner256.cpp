@@ -59,7 +59,7 @@ int checkLargeEntry256(int offset, int entrySize) {
         byteStop[i] = ((offset + entrySize * (i + 1)) - 1) / BYTE_LEN;
     }
     for (int i = 0; i < 8; i++) {
-        if (i % 2 == 0 && byteStop[i + 1] - byteStart[i] >= 8)
+        if (i % 2 == 0 && byteStop[i + 2] - byteStart[i] >= 8)
             return 2;
         if (byteStop[i] - byteStart[i] >= 4) {
             return 1;
