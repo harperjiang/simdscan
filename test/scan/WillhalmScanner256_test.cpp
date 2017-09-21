@@ -76,7 +76,7 @@ TEST(WillhalmScanner256, TestCheckLargeEntry256) {
     }
     // Check 9 bytes
     for (int i = 0; i < 8; i++) {
-        if (i == 7 || i == 5)
+        if (i == 7 || i == 5 || i == 3 || i == 1)
             EXPECT_EQ(2, checkLargeEntry256(i, 29)) << i;
         else {
             EXPECT_EQ(1, checkLargeEntry256(i, 29)) << i;
