@@ -29,6 +29,10 @@ BitWeaverHScanner256::BitWeaverHScanner256(int entrySize) {
     this->entrySize = entrySize;
 }
 
+BitWeaverHScanner256::~BitWeaverHScanner256() {
+
+}
+
 void BitWeaverHScanner256::scan(int *input, uint64_t numEntry, int *output, Predicate *p) {
 
     __m256i *simdinput = (__m256i *) input;

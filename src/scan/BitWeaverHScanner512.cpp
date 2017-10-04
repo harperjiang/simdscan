@@ -29,6 +29,10 @@ BitWeaverHScanner512::BitWeaverHScanner512(int entrySize) {
     this->entrySize = entrySize;
 }
 
+BitWeaverHScanner512::~BitWeaverHScanner512() {
+
+}
+
 void BitWeaverHScanner512::scan(int *input, uint64_t numEntry, int *output, Predicate *p) {
 
     __m512i *simdinput = (__m512i *) input;

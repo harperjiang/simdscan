@@ -28,6 +28,10 @@ BitWeaverHScanner128::BitWeaverHScanner128(int entrySize) {
     this->entrySize = entrySize;
 }
 
+BitWeaverHScanner128::~BitWeaverHScanner128() {
+
+}
+
 void BitWeaverHScanner128::scan(int *input, uint64_t numEntry, int *output, Predicate *p) {
 
     __m128i *simdinput = (__m128i *) input;
