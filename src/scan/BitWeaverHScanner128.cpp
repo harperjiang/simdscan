@@ -15,7 +15,7 @@ __m128i make128(int num, int entrySize) {
         word[0] |= num << i * (entrySize + 1);
         word[1] |= num << i * (entrySize + 1);
     }
-    return _mm_setr_epi64(word[0], word[1]);
+    return _mm_setr_epi64(_mm_set_pi64x(word[0]), _mm_set_pi64x(word[1]));
 }
 
 __m128i makeMask128(int entrySize) {
@@ -38,7 +38,7 @@ void BitWeaverHScanner128::scan(int *input, uint64_t numEntry, int *output, Pred
 
     switch (p->getOpr()) {
         case opr_eq:
-        case opr_neq:
+        case opr_neq: {
             __m128i mask = makeMask128(entrySize);
             __m128i eq = make128(p->getVal1(), entrySize);
             for (int i = 0; i < numSimd; i++) {
@@ -47,7 +47,8 @@ void BitWeaverHScanner128::scan(int *input, uint64_t numEntry, int *output, Pred
                 _mm_stream_si128(simdoutput + i, out);
             }
             break;
-        case opr_in:
+        }
+        case opr_in: {
             __m128i low = make128(p->getVal1(), entrySize);
             __m128i high = make128(p->getVal2(), entrySize);
             __m128i mbpMask = make128(1 << entrySize, entrySize);
@@ -60,6 +61,7 @@ void BitWeaverHScanner128::scan(int *input, uint64_t numEntry, int *output, Pred
                 _mm_stream_si128(simdoutput + i, output);
             }
             break;
+        }
         default:
             break;
     }

@@ -39,16 +39,17 @@ void BitWeaverHScanner512::scan(int *input, uint64_t numEntry, int *output, Pred
 
     switch (p->getOpr()) {
         case opr_eq:
-        case opr_neq:
+        case opr_neq: {
             __m512i mask = makeMask512(entrySize);
             __m512i eq = make512(p->getVal1(), entrySize);
             for (int i = 0; i < numSimd; i++) {
                 __m512i current = _mm512_stream_load_si512(simdinput + i);
-                __m512i out = _mm_add_epi64(_mm512_xor_si512(current, eq), mask);
+                __m512i out = _mm512_add_epi64(_mm512_xor_si512(current, eq), mask);
                 _mm512_stream_si512(simdoutput + i, out);
             }
             break;
-        case opr_in:
+        }
+        case opr_in: {
             __m512i low = make512(p->getVal1(), entrySize);
             __m512i high = make512(p->getVal2(), entrySize);
             __m512i mbpMask = make512(1 << entrySize, entrySize);
@@ -61,6 +62,7 @@ void BitWeaverHScanner512::scan(int *input, uint64_t numEntry, int *output, Pred
                 _mm512_stream_si512(simdoutput + i, output);
             }
             break;
+        }
         default:
             break;
     }

@@ -19,7 +19,6 @@ public:
 
     void scan(int *, uint64_t, int *, Predicate *);
 };
-};
 
 
 #endif //SIMDSCAN_BITWEAVERHSCANNER512_H
