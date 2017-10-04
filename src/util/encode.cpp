@@ -36,7 +36,6 @@ void encode(int *input, int *output, int length, int entrySize) {
 void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
     long *outputLong = (long *) output;
     // Each 64 bit will accommodate 64 / (entrySize+1) entry
-    int entryInWord = 64 / (entrySize + 1);
 
     long buffer = 0;
     int offset = 0;
@@ -51,4 +50,5 @@ void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
         offset += entrySize + 1;
     }
 
+    output[outputCounter] = buffer;
 }
