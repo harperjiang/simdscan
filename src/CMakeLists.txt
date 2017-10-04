@@ -11,7 +11,7 @@ file(GLOB_RECURSE SCAN_SOURCE
         )
 
 add_library(util STATIC ${UTIL_SOURCE})
-add_library(scan STATIC ${SCAN_SOURCE} scan/HaoScanner512.cpp scan/HaoScanner512.h scan/BitWeaverHScanner128.cpp scan/BitWeaverHScanner128.h)
+add_library(scan STATIC ${SCAN_SOURCE} scan/HaoScanner512.cpp scan/HaoScanner512.h scan/BitWeaverHScanner128.cpp scan/BitWeaverHScanner128.h scan/BitWeaverHScanner256.cpp scan/BitWeaverHScanner256.h scan/BitWeaverHScanner512.cpp scan/BitWeaverHScanner512.h)
 
 set(SOURCE_FILES
         "main.cpp"
