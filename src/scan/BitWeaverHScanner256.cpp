@@ -44,12 +44,11 @@ void BitWeaverHScanner256::scan(int *input, uint64_t numEntry, int *output, Pred
     switch (p->getOpr()) {
         case opr_eq:
         case opr_neq: {
-            __m256i mask = makeMask256(entrySize);
             __m256i eq = make256(p->getVal1(), entrySize);
+            __m256i mbpMask = make256(1 << entrySize, entrySize);
+            __m256i rbMask = make256((1 << entrySize) - 1, entrySize);
             for (uint64_t i = 0; i < numSimd; i++) {
                 __m256i current = _mm256_stream_load_si256(simdinput + i);
-                __m256i mbpMask = make256(1 << entrySize, entrySize);
-                __m256i rbMask = make256((1 << entrySize) - 1, entrySize);
                 __m256i out = _mm256_and_si256(_mm256_add_epi64(_mm256_xor_si256(current, eq), rbMask), mbpMask);
                 _mm256_stream_si256(simdoutput + i, out);
             }
