@@ -39,9 +39,13 @@ TEST(Encode, TestBitWeaverHEncode) {
     bitweaverh_encode(input, output, 15, entrySize);
 
 /*
- *  01 1100 0000 0100 0011 0110 1000   1000 0010 1001 1101 0010 0101 1110 0100 0100 0110 0110 0101 0011 0101 0001 1111
+ *  01 1100 0000 0100 0011 0110 1000 1000
+ *  0000 0010 1001 1101 0010 0101 1110 0100 - 0100 0110 0110 0101 0011 0101 0001 1111
  */
     EXPECT_EQ(0x4665351f, output[0]);
-    EXPECT_EQ(0x82ad25e4, output[1]) ;
-    EXPECT_EQ(0x1c04368, output[2]);
+    EXPECT_EQ(0x29d25e4, output[1]);
+    EXPECT_EQ(0x1c043688, output[2]);
+
+
+
 }
