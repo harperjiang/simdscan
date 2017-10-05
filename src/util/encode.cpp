@@ -51,5 +51,5 @@ void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
         offset += entrySize + 1;
     }
 
-    output[outputCounter] = buffer;
+    outputLong[outputCounter] = buffer;
 }
