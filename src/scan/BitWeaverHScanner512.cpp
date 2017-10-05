@@ -37,9 +37,9 @@ void BitWeaverHScanner512::scan(int *input, uint64_t numEntry, int *output, Pred
 
     __m512i *simdinput = (__m512i *) input;
     __m512i *simdoutput = (__m512i *) output;
-    int entryInWord = 64 / (entrySize + 1);
-    int numLongWord = numEntry / entryInWord + (numEntry % entryInWord ? 1 : 0);
-    int numSimd = numLongWord / WORD_IN_SIMD + (numLongWord % WORD_IN_SIMD ? 1 : 0);
+    uint64_t entryInWord = 64 / (entrySize + 1);
+    uint64_t numLongWord = numEntry / entryInWord + (numEntry % entryInWord ? 1 : 0);
+    uint64_t numSimd = numLongWord / WORD_IN_SIMD + (numLongWord % WORD_IN_SIMD ? 1 : 0);
 
     switch (p->getOpr()) {
         case opr_eq:
