@@ -6,7 +6,7 @@
 #include <immintrin.h>
 
 #define SIMD_LEN 256
-#define WORD_IN_SIMD SIMD_LEN / 64
+#define WORD_IN_SIMD 4
 
 
 __m256i make256(int num, int entrySize) {
