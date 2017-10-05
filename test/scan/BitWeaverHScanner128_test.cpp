@@ -31,9 +31,9 @@ TEST(BitWeaverHScanner128, TestScan) {
         int longOffset = (i % numEntryInWord)*(entrySize+1);
 
         if (i == 17) {
-            EXPECT_EQ(0, outputLong[longIndex] & (1<< longOffset)) << i;
+            EXPECT_EQ(1 << longOffset, outputLong[longIndex] & (1<< longOffset)) << i;
         } else {
-            EXPECT_EQ(1 << longOffset, outputLong[longIndex] & (1 << longOffset)) << i;
+            EXPECT_EQ(0, outputLong[longIndex] & (1 << longOffset)) << i;
         }
     }
     free(encoded);
