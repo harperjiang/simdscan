@@ -43,11 +43,12 @@ void BitWeaverHScanner128::scan(int *input, uint64_t numEntry, int *output, Pred
     switch (p->getOpr()) {
         case opr_eq:
         case opr_neq: {
-            __m128i mask = makeMask128(entrySize);
+            __m128i mbpMask = make128(1 << entrySize, entrySize);
+            __m128i rbMask = make128((1 << entrySize) - 1, entrySize);
             __m128i eq = make128(p->getVal1(), entrySize);
-            for (int i = 0; i < numSimd; i++) {
+            for (uint64_t i = 0; i < numSimd; i++) {
                 __m128i current = _mm_stream_load_si128(simdinput + i);
-                __m128i out = _mm_add_epi64(_mm_xor_si128(current, eq), mask);
+                __m128i out = _mm_and_si128(_mm_add_epi64(_mm_xor_si128(current, eq), rbMask), mbpMask);
                 _mm_stream_si128(simdoutput + i, out);
             }
             break;
@@ -56,11 +57,11 @@ void BitWeaverHScanner128::scan(int *input, uint64_t numEntry, int *output, Pred
             __m128i low = make128(p->getVal1(), entrySize);
             __m128i high = make128(p->getVal2(), entrySize);
             __m128i mbpMask = make128(1 << entrySize, entrySize);
-            __m128i rpMask = make128((1 << entrySize) - 1, entrySize);
-            for (int i = 0; i < numSimd; i++) {
+            __m128i rbMask = make128((1 << entrySize) - 1, entrySize);
+            for (uint64_t i = 0; i < numSimd; i++) {
                 __m128i current = _mm_stream_load_si128(simdinput + i);
-                __m128i cmplow = _mm_and_si128(_mm_add_epi64(_mm_xor_si128(low, rpMask), current), mbpMask);
-                __m128i cmphigh = _mm_and_si128(_mm_add_epi64(_mm_xor_si128(current, rpMask), high), mbpMask);
+                __m128i cmplow = _mm_and_si128(_mm_add_epi64(_mm_xor_si128(low, rbMask), current), mbpMask);
+                __m128i cmphigh = _mm_and_si128(_mm_add_epi64(_mm_xor_si128(current, rbMask), high), mbpMask);
                 __m128i output = _mm_and_si128(cmplow, cmphigh);
                 _mm_stream_si128(simdoutput + i, output);
             }

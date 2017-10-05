@@ -46,9 +46,11 @@ void BitWeaverHScanner256::scan(int *input, uint64_t numEntry, int *output, Pred
         case opr_neq: {
             __m256i mask = makeMask256(entrySize);
             __m256i eq = make256(p->getVal1(), entrySize);
-            for (int i = 0; i < numSimd; i++) {
+            for (uint64_t i = 0; i < numSimd; i++) {
                 __m256i current = _mm256_stream_load_si256(simdinput + i);
-                __m256i out = _mm256_add_epi64(_mm256_xor_si256(current, eq), mask);
+                __m256i mbpMask = make256(1 << entrySize, entrySize);
+                __m256i rbMask = make256((1 << entrySize) - 1, entrySize);
+                __m256i out = _mm256_and_si256(_mm256_add_epi64(_mm256_xor_si256(current, eq), rbMask), mbpMask);
                 _mm256_stream_si256(simdoutput + i, out);
             }
             break;
@@ -58,7 +60,7 @@ void BitWeaverHScanner256::scan(int *input, uint64_t numEntry, int *output, Pred
             __m256i high = make256(p->getVal2(), entrySize);
             __m256i mbpMask = make256(1 << entrySize, entrySize);
             __m256i rpMask = make256((1 << entrySize) - 1, entrySize);
-            for (int i = 0; i < numSimd; i++) {
+            for (uint64_t i = 0; i < numSimd; i++) {
                 __m256i current = _mm256_stream_load_si256(simdinput + i);
                 __m256i cmplow = _mm256_and_si256(_mm256_add_epi64(_mm256_xor_si256(low, rpMask), current), mbpMask);
                 __m256i cmphigh = _mm256_and_si256(_mm256_add_epi64(_mm256_xor_si256(current, rpMask), high), mbpMask);

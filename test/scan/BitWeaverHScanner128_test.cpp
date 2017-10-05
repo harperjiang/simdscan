@@ -23,17 +23,17 @@ TEST(BitWeaverHScanner128, TestScan) {
     int numEntryInWord = 64 / (entrySize + 1);
 
 
-    long* outputLong = (long*)output;
+    long *outputLong = (long *) output;
 
     scanner->scan(encoded, 20, output, &p);
     for (int i = 0; i < 20; i++) {
         int longIndex = i / numEntryInWord;
-        int longOffset = (i % numEntryInWord)*(entrySize+1);
+        int longOffset = (i % numEntryInWord) * (entrySize + 1);
 
         if (i == 17) {
-            EXPECT_EQ(1 << longOffset, outputLong[longIndex] & (1<< longOffset)) << i;
+            EXPECT_EQ(0, outputLong[longIndex] & (1L << longOffset)) << i;
         } else {
-            EXPECT_EQ(0, outputLong[longIndex] & (1 << longOffset)) << i;
+            EXPECT_EQ(1L << longOffset, outputLong[longIndex] & (1L << longOffset)) << i;
         }
     }
     free(encoded);
