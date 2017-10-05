@@ -5,6 +5,7 @@
  *      Author: harper
  */
 
+#include <cstdint>
 #include "encode.h"
 
 void encode(int *input, int *output, int length, int entrySize) {
@@ -34,10 +35,10 @@ void encode(int *input, int *output, int length, int entrySize) {
 }
 
 void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
-    long *outputLong = (long *) output;
+    uint64_t *outputLong = (uint64_t *) output;
     // Each 64 bit will accommodate 64 / (entrySize+1) entry
 
-    long buffer = 0;
+    uint64_t buffer = 0;
     int offset = 0;
     int outputCounter = 0;
     for (int i = 0; i < length; i++) {
@@ -46,7 +47,7 @@ void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
             buffer = 0;
             offset = 0;
         }
-        buffer |= input[i] << offset;
+        buffer |= ((uint64_t) input[i]) << offset;
         offset += entrySize + 1;
     }
 
