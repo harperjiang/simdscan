@@ -33,7 +33,7 @@ TEST(Encode, TestEncode) {
 
 TEST(Encode, TestBitWeaverHEncode) {
     int input[] = {31, 20, 19, 25, 6, 17, 30, 9, 29, 10, 8, 26, 3, 1, 28};
-    int output[2];
+    int output[4];
     int entrySize = 5;
 
     bitweaverh_encode(input, output, 15, entrySize);
@@ -41,6 +41,7 @@ TEST(Encode, TestBitWeaverHEncode) {
 /*
  *  01 1100 0000 0100 0011 0110 1000   1000 0010 1001 1101 0010 0101 1110 0100 0100 0110 0110 0101 0011 0101 0001 1111
  */
-    EXPECT_EQ(0x82ad25e44665351f, output[0]);
-    EXPECT_EQ(0x1c04368, output[1]);
+    EXPECT_EQ(0x4665351f, output[0]);
+    EXPECT_EQ(0x82ad25e4, output[1]) ;
+    EXPECT_EQ(0x1c04368, output[2]);
 }
