@@ -9,8 +9,10 @@
 #include "../Scanner.h"
 
 class SimdDeltaScanner : public Scanner {
+protected:
+    bool shortMode;
 public:
-    SimdDeltaScanner();
+    SimdDeltaScanner(bool);
     virtual ~SimdDeltaScanner();
 
     void scan(int*, uint64_t, int*, Predicate*);
