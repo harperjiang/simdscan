@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
-#include "../../src/util/encode.h"
-#include "../../src/predicate/Predicate.h"
-#include "../../src/scan/BitWeaverHScanner128.h"
+#include "../../../src/util/encode.h"
+#include "../../../src/predicate/Predicate.h"
+#include "../../../src/scan/bitpack/BitWeaverHScanner128.h"
 
 TEST(BitWeaverHScanner128, TestScan) {
     int entrySize = 9;

@@ -5,7 +5,7 @@
  *      Author: harper
  */
 
-#include "../../src/scan/HaoScanner128.h"
+#include "../../../src/scan/bitpack/HaoScanner128.h"
 #include <immintrin.h>
 #include <gtest/gtest.h>
 

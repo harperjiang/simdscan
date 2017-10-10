@@ -7,7 +7,7 @@
 
 #include <immintrin.h>
 #include "WillhalmScanner128.h"
-#include "../util/template.h"
+#include "../../util/template.h"
 #include <cassert>
 #include <sys/param.h>
 

@@ -5,13 +5,13 @@
 #include <sys/time.h>
 #include "scan/Scanner.h"
 #include "util/encode.h"
-#include "scan/WillhalmScanner128.h"
-#include "scan/HaoScanner128.h"
-#include "scan/HaoScanner256.h"
-#include "scan/HaoScanner512.h"
-#include "scan/BitWeaverHScanner128.h"
-#include "scan/BitWeaverHScanner256.h"
-#include "scan/BitWeaverHScanner512.h"
+#include "scan/bitpack/WillhalmScanner128.h"
+#include "scan/bitpack/HaoScanner128.h"
+#include "scan/bitpack/HaoScanner256.h"
+#include "scan/bitpack/HaoScanner512.h"
+#include "scan/bitpack/BitWeaverHScanner128.h"
+#include "scan/bitpack/BitWeaverHScanner256.h"
+#include "scan/bitpack/BitWeaverHScanner512.h"
 #include "scan/delta/TrivialDeltaScanner.h"
 #include "scan/delta/SimdDeltaScanner128.h"
 #include "scan/delta/SimdDeltaScanner256.h"
@@ -218,7 +218,7 @@ int main(int argc, char **argv) {
     int sdn128 = delta_throughput(new SimdDeltaScanner128(false), repeat);
     int sds256 = delta_throughput(new SimdDeltaScanner256(true), repeat);
     int sdn256 = delta_throughput(new SimdDeltaScanner256(false), repeat);
-    std::cout << (double) sds128 / tds << "," << (double) sdn128 / tdn << (double) sds256 / tds << ","
+    std::cout << (double) sds128 / tds << "," << (double) sdn128 / tdn << "," << (double) sds256 / tds << ","
               << (double) sdn256 / tdn << std::endl;
 //    for (int es = 5; es < 30; es++) {
 //        int h128 = throughput(new HaoScanner128(es, true), repeat, es);

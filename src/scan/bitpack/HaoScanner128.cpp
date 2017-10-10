@@ -7,7 +7,7 @@
 
 #include <immintrin.h>
 #include <assert.h>
-#include "../util/math_util.h"
+#include "../../util/math_util.h"
 #include "HaoScanner128.h"
 
 #define INT_LEN 32

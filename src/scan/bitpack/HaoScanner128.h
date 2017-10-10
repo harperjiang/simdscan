@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <immintrin.h>
-#include "Scanner.h"
+#include "../Scanner.h"
 
 class HaoScanner128 : public Scanner {
 private:

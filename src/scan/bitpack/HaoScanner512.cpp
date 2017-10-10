@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "HaoScanner512.h"
-#include "../util/math_util.h"
+#include "../../util/math_util.h"
 
 #define INT_LEN 32
 #define SIMD_LEN 512

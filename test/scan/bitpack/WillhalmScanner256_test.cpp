@@ -5,7 +5,7 @@
  *      Author: harper
  */
 
-#include "../../src/scan/WillhalmScanner256.h"
+#include "../../../src/scan/bitpack/WillhalmScanner256.h"
 #include <immintrin.h>
 #include <gtest/gtest.h>
 

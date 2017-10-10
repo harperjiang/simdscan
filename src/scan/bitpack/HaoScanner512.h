@@ -6,7 +6,7 @@
 #define SIMDSCAN_HAOSCANNER512_H
 
 #include <immintrin.h>
-#include "Scanner.h"
+#include "../Scanner.h"
 
 class HaoScanner512 : public Scanner {
 private:

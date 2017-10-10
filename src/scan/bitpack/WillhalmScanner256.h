@@ -9,7 +9,7 @@
 #define SRC_SCAN_WILLHALMSCANNER256_H_
 
 #include <immintrin.h>
-#include "Scanner.h"
+#include "../Scanner.h"
 
 class WillhalmScanner256: public Scanner {
 private:

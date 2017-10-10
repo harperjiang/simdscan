@@ -6,7 +6,7 @@
 #define SIMDSCAN_BITWEAVERHSCANNER256_H
 
 
-#include "Scanner.h"
+#include "../Scanner.h"
 
 class BitWeaverHScanner256 : public Scanner {
 private:
