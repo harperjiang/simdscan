@@ -15,7 +15,7 @@ add_library(scan STATIC ${SCAN_SOURCE} scan/HaoScanner512.cpp scan/HaoScanner512
 
 set(SOURCE_FILES
         "main.cpp"
-        scan/delta/SimdDeltaScanner.cpp scan/delta/SimdDeltaScanner.h scan/delta/TrivialDeltaScanner.cpp scan/delta/TrivialDeltaScanner.h)
+        scan/delta/SimdDeltaScanner128.cpp scan/delta/SimdDeltaScanner128.h scan/delta/TrivialDeltaScanner.cpp scan/delta/TrivialDeltaScanner.h scan/delta/SimdDeltaScanner256.cpp scan/delta/SimdDeltaScanner256.h)
 
 add_executable(main
     ${SOURCE_FILES}

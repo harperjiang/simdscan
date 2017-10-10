@@ -13,7 +13,8 @@
 #include "scan/BitWeaverHScanner256.h"
 #include "scan/BitWeaverHScanner512.h"
 #include "scan/delta/TrivialDeltaScanner.h"
-#include "scan/delta/SimdDeltaScanner.h"
+#include "scan/delta/SimdDeltaScanner128.h"
+#include "scan/delta/SimdDeltaScanner256.h"
 
 void storeSpeed() {
     struct timeval tp;
@@ -213,10 +214,12 @@ int main(int argc, char **argv) {
 
     int tds = delta_throughput(new TrivialDeltaScanner(true), repeat);
     int tdn = delta_throughput(new TrivialDeltaScanner(false), repeat);
-    int sds = delta_throughput(new SimdDeltaScanner(true), repeat);
-    int sdn = delta_throughput(new SimdDeltaScanner(false), repeat);
-
-    std::cout << sds / tds << "," << sdn / tdn << std::endl;
+    int sds128 = delta_throughput(new SimdDeltaScanner128(true), repeat);
+    int sdn128 = delta_throughput(new SimdDeltaScanner128(false), repeat);
+    int sds256 = delta_throughput(new SimdDeltaScanner256(true), repeat);
+    int sdn256 = delta_throughput(new SimdDeltaScanner256(false), repeat);
+    std::cout << (double) sds128 / tds << "," << (double) sdn128 / tdn << (double) sds256 / tds << ","
+              << (double) sdn256 / tdn << std::endl;
 //    for (int es = 5; es < 30; es++) {
 //        int h128 = throughput(new HaoScanner128(es, true), repeat, es);
 //        int h256 = throughput(new HaoScanner256(es, true), repeat, es);
