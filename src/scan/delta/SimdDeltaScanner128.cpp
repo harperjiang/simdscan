@@ -28,6 +28,7 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
         __m128i a = _mm_set1_epi16(p->getVal1());
         __m128i b = _mm_set1_epi16(p->getVal2());
 
+        int last = 0;
         switch (p->getOpr()) {
             case opr_eq:
             case opr_neq:
@@ -41,7 +42,8 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
                     __m128i s4 = _mm_and_si128(s3, MASK16);
 
                     __m128i extracted = _mm_hadd_epi16(s3, s4);
-
+                    extracted = _mm_add_epi16(extracted,_mm_set1_epi16(last));
+                    last = _mm_extract_epi16(extracted, 0);
                     __mmask8 result = _mm_cmpeq_epi16_mask(extracted, a);
                     maskout[i] = result;
                 }
@@ -57,6 +59,8 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
                     __m128i s4 = _mm_and_si128(s3, MASK16);
 
                     __m128i extracted = _mm_hadd_epi16(s3, s4);
+                    extracted = _mm_add_epi16(extracted,_mm_set1_epi16(last));
+                    last = _mm_extract_epi16(extracted, 0);
 
                     __mmask8 lower = _mm_cmpge_epi16_mask(a, extracted);
                     __mmask8 higher = _mm_cmple_epi16_mask(b, extracted);
@@ -70,7 +74,7 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
 
         __m128i a = _mm_set1_epi32(p->getVal1());
         __m128i b = _mm_set1_epi32(p->getVal2());
-
+        int last = 0;
         switch (p->getOpr()) {
             case opr_eq:
             case opr_neq:
@@ -81,7 +85,8 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
                     __m128i s1 = _mm_hadd_epi32(current, aligned);
                     __m128i s2 = _mm_and_si128(s1, MASK32);
                     __m128i extracted = _mm_hadd_epi32(s1, s2);
-
+                    extracted = _mm_add_epi32(extracted, _mm_set1_epi32(last));
+                    last = _mm_extract_epi32(extracted, 0);
                     __mmask8 result = _mm_cmpeq_epi32_mask(extracted, a);
                     maskout[i] = result;
                 }
@@ -94,6 +99,9 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
                     __m128i s1 = _mm_hadd_epi32(current, aligned);
                     __m128i s2 = _mm_and_si128(s1, MASK32);
                     __m128i extracted = _mm_hadd_epi32(s1, s2);
+
+                    extracted = _mm_add_epi32(extracted, _mm_set1_epi32(last));
+                    last = _mm_extract_epi32(extracted, 0);
 
                     __mmask8 lower = _mm_cmpge_epi32_mask(a, extracted);
                     __mmask8 higher = _mm_cmple_epi32_mask(b, extracted);
