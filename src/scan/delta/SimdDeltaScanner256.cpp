@@ -110,7 +110,7 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
                     __m256i s2 = _mm256_bslli_epi128(s1, 32);
                     __m256i s3 = _mm256_hadd_epi32(s1, s2);
                     __m256i s4 = _mm256_and_si256(s3, MASK32);
-                    __m256i extracted = _mm256_hadd_epi32(s1, s2);
+                    __m256i extracted = _mm256_hadd_epi32(s3, s4);
                     __m256i start = _mm256_set1_epi32(cumsum);
                     extracted = _mm256_add_epi32(start, extracted);
                     cumsum = _mm256_extract_epi32(extracted, 0);
@@ -128,7 +128,7 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
                     __m256i s2 = _mm256_bslli_epi128(s1, 32);
                     __m256i s3 = _mm256_hadd_epi32(s1, s2);
                     __m256i s4 = _mm256_and_si256(s3, MASK32);
-                    __m256i extracted = _mm256_hadd_epi32(s1, s2);
+                    __m256i extracted = _mm256_hadd_epi32(s3, s4);
                     __m256i start = _mm256_set1_epi32(cumsum);
                     extracted = _mm256_add_epi32(start, extracted);
                     cumsum = _mm256_extract_epi32(extracted, 0);

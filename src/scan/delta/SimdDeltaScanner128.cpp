@@ -35,9 +35,9 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
                 for (uint64_t i = 0; i < numSimd; i++) {
                     __m128i current = _mm_stream_load_si128(simdin + i);
 
-                    __m128i aligned = _mm_bsrli_si128(current, 16);
+                    __m128i aligned = _mm_bslli_si128(current, 16);
                     __m128i s1 = _mm_hadd_epi16(current, aligned);
-                    __m128i s2 = _mm_srlv_epi64(s1, SHIFT16);
+                    __m128i s2 = _mm_sllv_epi64(s1, SHIFT16);
                     __m128i s3 = _mm_hadd_epi16(s1, s2);
                     __m128i s4 = _mm_and_si128(s3, MASK16);
 
@@ -52,9 +52,9 @@ void SimdDeltaScanner128::scan(int *input, uint64_t length, int *output, Predica
                 for (uint64_t i = 0; i < numSimd; i++) {
                     __m128i current = _mm_stream_load_si128(simdin + i);
 
-                    __m128i aligned = _mm_bsrli_si128(current, 16);
+                    __m128i aligned = _mm_bslli_si128(current, 16);
                     __m128i s1 = _mm_hadd_epi16(current, aligned);
-                    __m128i s2 = _mm_srlv_epi64(s1, SHIFT16);
+                    __m128i s2 = _mm_sllv_epi64(s1, SHIFT16);
                     __m128i s3 = _mm_hadd_epi16(s1, s2);
                     __m128i s4 = _mm_and_si128(s3, MASK16);
 

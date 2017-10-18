@@ -218,6 +218,7 @@ int main(int argc, char **argv) {
     int sdn128 = delta_throughput(new SimdDeltaScanner128(false), repeat);
     int sds256 = delta_throughput(new SimdDeltaScanner256(true), repeat);
     int sdn256 = delta_throughput(new SimdDeltaScanner256(false), repeat);
+
     std::cout << (double) sds128 / tds << "," << (double) sdn128 / tdn << "," << (double) sds256 / tds << ","
               << (double) sdn256 / tdn << std::endl;
 //    for (int es = 5; es < 30; es++) {
