@@ -9,7 +9,10 @@
 #include "../Scanner.h"
 
 class TrivialRLEScanner : public Scanner {
+    TrivialRLEScanner();
+    virtual ~TrivialRLEScanner();
 
+    void scan(int*, uint64_t, int*, Predicate*);
 };
 
 

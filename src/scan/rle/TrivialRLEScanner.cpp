@@ -3,3 +3,15 @@
 //
 
 #include "TrivialRLEScanner.h"
+
+TrivialRLEScanner::TrivialRLEScanner() {
+
+}
+
+TrivialRLEScanner::~TrivialRLEScanner() {
+
+}
+
+void TrivialRLEScanner::scan(int *, uint64_t, int *, Predicate *) {
+
+}
