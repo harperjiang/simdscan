@@ -11,7 +11,7 @@ file(GLOB_RECURSE SCAN_SOURCE
         )
 
 add_library(util STATIC ${UTIL_SOURCE})
-add_library(scan STATIC ${SCAN_SOURCE})
+add_library(scan STATIC ${SCAN_SOURCE} scan/rle/SIMDRLEScanner.cpp scan/rle/SIMDRLEScanner.h)
 
 set(SOURCE_FILES
         "main.cpp"
