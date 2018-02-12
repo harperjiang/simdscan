@@ -53,3 +53,7 @@ void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
 
     outputLong[outputCounter] = buffer;
 }
+
+void encode_rle(int* input, int* output, int length, int entrySize, int rlSize) {
+
+}
