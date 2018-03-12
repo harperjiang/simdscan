@@ -11,7 +11,7 @@ file(GLOB_RECURSE SCAN_SOURCE
         )
 
 add_library(util STATIC ${UTIL_SOURCE})
-add_library(scan STATIC ${SCAN_SOURCE} scan/rle/SimdRLEScanner.cpp scan/rle/SimdRLEScanner.h)
+add_library(scan STATIC ${SCAN_SOURCE})
 
 set(SOURCE_FILES
         "main.cpp"
@@ -20,6 +20,9 @@ set(SOURCE_FILES
 add_executable(main
     ${SOURCE_FILES}
 )
+
+add_executable(perf_uload
+        "perf_uload.cpp")
 
 target_link_libraries(scan util)
 target_link_libraries(main util scan)
