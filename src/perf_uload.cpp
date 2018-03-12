@@ -59,7 +59,7 @@ void uloadSpeed() {
     // Unaligned load
     gettimeofday(&start, NULL);
     for (int i = 0; i < 100000000; i++) {
-        __m256i a = _mm256_loadu_si256((__m256i *) (unaligned + i));
+        __m256i a = _mm256_loadu_si256((__m256i *) (((void*)unaligned) + i));
         result = _mm256_xor_si256(a, result);
     }
     gettimeofday(&stop, NULL);
