@@ -29,6 +29,8 @@ void store() {
     printf("Stopping %ld\n", tp.tv_sec * 1000 + tp.tv_usec / 1000);
 }
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 void uloadSpeed() {
 
     __m256i result = _mm256_set1_epi32(8);
@@ -84,6 +86,7 @@ void uloadSpeed() {
     printf("%d\n", _mm256_extract_epi64(result, 3));
 }
 
+#pragma GCC pop_options
 void load() {
     int data[] = {2, 4, 8, 16, 0};
     void *d = data;
