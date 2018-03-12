@@ -35,6 +35,9 @@ void TrivialDeltaScanner::shortScan(int *in, uint64_t len, int *out, Predicate *
             case opr_neq:
                 shortout[i] = current != p->getVal1() ? 0xffff : 0;
                 break;
+            case opr_less:
+                shortout[i] = current < p->getVal1() ? 0xffff : 0;
+                break;
             case opr_in:
                 shortout[i] = (current <= p->getVal2() && current >= p->getVal1()) ? 0xffff : 0;
                 break;
@@ -53,6 +56,9 @@ void TrivialDeltaScanner::normalScan(int *in, uint64_t len, int *out, Predicate 
                 break;
             case opr_neq:
                 out[i] = current != p->getVal1() ? 0xffffffff : 0;
+                break;
+            case opr_less:
+                out[i] = current < p->getVal1() ? 0xffffffff : 0;
                 break;
             case opr_in:
                 out[i] = (current <= p->getVal2() && current >= p->getVal1()) ? 0xffffffff : 0;
