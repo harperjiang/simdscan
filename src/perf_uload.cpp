@@ -46,8 +46,11 @@ void uloadSpeed() {
     gettimeofday(&stop, NULL);
     printf("Time for Aligned ULoad: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
                                             - start.tv_sec * 1000 - start.tv_usec / 1000);
-    for (int i = 0; i < 4; i++)
-        printf("%d\n", _mm256_extract_epi64(result, i));
+
+    printf("%d\n", _mm256_extract_epi64(result, 0));
+    printf("%d\n", _mm256_extract_epi64(result, 1));
+    printf("%d\n", _mm256_extract_epi64(result, 2));
+    printf("%d\n", _mm256_extract_epi64(result, 3));
 
     // Unaligned load
     gettimeofday(&start, NULL);
@@ -60,8 +63,10 @@ void uloadSpeed() {
     printf("Time for Unaligned Load: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
                                              - start.tv_sec * 1000 - start.tv_usec / 1000);
 
-    for (int i = 0; i < 4; i++)
-        printf("%d\n", _mm256_extract_epi64(result, i));
+    printf("%d\n", _mm256_extract_epi64(result, 0));
+    printf("%d\n", _mm256_extract_epi64(result, 1));
+    printf("%d\n", _mm256_extract_epi64(result, 2));
+    printf("%d\n", _mm256_extract_epi64(result, 3));
 
     // Aligned Load
     gettimeofday(&start, NULL);
@@ -73,8 +78,10 @@ void uloadSpeed() {
     printf("Time for aligned Load: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
                                            - start.tv_sec * 1000 - start.tv_usec / 1000);
 
-    for (int i = 0; i < 4; i++)
-        printf("%d\n", _mm256_extract_epi64(result, i));
+    printf("%d\n", _mm256_extract_epi64(result, 0));
+    printf("%d\n", _mm256_extract_epi64(result, 1));
+    printf("%d\n", _mm256_extract_epi64(result, 2));
+    printf("%d\n", _mm256_extract_epi64(result, 3));
 }
 
 void load() {
