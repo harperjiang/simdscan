@@ -21,8 +21,12 @@ add_executable(main
     ${SOURCE_FILES}
 )
 
+add_executable(perf_delta
+        "perf_delta.cpp")
+
 add_executable(perf_uload
         "perf_uload.cpp")
 
 target_link_libraries(scan util)
 target_link_libraries(main util scan)
+target_link_libraries(perf_delta scan)
