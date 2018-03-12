@@ -38,9 +38,10 @@ void uloadSpeed() {
     struct timeval start;
     struct timeval stop;
 
+    int *aligned = (int *) aligned_alloc(2048, 8000000 * sizeof(int));
+
     gettimeofday(&start, NULL);
     // Aligned Load
-    int *aligned = (int *) aligned_alloc(2048, 8000000 * sizeof(int));
     for (int i = 0; i < 1000000; i++) {
         __m256i a = _mm256_loadu_si256((__m256i *) (aligned + i * 8));
         result = _mm256_xor_si256(a, result);
@@ -54,9 +55,9 @@ void uloadSpeed() {
     printf("%d\n", _mm256_extract_epi64(result, 2));
     printf("%d\n", _mm256_extract_epi64(result, 3));
 
+    int *unaligned = new int[1000007];
     // Unaligned load
     gettimeofday(&start, NULL);
-    int *unaligned = new int[1000007];
     for (int i = 0; i < 1000000; i++) {
         __m256i a = _mm256_loadu_si256((__m256i *) (unaligned + i));
         result = _mm256_xor_si256(a, result);
