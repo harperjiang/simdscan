@@ -85,9 +85,6 @@ HaoScanner128::~HaoScanner128() {
 }
 
 void HaoScanner128::scan(int *data, uint64_t length, int *dest, Predicate *p) {
-    // XXX For experimental purpose, assume data is aligned for now
-    assert(length % (SIMD_LEN / INT_LEN) == 0);
-
     this->data = data;
     this->dest = dest;
     this->length = length;
