@@ -19,6 +19,7 @@ extern __m256i mm256_add_epi256_1(__m256i a, __m256i b);
 
 extern __m256i mm256_add_epi256_2(__m256i a, __m256i b);
 
+/*
 TEST(Math, TestAddEpi128Perf) {
 
     int repeat = 10000000;
@@ -112,7 +113,7 @@ TEST(Math, TestAddEpi128Perf) {
     delete[] b1;
     delete[] b2;
 }
-
+*/
 TEST(Math, TestAddEpi128) {
     for (int i = 0; i < 100; i++) {
         __m128i a0 = _mm_setr_epi32(0, 3 * i, 0, i);
@@ -319,7 +320,7 @@ TEST(Math, TestAddEpi256) {
         EXPECT_EQ(1, _mm256_extract_epi64(r4, 3)) << i;
     }
 }
-
+/*
 TEST(Math, TestAddEpi256Perf) {
     long top = 0x8000000000000000;
 
@@ -460,7 +461,7 @@ TEST(Math, TestAddEpi256Perf) {
     free(b2);
     free(b3);
 }
-
+*/
 TEST(Math, TestSubEpi256) {
     long top = 0x8000000000000000;
 
@@ -502,7 +503,7 @@ TEST(Math, TestSubEpi256) {
         EXPECT_EQ(0, _mm256_extract_epi64(r4, 3)) << i;
     }
 }
-
+/*
 TEST(Math, TestSubEpi256Perf) {
 
-}
+}*/
