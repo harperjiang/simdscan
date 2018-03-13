@@ -325,7 +325,7 @@ TEST(Math, TestAddEpi512) {
 
     long top = 0x8000000000000000;
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 3; i++) {
         __m512i a = _mm512_setr_epi64(i, 0, 0, 0, 0, 0, 0, 0);
         __m512i b = _mm512_setr_epi64(2 * i, 0, 0, 0, 0, 0, 0, 0);
 
