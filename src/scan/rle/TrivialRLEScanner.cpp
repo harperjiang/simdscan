@@ -3,6 +3,7 @@
 //
 
 #include "TrivialRLEScanner.h"
+#include "../../util/encode.h"
 
 TrivialRLEScanner::TrivialRLEScanner(int es, int rls) {
     this->entrySize = es;
@@ -55,24 +56,12 @@ void TrivialRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *
     }
 }
 
-int extractEntry(int *input, int index, int offset, int entrySize) {
-    int mask = (1 << entrySize) - 1;
-    int word0 = *(input + index);
-    if (offset + entrySize <= 32) {
-        return (word0 >> offset) & mask;
-    } else {
-        int mask0 = (1 << (32 - offset)) - 1;
-        int word1 = *(input + index + 1);
-        return ((word0 >> offset & mask0) | word1 << (32 - offset)) & mask;
-    }
-}
-
 void TrivialRLEScanner::extract(int *input, uint64_t index, int *entry, uint32_t *rl) {
     uint64_t offset = index * (entrySize + rlSize);
     uint64_t entryIndex = offset / 32;
     uint64_t entryOffset = offset % 32;
     uint64_t rlIndex = (offset + entrySize) / 32;
     uint64_t rlOffset = (offset + entrySize) % 32;
-    *entry = extractEntry(input, entryIndex, entryOffset, entrySize);
-    *rl = extractEntry(input, rlIndex, rlOffset, rlSize);
+    *entry = extract_entry(input, entryIndex, entryOffset, entrySize);
+    *rl = extract_entry(input, rlIndex, rlOffset, rlSize);
 }

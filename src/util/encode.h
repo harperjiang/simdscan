@@ -14,4 +14,5 @@ void bitweaverh_encode(int* incode, int* output, int length, int entrySize);
 
 void encode_rle(int* input, int* output, int length, int entrySize, int rlSize);
 
+int extract_entry(int *input, int index, int offset, int entrySize);
 #endif /* SRC_UTIL_ENCODE_H_ */

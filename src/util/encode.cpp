@@ -101,3 +101,15 @@ void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) 
         output[writeCounter] = counter >> (rlSize - offset);
     }
 }
+
+int extract_entry(int *input, int index, int offset, int entrySize) {
+    int mask = (1 << entrySize) - 1;
+    int word0 = *(input + index);
+    if (offset + entrySize <= 32) {
+        return (word0 >> offset) & mask;
+    } else {
+        int mask0 = (1 << (32 - offset)) - 1;
+        int word1 = *(input + index + 1);
+        return ((word0 >> offset & mask0) | word1 << (32 - offset)) & mask;
+    }
+}

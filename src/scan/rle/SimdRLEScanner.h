@@ -13,6 +13,7 @@ class SimdRLEScanner : public Scanner {
 private:
     int entrySize = 0;
     int rlSize = 0;
+    bool aligned = false;
     int groupSize = 0;
 
     Predicate *predicate = NULL;
@@ -35,7 +36,7 @@ private:
     __m512i *notmasks = NULL;
     // This one set the rl region all 1
 public:
-    SimdRLEScanner(int es, int rls);
+    SimdRLEScanner(int es, int rls, bool aligned);
 
     virtual ~SimdRLEScanner();
 
@@ -43,8 +44,10 @@ public:
 
 protected:
     void equal();
+    void aequal();
 
-    void range();
+    void less();
+    void aless();
 };
 
 
