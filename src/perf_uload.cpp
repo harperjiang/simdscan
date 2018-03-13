@@ -29,8 +29,8 @@ void store() {
     printf("Stopping %ld\n", tp.tv_sec * 1000 + tp.tv_usec / 1000);
 }
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
+// #pragma GCC push_options
+// #pragma GCC optimize ("O0")
 void uloadSpeed() {
 
     __m256i result = _mm256_set1_epi32(8);
@@ -51,8 +51,8 @@ void uloadSpeed() {
                                             - start.tv_sec * 1000 - start.tv_usec / 1000);
 
     printf("%d\n", _mm256_extract_epi64(result, 0));
-    printf("%d\n", _mm256_extract_epi64(result, 1));
-    printf("%d\n", _mm256_extract_epi64(result, 2));
+//    printf("%d\n", _mm256_extract_epi64(result, 1));
+//    printf("%d\n", _mm256_extract_epi64(result, 2));
     printf("%d\n", _mm256_extract_epi64(result, 3));
 
     int *unaligned = new int[100000007];
@@ -67,8 +67,8 @@ void uloadSpeed() {
                                              - start.tv_sec * 1000 - start.tv_usec / 1000);
 
     printf("%d\n", _mm256_extract_epi64(result, 0));
-    printf("%d\n", _mm256_extract_epi64(result, 1));
-    printf("%d\n", _mm256_extract_epi64(result, 2));
+//    printf("%d\n", _mm256_extract_epi64(result, 1));
+//    printf("%d\n", _mm256_extract_epi64(result, 2));
     printf("%d\n", _mm256_extract_epi64(result, 3));
 
     // Aligned Load
@@ -82,12 +82,12 @@ void uloadSpeed() {
                                            - start.tv_sec * 1000 - start.tv_usec / 1000);
 
     printf("%d\n", _mm256_extract_epi64(result, 0));
-    printf("%d\n", _mm256_extract_epi64(result, 1));
-    printf("%d\n", _mm256_extract_epi64(result, 2));
+//    printf("%d\n", _mm256_extract_epi64(result, 1));
+//    printf("%d\n", _mm256_extract_epi64(result, 2));
     printf("%d\n", _mm256_extract_epi64(result, 3));
 }
 
-#pragma GCC pop_options
+// #pragma GCC pop_options
 void load() {
     int data[] = {2, 4, 8, 16, 0};
     void *d = data;
