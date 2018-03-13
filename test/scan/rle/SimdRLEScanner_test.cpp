@@ -97,7 +97,7 @@ TEST(SimdRLEScanner, TestEqAligned) {
     scanner->scan(encoded, 17, output, &p);
 
     int expected[] = {0, 2, 0, 1, 0, 2, 0, 1, 0, 1, 0, 1, 0, 2, 0, 1, 1, 1,
-                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 1, 3, 1, 3};
+                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 0, 3, 1, 3};
 
     for (int i = 0; i < 17; i++) {
         int bitoff = i * 11 + 8;
@@ -133,7 +133,7 @@ TEST(SimdRLEScanner, TestEqUnaligned) {
     scanner->scan(encoded, 17, output, &p);
 
     int expected[] = {0, 2, 0, 1, 0, 2, 0, 1, 0, 1, 0, 1, 0, 2, 0, 1, 1, 1,
-                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 1, 3, 1, 3};
+                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 0, 3, 1, 3};
 
     for (int i = 0; i < 17; i++) {
         int bitoff = i * 11 + 8;
