@@ -330,53 +330,53 @@ TEST(Math, TestAddEpi512) {
         __m512i b = _mm512_setr_epi64(2 * i, 0, 0, 0, 0, 0, 0, 0);
 
         __m512i r1 = mm512_add_epi512(a, b);
-        EXPECT_EQ(3 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 0), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 0), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 1), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 1), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 2), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 2), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 3), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 3), 1)) << i;
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 0), 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 0), 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 0), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 0), 3)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 1), 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 1), 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 1), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r1, 1), 3)) << i;
 
         a = _mm512_setr_epi64(top + i, 0, 0, 0, 0, 0, 0, 0);
         b = _mm512_setr_epi64(top + 2 * i, 0, 0, 0, 0, 0, 0, 0);
 
         __m512i r2 = mm512_add_epi512(a, b);
-        EXPECT_EQ(3 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 0), 0)) << i;
-        EXPECT_EQ(1, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 0), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 1), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 1), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 2), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 2), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 3), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r2, 3), 1)) << i;
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 0), 0)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 0), 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 0), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 0), 3)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 1), 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 1), 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 1), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r2, 1), 3)) << i;
 
         a = _mm512_setr_epi64(3 * i, top + i, 0, 0, 0, 0, 0, 0);
         b = _mm512_setr_epi64(5 * i, top + 2 * i, 0, 0, 0, 0, 0, 0);
 
         __m512i r3 = mm512_add_epi512(a, b);
-        EXPECT_EQ(8 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 0), 0)) << i;
-        EXPECT_EQ(3 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 0), 1)) << i;
-        EXPECT_EQ(1, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 1), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 1), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 2), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 2), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 3), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r3, 3), 1)) << i;
+        EXPECT_EQ(8 * i, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 0), 0)) << i;
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 0), 1)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 0), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 0), 3)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 1), 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 1), 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 1), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r3, 1), 3)) << i;
 
         a = _mm512_setr_epi64(3 * i, 0, 0, top, 0, 0, top + i, 0);
         b = _mm512_setr_epi64(5 * i, 0, 0, top, 0, 0, top + 2 * i, 0);
 
         __m512i r4 = mm512_add_epi512(a, b);
-        EXPECT_EQ(8 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 0), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 0), 1)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 1), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 1), 1)) << i;
-        EXPECT_EQ(1, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 2), 0)) << i;
-        EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 2), 1)) << i;
-        EXPECT_EQ(3 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 3), 0)) << i;
-        EXPECT_EQ(1, _mm_extract_epi64(_mm512_extracti64x2_epi64(r4, 3), 1)) << i;
+        EXPECT_EQ(8 * i, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 0), 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 0), 1)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 0), 2)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 0), 3)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 1), 0)) << i;
+        EXPECT_EQ(0, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 1), 1)) << i;
+        EXPECT_EQ(3 * i, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 1), 2)) << i;
+        EXPECT_EQ(1, _mm256_extract_epi64(_mm512_extracti64x4_epi64(r4, 1), 3)) << i;
     }
 }
 
