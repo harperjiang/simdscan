@@ -13,8 +13,8 @@ TEST(SimdRLEScanner, TestLessAligned) {
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-    int *encoded = (int *) aligned_alloc(32, 100 * sizeof(int));
-    int *output = (int *) aligned_alloc(32, 100 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 100 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 100 * sizeof(int));
     encode_rle(data, encoded, 28, entrySize, rlSize);
 
     SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, true);
@@ -49,8 +49,8 @@ TEST(SimdRLEScanner, TestLessUnaligned) {
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-    int *encoded = (int *) aligned_alloc(32, 100 * sizeof(int));
-    int *output = (int *) aligned_alloc(32, 100 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 100 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 100 * sizeof(int));
     encode_rle(data, encoded, 28, entrySize, rlSize);
 
     SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, false);
@@ -86,8 +86,8 @@ TEST(SimdRLEScanner, TestEqAligned) {
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-    int *encoded = (int *) aligned_alloc(32, 100 * sizeof(int));
-    int *output = (int *) aligned_alloc(32, 100 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 100 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 100 * sizeof(int));
     encode_rle(data, encoded, 28, entrySize, rlSize);
 
     SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, true);
@@ -122,8 +122,8 @@ TEST(SimdRLEScanner, TestEqUnaligned) {
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-    int *encoded = (int *) aligned_alloc(32, 100 * sizeof(int));
-    int *output = (int *) aligned_alloc(32, 100 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 100 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 100 * sizeof(int));
     encode_rle(data, encoded, 28, entrySize, rlSize);
 
     SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, false);
