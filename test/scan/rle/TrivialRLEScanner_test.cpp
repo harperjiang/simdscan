@@ -16,7 +16,7 @@ TEST(TrivialRLEScanner, TestScan) {
 
     int *encoded = (int *) aligned_alloc(32, 100 * sizeof(int));
     int *output = (int *) aligned_alloc(32, 100 * sizeof(int));
-    encode_rle(data, encoded, 20, entrySize, rlSize);
+    encode_rle(data, encoded, 28, entrySize, rlSize);
 
     TrivialRLEScanner *scanner = new TrivialRLEScanner(entrySize, rlSize);
 
