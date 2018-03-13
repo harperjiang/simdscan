@@ -26,6 +26,18 @@ void TrivialRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *
                 *(offset++) = (entry == p->getVal1());
                 *(offset++) = runLength;
             }
+            break;
+        }
+        case opr_less:{
+            int entry;
+            uint32_t runLength;
+            int *offset = output;
+            for (uint64_t index = 0; index < size; index++) {
+                extract(input, index, &entry, &runLength);
+                *(offset++) = (entry < p->getVal1());
+                *(offset++) = runLength;
+            }
+            break;
         }
         case opr_in: {
             int entry;
@@ -36,6 +48,7 @@ void TrivialRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *
                 *(offset++) = (entry >= p->getVal1() && entry < p->getVal2());
                 *(offset++) = runLength;
             }
+            break;
         }
         default:
             break;

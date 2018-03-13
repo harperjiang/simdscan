@@ -116,7 +116,7 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
                     maskout[i] = result;
                 }
                 break;
-            case opr_in:
+            case opr_less:
                 for (uint64_t i = 0; i < numSimd; i++) {
                     __m256i current = _mm256_stream_load_si256(simdin + i);
 
@@ -130,10 +130,9 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
                     extracted = _mm256_add_epi32(start, extracted);
                     cumsum = _mm256_extract_epi32(extracted, 0);
 
-                    __mmask8 lower = _mm256_cmp_epi32_mask(a, extracted, _MM_CMPINT_LE);
-                    __mmask8 higher = _mm256_cmp_epi32_mask(b, extracted, _MM_CMPINT_GE);
+                    __mmask8 lower = _mm256_cmp_epi32_mask(extracted,a, _MM_CMPINT_LE);
 
-                    maskout[i] = lower & higher;
+                    maskout[i] = lower;
                 }
                 break;
         }

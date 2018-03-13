@@ -54,6 +54,60 @@ void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
     outputLong[outputCounter] = buffer;
 }
 
-void encode_rle(int* input, int* output, int length, int entrySize, int rlSize) {
+void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) {
+    int writeBuffer = 0;
+    int writeCounter = 0;
+    int offset = 0;
+    int current = input[0];
+    int counter = 1;
+    for (int i = 1; i < length; i++) {
+        if (input[i] != current) {
+            // Compose an entry
+            writeBuffer |= current << offset;
+            if (offset + entrySize <= 32) {
+                offset += entrySize;
+                offset %= 32;
+            } else {
+                offset += entrySize;
+                offset -= 32;
+                output[writeCounter++] = writeBuffer;
+                writeBuffer = current >> (entrySize - offset);
+            }
+
+            writeBuffer |= counter << offset;
+            if (offset + rlSize <= 32) {
+                offset += rlSize;
+                offset %= 32;
+            } else {
+                offset += rlSize;
+                offset %= 32;
+                output[writeCounter++] = writeBuffer;
+                writeBuffer = counter >> (rlSize - offset);
+            }
+
+            current = input[i];
+            counter = 0;
+        } else {
+            counter++;
+        }
+    }
+    writeBuffer |= current << offset;
+    if (offset + entrySize <= 32) {
+        offset += entrySize;
+        offset %= 32;
+    } else {
+        offset += entrySize;
+        offset -= 32;
+        output[writeCounter++] = writeBuffer;
+        output[writeCounter++] = current >> (entrySize - offset);
+    }
+
+    writeBuffer |= counter << offset;
+    if (offset + rlSize > 32) {
+        offset += rlSize;
+        offset %= 32;
+        output[writeCounter++] = writeBuffer;
+        output[writeCounter + 1] = counter >> (rlSize - offset);
+    }
 
 }
