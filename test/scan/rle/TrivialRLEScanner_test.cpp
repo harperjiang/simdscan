@@ -22,10 +22,12 @@ TEST(TrivialRLEScanner, TestScan) {
 
     Predicate p(opr_less, 5, 0);
 
-    scanner->scan(encoded, 20, output, &p);
+    scanner->scan(encoded, 17, output, &p);
 
-    int expected[] = {1, 2, 1, 1, 0, 2, 0, 1, 1, 1, 1, 2, 1, 1, 0, 1, 0,
-                      1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 1, 3, 0, 3};
+    // 1,2,1,1,0,2,0,1,0,1,1,1,2,2,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,2,0,3,1,3,0,3
+
+    int expected[] = {1, 2, 1, 1, 0, 2, 0, 1, 0, 1, 1, 1, 2, 2, 1, 1, 0, 1,
+                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 1, 3, 0, 3};
 
     for (int i = 0; i < 34; i++) {
         EXPECT_EQ(expected[i], output[i]) << i;
