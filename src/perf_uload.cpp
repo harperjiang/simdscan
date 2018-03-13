@@ -27,17 +27,18 @@ void uloadSpeed() {
         input[i] = dist(rng);
     }
 
-    gettimeofday(&start, NULL);
-    // Aligned Load
+
     __m512i *aligned = (__m512i *) input;
 
+    // Aligned Load
+    gettimeofday(&start, NULL);
     for (int i = 0; i < ite; i++) {
-        __m512i a = _mm512_stream_load_si512(aligned + i);
+        __m512i a = _mm512_loadu_si512(aligned + i);
         result = _mm512_xor_si512(a, result);
     }
     gettimeofday(&stop, NULL);
-    printf("Time for Aligned ULoad: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
-                                            - start.tv_sec * 1000 - start.tv_usec / 1000);
+    printf("Time for unaligned Load on aligned data: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
+                                                             - start.tv_sec * 1000 - start.tv_usec / 1000);
 
     printf("%d\n", _mm512_extracti64x4_epi64(result, 0));
 
@@ -54,17 +55,21 @@ void uloadSpeed() {
 
     printf("%d\n", _mm512_extracti64x4_epi64(result, 0));
 
-    // Aligned Load
+
     gettimeofday(&start, NULL);
+    // Aligned Load
+
     for (int i = 0; i < ite; i++) {
-        __m512i a = _mm512_loadu_si512(aligned + i);
+        __m512i a = _mm512_stream_load_si512(aligned + i);
         result = _mm512_xor_si512(a, result);
     }
     gettimeofday(&stop, NULL);
-    printf("Time for unaligned Load on aligned data: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
-                                                             - start.tv_sec * 1000 - start.tv_usec / 1000);
+    printf("Time for Aligned Load: %ld\n", stop.tv_sec * 1000 + stop.tv_usec / 1000
+                                           - start.tv_sec * 1000 - start.tv_usec / 1000);
 
     printf("%d\n", _mm512_extracti64x4_epi64(result, 0));
+
+
 }
 
 
