@@ -18,7 +18,7 @@ __m512i buildMask(int es, int rls, int offset) {
     return build512(1 << (es - 1), es + rls, offset);
 }
 
-int buildPiece(__m512i prev, __m512i current, int entrySize, int bitOffset) {
+int buildRlePiece(__m512i prev, __m512i current, int entrySize, int bitOffset) {
     int piece1 = _mm_extract_epi32(_mm512_extracti32x4_epi32(prev, 3), 3);
     int piece2 = _mm_extract_epi32(_mm512_extracti32x4_epi32(current, 0), 0);
     int s1 = entrySize - bitOffset;
@@ -122,7 +122,7 @@ void SimdRLEScanner::aequal() {
         if (bitOffset > rlSize) {
             // When bitOffset <= rlSize, it is the run-length section at boundary and no need to process
             // Has remain to process
-            int num = buildPiece(prev, current, entrySize, bitOffset - rlSize);
+            int num = buildRlePiece(prev, current, entrySize, bitOffset - rlSize);
             __m512i remain = _mm512_setr_epi64((num != predicate->getVal1()) << (bitOffset - rlSize - 1), 0, 0, 0, 0, 0,
                                                0, 0);
             result = _mm512_or_si512(result, remain);
@@ -189,7 +189,7 @@ void SimdRLEScanner::aless() {
 
         if (bitOffset > rlSize) {
             // Has remain to process
-            int num = buildPiece(prev, current, entrySize, bitOffset - rlSize);
+            int num = buildRlePiece(prev, current, entrySize, bitOffset - rlSize);
             __m512i remain = _mm512_setr_epi64(
                     (num < predicate->getVal1()) << (bitOffset - rlSize - 1), 0, 0, 0, 0, 0, 0,
                     0);
