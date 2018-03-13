@@ -9,6 +9,7 @@
 #define INT_LEN 32
 #define SIMD_LEN 512
 #define BYTE_LEN 8
+#define BYTE_IN_SIMD 64
 
 const __m512i one = _mm512_set1_epi32(0xffffffff);
 
@@ -18,7 +19,9 @@ __m512i build512(int num, int bitLength, int offset) {
     for (int i = 0; i < 16; i++) {
         int val = 0;
         int current = offset;
-        if (offset != 0) {
+        // Leave bits before offset to 0 can preserve result in last entry.
+        // This is useful for unaligned load
+        if (offset != 0 && i != 0) {
             val |= (num >> (bitLength - offset));
         }
         while (current < INT_LEN) {
@@ -105,11 +108,11 @@ void HaoScanner512::scan(int *data, uint64_t length, int *dest, Predicate *p) {
             else
                 unalignedEq();
             break;
-        case opr_in:
+        case opr_less:
             if (aligned)
-                alignedIn();
+                alignedLess();
             else
-                unalignedIn();
+                unalignedLess();
             break;
         default:
             break;
@@ -153,7 +156,7 @@ void HaoScanner512::alignedEq() {
     }
 }
 
-void HaoScanner512::alignedIn() {
+void HaoScanner512::alignedLess() {
     __m512i *mdata = (__m512i *) data;
     __m512i *mdest = (__m512i *) dest;
 
@@ -169,25 +172,19 @@ void HaoScanner512::alignedIn() {
     while (laneCounter < numLane) {
         __m512i mask = this->msbmasks[bitOffset];
         __m512i aornm = this->nmval1s[bitOffset];
-        __m512i bornm = this->nmval2s[bitOffset];
         __m512i na = this->nval1s[bitOffset];
-        __m512i nb = this->nval2s[bitOffset];
 
         __m512i current = _mm512_stream_load_si512(mdata + laneCounter);
 
         __m512i xorm = _mm512_or_si512(current, mask);
         __m512i l = mm512_sub_epi512(xorm, aornm);
-        __m512i h = mm512_sub_epi512(xorm, bornm);
-        __m512i el = _mm512_and_si512(_mm512_or_si512(current, na),
-                                      _mm512_or_si512(_mm512_and_si512(current, na), l));
-        __m512i eh = _mm512_and_si512(_mm512_or_si512(current, nb),
-                                      _mm512_or_si512(_mm512_and_si512(current, nb), h));
-        __m512i result = _mm512_xor_si512(el, eh);
+        __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
+                                          _mm512_or_si512(_mm512_and_si512(current, na), l));
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece512(prev, current, entrySize, bitOffset);
             __m512i remain = _mm512_setr_epi64(
-                    (num >= predicate->getVal1() && num < predicate->getVal2()) << (bitOffset - 1), 0, 0, 0, 0, 0, 0,
+                    (num < predicate->getVal1()) << (bitOffset - 1), 0, 0, 0, 0, 0, 0,
                     0);
             result = _mm512_or_si512(result, remain);
         }
@@ -216,25 +213,19 @@ void HaoScanner512::unalignedEq() {
         __m512i d = _mm512_xor_si512(current, eqnum);
         __m512i result = _mm512_or_si512(
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
-        __m512i resmask = _mm512_setr_epi64(-1 << bitOffset, -1, -1, -1, -1, -1, -1, -1);
-        int existMask = (1 << bitOffset) - 1;
-        int exist = (int) *((char *) (byteDest + byteOffset));
 
-        __m512i joined = _mm512_xor_si512(_mm512_and_si512(resmask, result),
-                                          _mm512_setr_epi64(existMask & exist, 0, 0, 0, 0, 0, 0, 0));
+        _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
 
-        _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), joined);
+        entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
-        int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
-        entryCounter += numFullEntry;
-        int bitAdvance = (bitOffset + numFullEntry * entrySize);
-        int byteAdvance = bitAdvance / BYTE_LEN;
-        byteOffset += byteAdvance;
-        bitOffset = bitAdvance % BYTE_LEN;
+        int partialEntryLen = (SIMD_LEN - bitOffset) % entrySize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteOffset += BYTE_IN_SIMD - partialBytes;
+        bitOffset = partialBytes * 8 - partialEntryLen;
     }
 }
 
-void HaoScanner512::unalignedIn() {
+void HaoScanner512::unalignedLess() {
 
     void *byteData = data;
     void *byteDest = dest;
@@ -246,36 +237,22 @@ void HaoScanner512::unalignedIn() {
     while (entryCounter < length) {
         __m512i mask = this->msbmasks[bitOffset];
         __m512i aornm = this->nmval1s[bitOffset];
-        __m512i bornm = this->nmval2s[bitOffset];
         __m512i na = this->nval1s[bitOffset];
-        __m512i nb = this->nval2s[bitOffset];
 
         __m512i current = _mm512_loadu_si512(
                 (__m512i *) (byteData + byteOffset));
         __m512i xorm = _mm512_or_si512(current, mask);
         __m512i l = mm512_sub_epi512(xorm, aornm);
-        __m512i h = mm512_sub_epi512(xorm, bornm);
-        __m512i el = _mm512_and_si512(_mm512_or_si512(current, na),
-                                      _mm512_or_si512(_mm512_and_si512(current, na), l));
-        __m512i eh = _mm512_and_si512(_mm512_or_si512(current, nb),
-                                      _mm512_or_si512(_mm512_and_si512(current, nb), h));
-        __m512i result = _mm512_xor_si512(el, eh);
+        __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
+                                          _mm512_or_si512(_mm512_and_si512(current, na), l));
 
-        __m512i resmask = _mm512_setr_epi64(-1 << bitOffset, -1, -1, -1, -1, -1, -1, -1);
-        int existMask = (1 << bitOffset) - 1;
-        int exist = (int) *((char *) (byteDest + byteOffset));
+        _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
 
-        __m512i joined = _mm512_xor_si512(_mm512_and_si512(resmask, result),
-                                          _mm512_setr_epi64(existMask & exist, 0, 0, 0, 0, 0, 0, 0));
+        entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
-        _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), joined);
-
-        int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
-        entryCounter += numFullEntry;
-        int bitAdvance = (bitOffset + numFullEntry * entrySize);
-        int byteAdvance = bitAdvance / BYTE_LEN;
-        byteOffset += byteAdvance;
-        bitOffset = bitAdvance % BYTE_LEN;
+        int partialEntryLen = (SIMD_LEN - bitOffset) % entrySize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteOffset += BYTE_IN_SIMD - partialBytes;
+        bitOffset = partialBytes * 8 - partialEntryLen;
     }
-
 }

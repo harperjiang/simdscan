@@ -1,7 +1,7 @@
 /*
  * HaoScanner.h
  *
- * Use AVX2 to perform scanning
+ * Use SSE to perform scanning
  *
  *  Created on: Aug 25, 2017
  *      Author: harper
@@ -43,8 +43,8 @@ protected:
     void alignedEq();
     void unalignedEq();
 
-    void alignedIn();
-    void unalignedIn();
+    void alignedLess();
+    void unalignedLess();
 };
 
 

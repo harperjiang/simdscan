@@ -1,6 +1,8 @@
-//
-// Created by harper on 9/19/17.
-//
+/**
+ *  Use AvX-512 to perform scanning
+ *
+ *  Created by harper on 9/19/17.
+ */
 
 #ifndef SIMDSCAN_HAOSCANNER512_H
 #define SIMDSCAN_HAOSCANNER512_H
@@ -39,11 +41,11 @@ protected:
 
     void alignedEq();
 
-    void alignedIn();
+    void alignedLess();
 
     void unalignedEq();
 
-    void unalignedIn();
+    void unalignedLess();
 
 };
 

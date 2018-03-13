@@ -8,9 +8,6 @@
 #include "scan/delta/SimdDeltaScanner256.h"
 #include "scan/delta/TrivialDeltaScanner.h"
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-
 int delta_throughput(Scanner *scanner, uint64_t num) {
     int *input = (int *) aligned_alloc(64, sizeof(int) * num);
 
@@ -38,6 +35,8 @@ int delta_throughput(Scanner *scanner, uint64_t num) {
 
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+
+    printf("%d\n",output[3234]);
 
     free(input);
     free(output);

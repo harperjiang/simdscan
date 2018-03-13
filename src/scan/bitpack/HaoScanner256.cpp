@@ -13,6 +13,7 @@
 #define INT_LEN 32
 #define SIMD_LEN 256
 #define BYTE_LEN 8
+#define BYTE_IN_SIMD 32
 
 const __m256i one = _mm256_set1_epi32(0xffffffff);
 
@@ -22,7 +23,7 @@ __m256i build(int num, int bitLength, int offset) {
     for (int i = 0; i < 8; i++) {
         int val = 0;
         int current = offset;
-        if (offset != 0) {
+        if (offset != 0 && i != 0) {
             val |= (num >> (bitLength - offset));
         }
         while (current < INT_LEN) {
@@ -108,11 +109,11 @@ void HaoScanner256::scan(int *data, uint64_t length, int *dest, Predicate *p) {
             else
                 unalignedEq();
             break;
-        case opr_in:
+        case opr_less:
             if (aligned)
-                alignedIn();
+                alignedLess();
             else
-                unalignedIn();
+                unalignedLess();
             break;
         default:
             break;
@@ -156,7 +157,7 @@ void HaoScanner256::alignedEq() {
     }
 }
 
-void HaoScanner256::alignedIn() {
+void HaoScanner256::alignedLess() {
     __m256i *mdata = (__m256i *) data;
     __m256i *mdest = (__m256i *) dest;
 
@@ -172,25 +173,19 @@ void HaoScanner256::alignedIn() {
     while (laneCounter < numLane) {
         __m256i mask = this->msbmasks[bitOffset];
         __m256i aornm = this->nmval1s[bitOffset];
-        __m256i bornm = this->nmval2s[bitOffset];
         __m256i na = this->nval1s[bitOffset];
-        __m256i nb = this->nval2s[bitOffset];
 
         __m256i current = _mm256_stream_load_si256(mdata + laneCounter);
 
         __m256i xorm = _mm256_or_si256(current, mask);
         __m256i l = mm256_sub_epi256(xorm, aornm);
-        __m256i h = mm256_sub_epi256(xorm, bornm);
-        __m256i el = _mm256_and_si256(_mm256_or_si256(current, na),
-                                      _mm256_or_si256(_mm256_and_si256(current, na), l));
-        __m256i eh = _mm256_and_si256(_mm256_or_si256(current, nb),
-                                      _mm256_or_si256(_mm256_and_si256(current, nb), h));
-        __m256i result = _mm256_xor_si256(el, eh);
+        __m256i result = _mm256_and_si256(_mm256_or_si256(current, na),
+                                          _mm256_or_si256(_mm256_and_si256(current, na), l));
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece(prev, current, entrySize, bitOffset);
             __m256i remain = _mm256_setr_epi64x(
-                    (num >= predicate->getVal1() && num < predicate->getVal2()) << (bitOffset - 1), 0, 0, 0);
+                    (num < predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
             result = _mm256_or_si256(result, remain);
         }
         _mm256_stream_si256(mdest + (laneCounter++), result);
@@ -218,25 +213,18 @@ void HaoScanner256::unalignedEq() {
         __m256i d = _mm256_xor_si256(current, eqnum);
         __m256i result = _mm256_or_si256(
                 mm256_add_epi256(_mm256_and_si256(d, notmask), notmask), d);
-        __m256i resmask = _mm256_setr_epi64x(-1 << bitOffset, -1, -1, -1);
-        int existMask = (1 << bitOffset) - 1;
-        int exist = (int) *((char *) (byteDest + byteOffset));
+        _mm256_storeu_si256((__m256i *) (byteDest + byteOffset), result);
 
-        __m256i joined = _mm256_xor_si256(_mm256_and_si256(resmask, result),
-                                          _mm256_setr_epi64x(existMask & exist, 0, 0, 0));
+        entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
-        _mm256_storeu_si256((__m256i *) (byteDest + byteOffset), joined);
-
-        int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
-        entryCounter += numFullEntry;
-        int bitAdvance = (bitOffset + numFullEntry * entrySize);
-        int byteAdvance = bitAdvance / BYTE_LEN;
-        byteOffset += byteAdvance;
-        bitOffset = bitAdvance % BYTE_LEN;
+        int partialEntryLen = (SIMD_LEN - bitOffset) % entrySize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteOffset += BYTE_IN_SIMD - partialBytes;
+        bitOffset = partialBytes * 8 - partialEntryLen;
     }
 }
 
-void HaoScanner256::unalignedIn() {
+void HaoScanner256::unalignedLess() {
 
     void *byteData = data;
     void *byteDest = dest;
@@ -248,36 +236,23 @@ void HaoScanner256::unalignedIn() {
     while (entryCounter < length) {
         __m256i mask = this->msbmasks[bitOffset];
         __m256i aornm = this->nmval1s[bitOffset];
-        __m256i bornm = this->nmval2s[bitOffset];
         __m256i na = this->nval1s[bitOffset];
-        __m256i nb = this->nval2s[bitOffset];
 
         __m256i current = _mm256_loadu_si256(
                 (__m256i *) (byteData + byteOffset));
         __m256i xorm = _mm256_or_si256(current, mask);
         __m256i l = mm256_sub_epi256(xorm, aornm);
-        __m256i h = mm256_sub_epi256(xorm, bornm);
-        __m256i el = _mm256_and_si256(_mm256_or_si256(current, na),
+        __m256i result = _mm256_and_si256(_mm256_or_si256(current, na),
                                       _mm256_or_si256(_mm256_and_si256(current, na), l));
-        __m256i eh = _mm256_and_si256(_mm256_or_si256(current, nb),
-                                      _mm256_or_si256(_mm256_and_si256(current, nb), h));
-        __m256i result = _mm256_xor_si256(el, eh);
 
-        __m256i resmask = _mm256_setr_epi64x(-1 << bitOffset, -1, -1, -1);
-        int existMask = (1 << bitOffset) - 1;
-        int exist = (int) *((char *) (byteDest + byteOffset));
+        _mm256_storeu_si256((__m256i *) (byteDest + byteOffset), result);
 
-        __m256i joined = _mm256_xor_si256(_mm256_and_si256(resmask, result),
-                                          _mm256_setr_epi64x(existMask & exist, 0, 0, 0));
+        entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
-        _mm256_storeu_si256((__m256i *) (byteDest + byteOffset), joined);
-
-        int numFullEntry = (SIMD_LEN - bitOffset) / entrySize;
-        entryCounter += numFullEntry;
-        int bitAdvance = (bitOffset + numFullEntry * entrySize);
-        int byteAdvance = bitAdvance / BYTE_LEN;
-        byteOffset += byteAdvance;
-        bitOffset = bitAdvance % BYTE_LEN;
+        int partialEntryLen = (SIMD_LEN - bitOffset) % entrySize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteOffset += BYTE_IN_SIMD - partialBytes;
+        bitOffset = partialBytes * 8 - partialEntryLen;
     }
 
 }

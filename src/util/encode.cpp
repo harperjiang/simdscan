@@ -54,12 +54,13 @@ void bitweaverh_encode(int *input, int *output, int length, int entrySize) {
     outputLong[outputCounter] = buffer;
 }
 
-void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) {
+int encode_rle(int *input, int *output, int length, int entrySize, int rlSize) {
     int writeBuffer = 0;
     int writeCounter = 0;
     int offset = 0;
     int current = input[0];
     int counter = 1;
+    int total = 1;
     for (int i = 1; i < length; i++) {
         if (input[i] != current) {
             // Compose an entry
@@ -78,7 +79,7 @@ void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) 
                 output[writeCounter++] = writeBuffer;
                 writeBuffer = counter >> (rlSize - offset);
             }
-
+            total++;
             current = input[i];
             counter = 1;
         } else {
@@ -100,6 +101,7 @@ void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) 
         offset -= 32;
         output[writeCounter] = counter >> (rlSize - offset);
     }
+    return total;
 }
 
 int extract_entry(int *input, int index, int offset, int entrySize) {

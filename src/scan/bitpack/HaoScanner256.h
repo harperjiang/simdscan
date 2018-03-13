@@ -41,10 +41,10 @@ public:
 
 protected:
 	void alignedEq();
-	void alignedIn();
+	void alignedLess();
 
 	void unalignedEq();
-	void unalignedIn();
+	void unalignedLess();
 };
 
 #endif /* SRC_SCAN_HAOSCANNER256_H_ */
