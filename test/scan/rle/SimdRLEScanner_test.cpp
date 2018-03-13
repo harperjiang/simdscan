@@ -35,7 +35,7 @@ TEST(SimdRLEScanner, TestLessAligned) {
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
         }
-        int extractedRl = extract_entry(output, (bitoff + 9) / 32, (bitoff + 9) % 32, 2);
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
     }
 
@@ -71,7 +71,7 @@ TEST(SimdRLEScanner, TestLessUnaligned) {
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
         }
-        int extractedRl = extract_entry(output, (bitoff + 9) / 32, (bitoff + 9) % 32, 2);
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
     }
 
@@ -108,7 +108,7 @@ TEST(SimdRLEScanner, TestEqAligned) {
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
         }
-        int extractedRl = extract_entry(output, (bitoff + 9) / 32, (bitoff + 9) % 32, 2);
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
     }
 
@@ -144,7 +144,7 @@ TEST(SimdRLEScanner, TestEqUnaligned) {
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
         }
-        int extractedRl = extract_entry(output, (bitoff + 9) / 32, (bitoff + 9) % 32, 2);
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
     }
 
