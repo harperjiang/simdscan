@@ -36,7 +36,7 @@ int delta_throughput(Scanner *scanner, uint64_t num) {
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
-    printf("%d\n",output[3234]);
+    printf("%d\n", output[3234]);
 
     free(input);
     free(output);
@@ -44,9 +44,8 @@ int delta_throughput(Scanner *scanner, uint64_t num) {
     return num / elapse;
 }
 
-#pragma GCC pop_options
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     uint64_t repeat = 100000000;
 
     int tds = delta_throughput(new TrivialDeltaScanner(true), repeat);
@@ -56,7 +55,6 @@ int main(int argc, char** argv) {
     int sds256 = delta_throughput(new SimdDeltaScanner256(true), repeat);
     int sdn256 = delta_throughput(new SimdDeltaScanner256(false), repeat);
 
-    std::cout << (double) sds128 / tds << "," << (double) sdn128 / tdn << "," << (double) sds256 / tds << ","
-              << (double) sdn256 / tdn << std::endl;
+    std::cout << tds << "," << tdn << "," << sds128 << "," << sdn128 << "," << sds256 << "," << sdn256 << std::endl;
 
 }

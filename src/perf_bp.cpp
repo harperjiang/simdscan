@@ -120,12 +120,16 @@ int main(int argc, char **argv) {
         int h128 = bp_throughput(new HaoScanner128(es, true), repeat, es);
         int h256 = bp_throughput(new HaoScanner256(es, true), repeat, es);
         int h512 = bp_throughput(new HaoScanner512(es, true), repeat, es);
+        int uh128 = bp_throughput(new HaoScanner128(es, false), repeat, es);
+        int uh256 = bp_throughput(new HaoScanner256(es, false), repeat, es);
+        int uh512 = bp_throughput(new HaoScanner512(es, false), repeat, es);
         int bwh128 = bwh_throughput(new BitWeaverHScanner128(es), repeat, es);
         int bwh256 = bwh_throughput(new BitWeaverHScanner256(es), repeat, es);
         int bwh512 = bwh_throughput(new BitWeaverHScanner512(es), repeat, es);
         int w = bp_throughput(new WillhalmScanner128(es, true), repeat, es);
-        std::cout << es << "," << ((double) h128 / bwh128) << "," << ((double) h256 / bwh256) << ","
-                  << ((double) h512 / bwh512) << "," << ((double) h512 / w)
+        std::cout << es << "," << h128 << "," << uh128 << ","
+                  << h256 << "," << uh256 << "," << h512 << "," << uh512 << "," << bwh128
+                  << "," << bwh256 << "," << bwh512 << "," << w
                   << std::endl;
     }
 }
