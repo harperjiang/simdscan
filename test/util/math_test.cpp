@@ -329,7 +329,7 @@ TEST(Math, TestAddEpi512) {
         __m512i a = _mm512_setr_epi64(i, 0, 0, 0, 0, 0, 0, 0);
         __m512i b = _mm512_setr_epi64(2 * i, 0, 0, 0, 0, 0, 0, 0);
 
-        __m512 r1 = mm512_add_epi512(a, b);
+        __m512i r1 = mm512_add_epi512(a, b);
         EXPECT_EQ(3 * i, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 0), 0)) << i;
         EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 0), 1)) << i;
         EXPECT_EQ(0, _mm_extract_epi64(_mm512_extracti64x2_epi64(r1, 1), 0)) << i;
