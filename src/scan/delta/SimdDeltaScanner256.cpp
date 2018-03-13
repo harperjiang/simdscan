@@ -26,8 +26,8 @@ SimdDeltaScanner256::~SimdDeltaScanner256() {
 
 void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predicate *p) {
     __m256i *simdin = (__m256i *) input;
-    __mmask16 *maskout = (__mmask16 *) output;
     if (shortMode) {
+        __mmask16 *maskout = (__mmask16 *) output;
         uint64_t numSimd = (length / SHORT_IN_SIMD) + (length % SHORT_IN_SIMD ? 1 : 0);
 
         __m256i a = _mm256_set1_epi16(p->getVal1());
@@ -58,11 +58,10 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
 
                     cumsum += cs1 + cs2;
 
-                    __mmask16 result = _mm256_cmpeq_epi16_mask(extracted, a);
-                    maskout[i] = result;
+                    maskout[i] = _mm256_cmpeq_epi16_mask(extracted, a);
                 }
                 break;
-            case opr_in:
+            case opr_less:
                 for (uint64_t i = 0; i < numSimd; i++) {
                     __m256i current = _mm256_stream_load_si256(simdin + i);
                     __m256i aligned = _mm256_bslli_epi128(current, 16);
@@ -84,10 +83,7 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
 
                     cumsum += cs1 + cs2;
 
-                    __mmask16 lower = _mm256_cmpge_epi16_mask(a, extracted);
-                    __mmask16 higher = _mm256_cmple_epi16_mask(b, extracted);
-
-                    maskout[i] = lower & higher;
+                    maskout[i] = _mm256_cmpge_epi16_mask(a, extracted);
                 }
                 break;
         }
@@ -97,6 +93,7 @@ void SimdDeltaScanner256::scan(int *input, uint64_t length, int *output, Predica
         __m256i a = _mm256_set1_epi32(p->getVal1());
         __m256i b = _mm256_set1_epi32(p->getVal2());
 
+        __mmask8 *maskout = (__mmask8 *) output;
 
         int cumsum = 0;
         switch (p->getOpr()) {

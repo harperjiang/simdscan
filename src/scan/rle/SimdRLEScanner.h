@@ -32,9 +32,8 @@ private:
     __m512i *rlmasks = NULL;
 
     // This one set the rl region all 0
-    __m512i *notmasks1 = NULL;
+    __m512i *notmasks = NULL;
     // This one set the rl region all 1
-    __m512i *notmasks2 = NULL;
 public:
     SimdRLEScanner(int es, int rls);
 

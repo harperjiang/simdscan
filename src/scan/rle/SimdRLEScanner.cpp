@@ -40,15 +40,13 @@ SimdRLEScanner::SimdRLEScanner(int es, int rls) {
     this->nval1s = (__m512i *) aligned_alloc(ALIGN, LEN);
     this->nval2s = (__m512i *) aligned_alloc(ALIGN, LEN);
     this->msbmasks = (__m512i *) aligned_alloc(ALIGN, LEN);
-    this->notmasks1 = (__m512i *) aligned_alloc(ALIGN, LEN);
-    this->notmasks2 = (__m512i *) aligned_alloc(ALIGN, LEN);
+    this->notmasks = (__m512i *) aligned_alloc(ALIGN, LEN);
     this->nmval1s = (__m512i *) aligned_alloc(ALIGN, LEN);
     this->nmval2s = (__m512i *) aligned_alloc(ALIGN, LEN);
     this->rlmasks = (__m512i *) aligned_alloc(ALIGN, LEN);
     for (int i = 0; i < entrySize; i++) {
         this->msbmasks[i] = build512(1 << (entrySize - 1), groupSize, i);
-        this->notmasks1[i] = build512((1 << (entrySize - 1)) - 1, groupSize, i);
-        this->notmasks2[i] = build512(((1 << (entrySize - 1)) - 1) | ((1 << rlSize) - 1), groupSize, i);
+        this->notmasks[i] = build512((1 << (entrySize - 1)) - 1, groupSize, i);
         this->rlmasks[i] = build512((1 << entrySize) - 1, groupSize, i);
     }
 }
@@ -106,14 +104,13 @@ void SimdRLEScanner::equal() {
 
     while (laneCounter < numLane) {
         __m512i eqnum = this->val1s[bitOffset];
-        __m512i notmask1 = this->notmasks1[bitOffset];
-        __m512i notmask2 = this->notmasks2[bitOffset];
+        __m512i notmask = this->notmasks[bitOffset];
 
         __m512i current = _mm512_stream_load_si512(input + laneCounter);
 
         __m512i d = _mm512_xor_si512(current, eqnum);
         __m512i result = _mm512_or_si512(
-                mm512_add_epi512(_mm512_and_si512(d, notmask2), notmask1), d);
+                mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
         if (bitOffset > rlSize) {
             // When bitOffset <= rlSize, it is the run-length section at boundary and no need to process
