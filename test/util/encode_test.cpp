@@ -68,4 +68,29 @@ TEST(Encode, TestRleEncode) {
     EXPECT_EQ(0x04E21110, output[3]);
     EXPECT_EQ(0x4D05118A, output[4]);
     EXPECT_EQ(0x2410888, output[5]);
+
+    entrySize = 9;
+    int rlSize = 2;
+    int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
+
+    // ,5,3
+    //
+    // 30
+    // 2e04c2b0
+    // 310b2084
+    // 0c82d0ea
+    // 05409009
+    // 00a09411
+    // 01d01C02
+
+    int output2[10];
+    encode_rle(data, output2, 28, entrySize, rlSize);
+    EXPECT_EQ(0x01d01c02, output[0]);
+    EXPECT_EQ(0x00a09411, output[1]);
+    EXPECT_EQ(0x05409009, output[2]);
+    EXPECT_EQ(0x0c82d0ea, output[3]);
+    EXPECT_EQ(0x310b2084, output[4]);
+    EXPECT_EQ(0x2e04c2b0, output[5]);
+    EXPECT_EQ(0x30, output[6]);
 }
