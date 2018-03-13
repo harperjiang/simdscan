@@ -96,17 +96,17 @@ TEST(SimdRLEScanner, TestEqAligned) {
 
     scanner->scan(encoded, 17, output, &p);
 
-    int expected[] = {0, 2, 0, 1, 0, 2, 0, 1, 0, 1, 0, 1, 0, 2, 0, 1, 1, 1,
-                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 0, 3, 1, 3};
+    int expected[] = {2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 2, 1, 12, 2, 21, 3, 4, 3, 5, 3};
 
     for (int i = 0; i < 17; i++) {
         int bitoff = i * 11 + 8;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2]) {
-            EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
+        if (expected[i * 2] == 5) {
+            EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i << "," << expected[i * 2];
         } else {
-            EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
+            EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i << "," << expected[i * 2];
         }
         int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
@@ -132,14 +132,14 @@ TEST(SimdRLEScanner, TestEqUnaligned) {
 
     scanner->scan(encoded, 17, output, &p);
 
-    int expected[] = {0, 2, 0, 1, 0, 2, 0, 1, 0, 1, 0, 1, 0, 2, 0, 1, 1, 1,
-                      0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 0, 3, 1, 3};
+    int expected[] = {2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 2, 1, 12, 2, 21, 3, 4, 3, 5, 3};
 
     for (int i = 0; i < 17; i++) {
         int bitoff = i * 11 + 8;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2]) {
+        if (expected[i * 2] == 5) {
             EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
