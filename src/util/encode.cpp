@@ -86,7 +86,7 @@ void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) 
             }
 
             current = input[i];
-            counter = 0;
+            counter = 1;
         } else {
             counter++;
         }
