@@ -64,23 +64,17 @@ void encode_rle(int *input, int *output, int length, int entrySize, int rlSize) 
         if (input[i] != current) {
             // Compose an entry
             writeBuffer |= current << offset;
-            if (offset + entrySize <= 32) {
-                offset += entrySize;
-                offset %= 32;
-            } else {
-                offset += entrySize;
+            offset += entrySize;
+            if (offset >= 32) {
                 offset -= 32;
                 output[writeCounter++] = writeBuffer;
                 writeBuffer = current >> (entrySize - offset);
             }
 
             writeBuffer |= counter << offset;
-            if (offset + rlSize <= 32) {
-                offset += rlSize;
-                offset %= 32;
-            } else {
-                offset += rlSize;
-                offset %= 32;
+            offset += rlSize;
+            if (offset >= 32) {
+                offset -= 32;
                 output[writeCounter++] = writeBuffer;
                 writeBuffer = counter >> (rlSize - offset);
             }
