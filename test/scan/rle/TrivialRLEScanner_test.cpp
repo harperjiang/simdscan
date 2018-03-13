@@ -4,30 +4,32 @@
 
 
 #include <gtest/gtest.h>
+#include "../../../src/util/encode.h"
+#include "../../../src/predicate/Predicate.h"
+#include "../../../src/scan/rle/TrivialRLEScanner.h"
 
 TEST(TrivialRLEScanner, TestScan) {
-int entrySize = 9;
-int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-              18, 19, 20};
+    int entrySize = 9;
+    int rlSize = 2;
+    int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-int *encoded = (int *) aligned_alloc(32, 32 * sizeof(int));
-int *output = (int *) aligned_alloc(32, 32 * sizeof(int));
-encode(data, encoded, 20, entrySize);
+    int *encoded = (int *) aligned_alloc(32, 100 * sizeof(int));
+    int *output = (int *) aligned_alloc(32, 100 * sizeof(int));
+    encode_rle(data, encoded, 20, entrySize, rlSize);
 
-HaoScanner256 *scanner = new HaoScanner256(entrySize, true);
+    TrivialRLEScanner *scanner = new TrivialRLEScanner(entrySize, rlSize);
 
-Predicate p(opr_in, 3, 8);
+    Predicate p(opr_less, 5, 0);
 
-scanner->scan(encoded, 20, output, &p);
-for (int i = 0; i < 20; i++) {
-int bitOffset = (i + 1) * entrySize - 1;
-int intIdx = bitOffset / 32;
-int bitIdx = bitOffset % 32;
-if (i >= 2 && i <= 6)
-EXPECT_EQ(1 << bitIdx, output[intIdx] & (1 << bitIdx)) << i;
-else
-EXPECT_EQ(0, output[intIdx] & (1 << bitIdx)) << i;
-}
-free(encoded);
-free(output);
+    scanner->scan(encoded, 20, output, &p);
+
+    int expected[] = {1, 2, 1, 1, 0, 2, 0, 1, 1, 1, 1, 2, 1, 1, 0, 1, 0,
+                      1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 0, 3, 1, 3, 0, 3};
+
+    for (int i = 0; i < 34; i++) {
+        EXPECT_EQ(expected[i], output[i]) << i;
+    }
+    free(encoded);
+    free(output);
 }
