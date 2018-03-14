@@ -122,6 +122,7 @@ void HaoScanner512::scan(int *data, uint64_t length, int *dest, Predicate *p) {
 void HaoScanner512::alignedEq() {
     __m512i *mdata = (__m512i *) data;
     __m512i *mdest = (__m512i *) dest;
+    uint8_t *bytedest = (uint8_t *) dest;
 
     int bitOffset = 0;
 
@@ -142,13 +143,19 @@ void HaoScanner512::alignedEq() {
         __m512i result = _mm512_or_si512(
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
+        _mm512_stream_si512(mdest + (laneCounter++), result);
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece512(prev, current, entrySize, bitOffset);
-            __m512i remain = _mm512_setr_epi64((num != predicate->getVal1()) << (bitOffset - 1), 0, 0, 0, 0, 0, 0, 0);
-            result = _mm512_or_si512(result, remain);
+
+            int remainIdx = bitOffset / 8;
+            int remainOffset = bitOffset % 8;
+            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm512_stream_si512(mdest + (laneCounter++), result);
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
@@ -159,6 +166,7 @@ void HaoScanner512::alignedEq() {
 void HaoScanner512::alignedLess() {
     __m512i *mdata = (__m512i *) data;
     __m512i *mdest = (__m512i *) dest;
+    uint8_t *bytedest = (uint8_t *) dest;
 
     int bitOffset = 0;
 
@@ -180,15 +188,20 @@ void HaoScanner512::alignedLess() {
         __m512i l = mm512_sub_epi512(xorm, aornm);
         __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
                                           _mm512_or_si512(_mm512_and_si512(current, na), l));
+
+        _mm512_stream_si512(mdest + (laneCounter++), result);
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece512(prev, current, entrySize, bitOffset);
-            __m512i remain = _mm512_setr_epi64(
-                    (num < predicate->getVal1()) << (bitOffset - 1), 0, 0, 0, 0, 0, 0,
-                    0);
-            result = _mm512_or_si512(result, remain);
+
+            int remainIdx = bitOffset / 8;
+            int remainOffset = bitOffset % 8;
+            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm512_stream_si512(mdest + (laneCounter++), result);
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
@@ -214,7 +227,10 @@ void HaoScanner512::unalignedEq() {
         __m512i result = _mm512_or_si512(
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
+        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+        preserve &= masks[bitOffset];
         _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
+        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
         entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
@@ -247,6 +263,11 @@ void HaoScanner512::unalignedLess() {
                                           _mm512_or_si512(_mm512_and_si512(current, na), l));
 
         _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
+
+        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+        preserve &= masks[bitOffset];
+        _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
+        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
         entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 

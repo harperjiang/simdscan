@@ -29,6 +29,9 @@ private:
     __m512i *nmval2s = NULL;
     __m512i *msbmasks = NULL;
     __m512i *notmasks = NULL;
+
+    uint8_t masks[8] = {0, 1, 2, 4, 8, 16, 32, 64};
+    uint8_t invmasks[8] = {0, 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf};
 public:
 
     HaoScanner512(int, bool);
