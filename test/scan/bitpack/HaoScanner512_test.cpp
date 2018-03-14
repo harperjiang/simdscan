@@ -18,7 +18,7 @@ extern void encode(int *, int *, int, int);
 TEST(HaoScanner512, TestBuild) {
     __m512i b = build512(3, 5, 0);
 
-    __m256 b1 = _mm512_extracti64x4_epi64(b,0);
+    __m256i b1 = _mm512_extracti64x4_epi64(b,0);
 
     ASSERT_EQ(0xc6318c63, _mm256_extract_epi32(b1, 0));
     ASSERT_EQ(0x318c6318, _mm256_extract_epi32(b1, 1));
