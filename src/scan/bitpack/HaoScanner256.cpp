@@ -123,6 +123,7 @@ void HaoScanner256::scan(int *data, uint64_t length, int *dest, Predicate *p) {
 void HaoScanner256::alignedEq() {
     __m256i *mdata = (__m256i *) data;
     __m256i *mdest = (__m256i *) dest;
+    uint8_t *bytedest = (uint8_t *) dest;
 
     int bitOffset = 0;
 
@@ -143,13 +144,19 @@ void HaoScanner256::alignedEq() {
         __m256i result = _mm256_or_si256(
                 mm256_add_epi256(_mm256_and_si256(d, notmask), notmask), d);
 
+        _mm256_stream_si256(mdest + (laneCounter++), result);
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece(prev, current, entrySize, bitOffset);
-            __m256i remain = _mm256_setr_epi64x((num != predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
-            result = _mm256_or_si256(result, remain);
+
+            int remainIdx = bitOffset / 8;
+            int remainOffset = bitOffset % 8;
+            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm256_stream_si256(mdest + (laneCounter++), result);
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
@@ -160,6 +167,7 @@ void HaoScanner256::alignedEq() {
 void HaoScanner256::alignedLess() {
     __m256i *mdata = (__m256i *) data;
     __m256i *mdest = (__m256i *) dest;
+    uint8_t *bytedest = (uint8_t *) dest;
 
     int bitOffset = 0;
 
@@ -181,14 +189,20 @@ void HaoScanner256::alignedLess() {
         __m256i l = mm256_sub_epi256(xorm, aornm);
         __m256i result = _mm256_and_si256(_mm256_or_si256(current, na),
                                           _mm256_or_si256(_mm256_and_si256(current, na), l));
+
+        _mm256_stream_si256(mdest + (laneCounter++), result);
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece(prev, current, entrySize, bitOffset);
-            __m256i remain = _mm256_setr_epi64x(
-                    (num < predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
-            result = _mm256_or_si256(result, remain);
+
+            int remainIdx = bitOffset / 8;
+            int remainOffset = bitOffset % 8;
+            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm256_stream_si256(mdest + (laneCounter++), result);
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
@@ -213,7 +227,11 @@ void HaoScanner256::unalignedEq() {
         __m256i d = _mm256_xor_si256(current, eqnum);
         __m256i result = _mm256_or_si256(
                 mm256_add_epi256(_mm256_and_si256(d, notmask), notmask), d);
+
+        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+        preserve &= masks[bitOffset];
         _mm256_storeu_si256((__m256i *) (byteDest + byteOffset), result);
+        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
         entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
@@ -245,7 +263,10 @@ void HaoScanner256::unalignedLess() {
         __m256i result = _mm256_and_si256(_mm256_or_si256(current, na),
                                       _mm256_or_si256(_mm256_and_si256(current, na), l));
 
+        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+        preserve &= masks[bitOffset];
         _mm256_storeu_si256((__m256i *) (byteDest + byteOffset), result);
+        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
         entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 

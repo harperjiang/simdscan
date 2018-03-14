@@ -33,6 +33,10 @@ private:
 	__m256i* nmval2s = NULL;
 	__m256i* msbmasks = NULL;
 	__m256i* notmasks = NULL;
+
+
+	uint8_t masks[8] = {0, 1, 2, 4, 8, 16, 32, 64};
+	uint8_t invmasks[8] = {0, 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf};
 public:
 	HaoScanner256(int, bool);
 	virtual ~HaoScanner256();

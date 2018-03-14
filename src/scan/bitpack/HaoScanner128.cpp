@@ -14,7 +14,6 @@
 #define SIMD_LEN 128
 #define BYTE_LEN 8
 #define BYTE_IN_SIMD 16
-#define INT_IN_SIMD 4
 
 const __m128i one = _mm_set1_epi32(0xffffffff);
 
