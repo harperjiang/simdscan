@@ -14,6 +14,7 @@
 #define SIMD_LEN 128
 #define BYTE_LEN 8
 #define BYTE_IN_SIMD 16
+#define INT_IN_SIMD 4
 
 const __m128i one = _mm_set1_epi32(0xffffffff);
 
@@ -123,6 +124,7 @@ void HaoScanner128::scan(int *data, uint64_t length, int *dest, Predicate *p) {
 void HaoScanner128::alignedEq() {
     __m128i *mdata = (__m128i *) data;
     __m128i *mdest = (__m128i *) dest;
+    uint8_t *bytedest = (uint8_t *) dest;
 
     int bitOffset = 0;
 
@@ -143,13 +145,19 @@ void HaoScanner128::alignedEq() {
         __m128i result = _mm_or_si128(
                 mm_add_epi128(_mm_and_si128(d, notmask), notmask), d);
 
+        _mm_stream_si128(mdest + (laneCounter++), result);
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece128(prev, current, entrySize, bitOffset);
-            __m128i remain = _mm_setr_epi32((num != predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
-            result = _mm_or_si128(result, remain);
+
+            int remainIdx = bitOffset / 8;
+            int remainOffset = bitOffset % 8;
+            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm_stream_si128(mdest + (laneCounter++), result);
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
@@ -191,6 +199,7 @@ void HaoScanner128::unalignedEq() {
 void HaoScanner128::alignedLess() {
     __m128i *mdata = (__m128i *) data;
     __m128i *mdest = (__m128i *) dest;
+    uint8_t *bytedest = (uint8_t *) dest;
 
     int bitOffset = 0;
 
@@ -212,17 +221,21 @@ void HaoScanner128::alignedLess() {
         __m128i l = mm_sub_epi128(xorm, aornm);
         __m128i result = _mm_and_si128(_mm_or_si128(current, na),
                                        _mm_or_si128(_mm_and_si128(current, na), l));
+        _mm_stream_si128(mdest + (laneCounter++), result);
         if (bitOffset != 0) {
             // Has remain to process
             int num = buildPiece128(prev, current, entrySize, bitOffset);
-            __m128i remain = _mm_setr_epi32(
-                    (num >= predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
-            result = _mm_or_si128(result, remain);
+
+            int remainIdx = bitOffset / 8;
+            int remainOffset = bitOffset % 8;
+            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm_stream_si128(mdest + (laneCounter++), result);
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
-
         prev = current;
     }
 }
