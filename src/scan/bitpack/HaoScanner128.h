@@ -22,7 +22,7 @@ private:
     int *data = NULL;
     int *dest = NULL;
     uint64_t length = 0;
-    Predicate* predicate;
+    Predicate *predicate;
 
     __m128i *val1s = NULL;
     __m128i *val2s = NULL;
@@ -33,7 +33,8 @@ private:
     __m128i *msbmasks = NULL;
     __m128i *notmasks = NULL;
 
-    uint8_t masks[8] = {0,1,2,4,8,16,32,64};
+    uint8_t masks[8] = {0, 1, 2, 4, 8, 16, 32, 64};
+    uint8_t invmasks[8] = {0, 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf};
 public:
     HaoScanner128(int, bool);
 
@@ -43,9 +44,11 @@ public:
 
 protected:
     void alignedEq();
+
     void unalignedEq();
 
     void alignedLess();
+
     void unalignedLess();
 };
 
