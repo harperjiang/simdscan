@@ -201,7 +201,7 @@ void SimdRLEScanner::equalNormal() {
 
         if (bitOffset > rlSize) {
             preserve = uoutput[byteOffset];
-            preserve &= masks[bitOffset];
+            preserve &= masks[bitOffset-rlSize];
         }
         _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
         if (bitOffset > rlSize) {
@@ -287,7 +287,7 @@ void SimdRLEScanner::lessNormal() {
 
         if (bitOffset > rlSize) {
             preserve = uoutput[byteOffset];
-            preserve &= masks[bitOffset];
+            preserve &= masks[bitOffset-rlSize];
         }
         _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
         if (bitOffset > rlSize) {
