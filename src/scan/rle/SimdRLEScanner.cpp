@@ -222,7 +222,7 @@ void SimdRLEScanner::aless() {
 
     int bitOffset = 0;
 
-    uint64_t numBit = entrySize * numEntry;
+    uint64_t numBit = groupSize * numEntry;
     uint64_t numLane = numBit / SIMD_LEN + (numBit % SIMD_LEN ? 1 : 0);
 
     uint64_t laneCounter = 0;
