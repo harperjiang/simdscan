@@ -202,33 +202,61 @@ TEST(SimdRLEScanner, TestLessUnalignedFast) {
 
 TEST(SimdRLEScanner, TestEqAligned) {
     int entrySize = 9;
-    int rlSize = 2;
+    int rlSize = 4;
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-    int *encoded = (int *) aligned_alloc(64, 100 * sizeof(int));
-    int *output = (int *) aligned_alloc(64, 100 * sizeof(int));
-    encode_rle(data, encoded, 28, entrySize, rlSize);
+    int *encoded = (int *) aligned_alloc(64, 400 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 400 * sizeof(int));
+    int numPair = encode_rle(data, encoded, 168, entrySize, rlSize);
 
     SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, true);
 
     Predicate p(opr_eq, 5, 0);
 
-    scanner->scan(encoded, 17, output, &p);
+    scanner->scan(encoded, numPair, output, &p);
 
     int expected[] = {2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
-                      29, 1, 11, 1, 6, 1, 8, 1, 2, 1, 12, 2, 21, 3, 4, 3, 5, 3};
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3};
 
-    for (int i = 0; i < 17; i++) {
-        int bitoff = i * 11 + 8;
+    for (int i = 0; i < numPair; i++) {
+        int bitoff = i * (entrySize + rlSize) + entrySize - 1;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2] == 5) {
-            EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i << "," << expected[i * 2];
+        if (expected[i * 2] != 5) {
+            EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
         } else {
-            EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i << "," << expected[i * 2];
+            EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
         }
-        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, rlSize);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
     }
 
@@ -236,35 +264,127 @@ TEST(SimdRLEScanner, TestEqAligned) {
     free(output);
 }
 
-TEST(SimdRLEScanner, TestEqUnaligned) {
+TEST(SimdRLEScanner, TestEqUnalignedNormal) {
     int entrySize = 9;
-    int rlSize = 2;
+    int rlSize = 4;
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
 
-    int *encoded = (int *) aligned_alloc(64, 100 * sizeof(int));
-    int *output = (int *) aligned_alloc(64, 100 * sizeof(int));
-    encode_rle(data, encoded, 28, entrySize, rlSize);
+    int *encoded = (int *) aligned_alloc(64, 400 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 400 * sizeof(int));
+    int numPair = encode_rle(data, encoded, 168, entrySize, rlSize);
 
     SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, false);
 
     Predicate p(opr_eq, 5, 0);
 
-    scanner->scan(encoded, 17, output, &p);
+    scanner->scan(encoded, numPair, output, &p);
 
     int expected[] = {2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
-                      29, 1, 11, 1, 6, 1, 8, 1, 2, 1, 12, 2, 21, 3, 4, 3, 5, 3};
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3};
 
-    for (int i = 0; i < 17; i++) {
-        int bitoff = i * 11 + 8;
+    for (int i = 0; i < numPair; i++) {
+        int bitoff = i * (entrySize + rlSize) + entrySize - 1;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2] == 5) {
+        if (expected[i * 2] != 5) {
             EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
         }
-        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, 2);
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, rlSize);
+        EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
+    }
+
+    free(encoded);
+    free(output);
+}
+
+TEST(SimdRLEScanner, TestEqUnalignedFast) {
+    int entrySize = 9;
+    int rlSize = 10;
+    int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
+                  2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
+                  6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5};
+
+    int *encoded = (int *) aligned_alloc(64, 400 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 400 * sizeof(int));
+    int numPair = encode_rle(data, encoded, 168, entrySize, rlSize);
+
+    SimdRLEScanner *scanner = new SimdRLEScanner(entrySize, rlSize, false);
+
+    Predicate p(opr_eq, 5, 0);
+
+    scanner->scan(encoded, numPair, output, &p);
+
+    int expected[] = {2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3,
+                      2, 2, 3, 1, 7, 2, 8, 1, 9, 1, 1, 1, 2, 2, 4, 1, 5, 1,
+                      29, 1, 11, 1, 6, 1, 8, 1, 22, 1, 12, 2, 21, 3, 4, 3, 5, 3};
+
+    for (int i = 0; i < numPair; i++) {
+        int bitoff = i * (entrySize + rlSize) + entrySize - 1;
+        int intidx = bitoff / 32;
+        int intoff = bitoff % 32;
+        if (expected[i * 2] != 5) {
+            EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
+        } else {
+            EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
+        }
+        int extractedRl = extract_entry(output, (bitoff + 1) / 32, (bitoff + 1) % 32, rlSize);
         EXPECT_EQ(expected[i * 2 + 1], extractedRl) << "Rl " << i;
     }
 
