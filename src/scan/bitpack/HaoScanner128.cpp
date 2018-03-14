@@ -174,7 +174,7 @@ void HaoScanner128::unalignedEq() {
         __m128i result = _mm_or_si128(
                 mm_add_epi128(_mm_and_si128(d, notmask), notmask), d);
 
-        uint8_t preserve = ((uint8_t *) byteData)[byteOffset];
+        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
         preserve &= masks[bitOffset];
         _mm_storeu_si128((__m128i *) (byteDest + byteOffset), result);
         ((uint8_t *) byteDest)[byteOffset] |= preserve;
@@ -246,7 +246,7 @@ void HaoScanner128::unalignedLess() {
         __m128i result = _mm_and_si128(_mm_or_si128(current, na),
                                        _mm_or_si128(_mm_and_si128(current, na), l));
 
-        uint8_t preserve = ((uint8_t *) byteData)[byteOffset];
+        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
         preserve &= masks[bitOffset];
         _mm_storeu_si128((__m128i *) (byteDest + byteOffset), result);
         ((uint8_t *) byteDest)[byteOffset] |= preserve;
