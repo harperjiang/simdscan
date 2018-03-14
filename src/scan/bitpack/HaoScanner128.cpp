@@ -216,7 +216,7 @@ void HaoScanner128::alignedLess() {
             // Has remain to process
             int num = buildPiece128(prev, current, entrySize, bitOffset);
             __m128i remain = _mm_setr_epi32(
-                    (num >= predicate->getVal1() && num < predicate->getVal2()) << (bitOffset - 1), 0, 0, 0);
+                    (num < predicate->getVal1()) << (bitOffset - 1), 0, 0, 0);
             result = _mm_or_si128(result, remain);
         }
         _mm_stream_si128(mdest + (laneCounter++), result);
