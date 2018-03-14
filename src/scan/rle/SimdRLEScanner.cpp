@@ -250,7 +250,7 @@ void SimdRLEScanner::aless() {
 
             int remainIdx = (entryOffset) / 8;
             int remainOffset = (entryOffset) % 8;
-            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
+            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
             uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
             set &= invmasks[remainOffset];
             set |= remain;
