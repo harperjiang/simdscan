@@ -120,7 +120,7 @@ TEST(HaoScanner128, TestUnalignedLess) {
 
     HaoScanner128 *scanner = new HaoScanner128(entrySize, false);
 
-    Predicate p(opr_in, 8, 0);
+    Predicate p(opr_less, 8, 0);
 
     scanner->scan(encoded, 25, output, &p);
     for (int i = 0; i < 25; i++) {
@@ -146,7 +146,7 @@ TEST(HaoScanner128, TestAlignedLess) {
 
     HaoScanner128 *scanner = new HaoScanner128(entrySize, true);
 
-    Predicate p(opr_in, 8, 0);
+    Predicate p(opr_less, 8, 0);
 
     scanner->scan(encoded, 25, output, &p);
     for (int i = 0; i < 25; i++) {
