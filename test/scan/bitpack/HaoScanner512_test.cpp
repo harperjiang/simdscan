@@ -60,8 +60,8 @@ TEST(HaoScanner512, TestUnalignedEq) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                   18, 19, 20};
-    int result[6];
-    int output[] = {0, 0, 0, 0, 0, 0};
+    int result[16];
+    int output[16];
     encode(data, result, 20, entrySize);
 
     HaoScanner512 *scanner = new HaoScanner512(entrySize, false);
@@ -112,8 +112,8 @@ TEST(HaoScanner512, TestUnalignedLess) {
     int entrySize = 9;
     int data[] = {3, 4, 9, 10, 22, 1, 7, 6, 8, 5, 6, 11, 12, 13, 14, 7, 8, 9, 10, 15, 16, 17,
                   18, 19, 20};
-    int *encoded = (int *) aligned_alloc(32, 8 * sizeof(int));
-    int *output = (int *) aligned_alloc(32, 8 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 16 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 16 * sizeof(int));
     encode(data, encoded, 25, entrySize);
 
     HaoScanner512 *scanner = new HaoScanner512(entrySize, false);
@@ -138,8 +138,8 @@ TEST(HaoScanner512, TestAlignedLess) {
     int entrySize = 9;
     int data[] = {3, 4, 9, 10, 22, 1, 7, 6, 8, 5, 6, 11, 12, 13, 14, 7, 8, 9, 10, 15, 16, 17,
                   18, 19, 20};
-    int *encoded = (int *) aligned_alloc(64, 8 * sizeof(int));
-    int *output = (int *) aligned_alloc(64, 8 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 16 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 16 * sizeof(int));
     encode(data, encoded, 25, entrySize);
 
     HaoScanner512 *scanner = new HaoScanner512(entrySize, true);
