@@ -14,10 +14,6 @@ const __m512i one = _mm512_set1_epi32(0xffffffff);
 
 extern __m512i build512(int num, int bitLength, int offset);
 
-__m512i buildMask(int es, int rls, int offset) {
-    return build512(1 << (es - 1), es + rls, offset);
-}
-
 int buildRlePiece(__m512i prev, __m512i current, int entrySize, int bitOffset) {
     int piece1 = _mm_extract_epi32(_mm512_extracti32x4_epi32(prev, 3), 3);
     int piece2 = _mm_extract_epi32(_mm512_extracti32x4_epi32(current, 0), 0);
@@ -83,16 +79,26 @@ void SimdRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *p) 
     switch (p->getOpr()) {
         case opr_eq:
         case opr_neq:
-            if (aligned)
-                aequal();
-            else
-                equal();
+            if (aligned) {
+                    aequal();
+            } else {
+                if (rlSize >= 8) {
+                    equalFast();
+                } else {
+                    equalNormal();
+                }
+            }
             break;
         case opr_less:
             if (aligned)
-                aless();
-            else
-                less();
+                    aless();
+            else {
+                if (rlSize >= 8) {
+                    lessFast();
+                } else {
+                    lessNormal();
+                }
+            }
             break;
         default:
             break;
@@ -100,6 +106,8 @@ void SimdRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *p) 
 }
 
 void SimdRLEScanner::aequal() {
+    uint8_t *bytedest = (uint8_t *) output;
+
     int bitOffset = 0;
 
     uint64_t numBit = groupSize * numEntry;
@@ -119,32 +127,39 @@ void SimdRLEScanner::aequal() {
         __m512i result = _mm512_or_si512(
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
-        if (bitOffset > rlSize) {
-            // When bitOffset <= rlSize, it is the run-length section at boundary and no need to process
-            // Has remain to process
-            int num = buildRlePiece(prev, current, entrySize, bitOffset - rlSize);
-            __m512i remain = _mm512_setr_epi64((num != predicate->getVal1()) << (bitOffset - rlSize - 1), 0, 0, 0, 0, 0,
-                                               0, 0);
-            result = _mm512_or_si512(result, remain);
-        }
         _mm512_stream_si512(output + (laneCounter++), result);
+        if (bitOffset > rlSize) {
+            // Has remain to process
+            int entryOffset = bitOffset - rlSize;
+
+            int num = buildRlePiece(prev, current, entrySize, entryOffset);
+
+            int remainIdx = (entryOffset) / 8;
+            int remainOffset = (entryOffset) % 8;
+            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
+        }
 
         bitOffset = groupSize - (SIMD_LEN - bitOffset) % groupSize;
         prev = current;
     }
 }
 
-void SimdRLEScanner::equal() {
-    void *uinput = (void *) input;
-    void *uoutput = (void *) output;
+
+void SimdRLEScanner::equalFast() {
+    uint8_t *uinput = (uint8_t *) input;
+    uint8_t *uoutput = (uint8_t *) output;
 
     uint64_t entryDone = 0;
 
-    uint64_t simdOffset = 0;
+    uint64_t byteOffset = 0;
     int bitOffset = 0;
 
     while (entryDone < this->numEntry) {
-        __m512i current = _mm512_loadu_si512(uinput + simdOffset);
+        __m512i current = _mm512_loadu_si512(uinput + byteOffset);
 
         __m512i eqnum = this->val1s[bitOffset];
         __m512i notmask = this->notmasks[bitOffset];
@@ -153,18 +168,57 @@ void SimdRLEScanner::equal() {
         __m512i result = _mm512_or_si512(
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
-        _mm512_storeu_si512(uoutput + simdOffset, result);
+        _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
 
         entryDone += (SIMD_LEN - bitOffset) / groupSize;
 
         int partialEntryLen = (SIMD_LEN - bitOffset) % groupSize;
         int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
-        simdOffset += BYTE_IN_SIMD - partialBytes;
+        byteOffset += BYTE_IN_SIMD - partialBytes;
+        bitOffset = partialBytes * 8 - partialEntryLen;
+    }
+}
+
+void SimdRLEScanner::equalNormal() {
+    uint8_t *uinput = (uint8_t *) input;
+    uint8_t *uoutput = (uint8_t *) output;
+
+    uint64_t entryDone = 0;
+
+    uint64_t byteOffset = 0;
+    int bitOffset = 0;
+    uint8_t preserve;
+
+    while (entryDone < this->numEntry) {
+        __m512i current = _mm512_loadu_si512(uinput + byteOffset);
+
+        __m512i eqnum = this->val1s[bitOffset];
+        __m512i notmask = this->notmasks[bitOffset];
+
+        __m512i d = _mm512_xor_si512(current, eqnum);
+        __m512i result = _mm512_or_si512(
+                mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
+
+        if (bitOffset > rlSize) {
+            preserve = uoutput[byteOffset];
+            preserve &= masks[bitOffset];
+        }
+        _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
+        if (bitOffset > rlSize) {
+            uoutput[byteOffset] |= preserve;
+        }
+
+        entryDone += (SIMD_LEN - bitOffset) / groupSize;
+
+        int partialEntryLen = (SIMD_LEN - bitOffset) % groupSize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteOffset += BYTE_IN_SIMD - partialBytes;
         bitOffset = partialBytes * 8 - partialEntryLen;
     }
 }
 
 void SimdRLEScanner::aless() {
+    uint8_t *bytedest = (uint8_t *) output;
 
     int bitOffset = 0;
 
@@ -187,15 +241,21 @@ void SimdRLEScanner::aless() {
         __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
                                           _mm512_or_si512(_mm512_and_si512(current, na), l));
 
+        _mm512_stream_si512(output + (laneCounter++), result);
         if (bitOffset > rlSize) {
             // Has remain to process
-            int num = buildRlePiece(prev, current, entrySize, bitOffset - rlSize);
-            __m512i remain = _mm512_setr_epi64(
-                    (num < predicate->getVal1()) << (bitOffset - rlSize - 1), 0, 0, 0, 0, 0, 0,
-                    0);
-            result = _mm512_or_si512(result, remain);
+            int entryOffset = bitOffset - rlSize;
+
+            int num = buildRlePiece(prev, current, entrySize, entryOffset);
+
+            int remainIdx = (entryOffset) / 8;
+            int remainOffset = (entryOffset) % 8;
+            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
+            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+            set &= invmasks[remainOffset];
+            set |= remain;
+            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
         }
-        _mm512_stream_si512(output + (laneCounter++), result);
 
         bitOffset = groupSize - (SIMD_LEN - bitOffset) % groupSize;
 
@@ -203,17 +263,18 @@ void SimdRLEScanner::aless() {
     }
 }
 
-void SimdRLEScanner::less() {
-    void *uinput = (void *) input;
-    void *uoutput = (void *) output;
+void SimdRLEScanner::lessNormal() {
+    uint8_t *uinput = (uint8_t *) input;
+    uint8_t *uoutput = (uint8_t *) output;
 
     uint64_t entryDone = 0;
 
-    uint64_t simdOffset = 0;
+    uint64_t byteOffset = 0;
     int bitOffset = 0;
+    uint8_t preserve;
 
     while (entryDone < this->numEntry) {
-        __m512i current = _mm512_loadu_si512(uinput + simdOffset);
+        __m512i current = _mm512_loadu_si512(uinput + byteOffset);
 
         __m512i mask = this->msbmasks[bitOffset];
         __m512i aornm = this->nmval1s[bitOffset];
@@ -224,13 +285,53 @@ void SimdRLEScanner::less() {
         __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
                                           _mm512_or_si512(_mm512_and_si512(current, na), l));
 
-        _mm512_storeu_si512(uoutput + simdOffset, result);
+        if (bitOffset > rlSize) {
+            preserve = uoutput[byteOffset];
+            preserve &= masks[bitOffset];
+        }
+        _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
+        if (bitOffset > rlSize) {
+            uoutput[byteOffset] |= preserve;
+        }
 
         entryDone += (SIMD_LEN - bitOffset) / groupSize;
 
         int partialEntryLen = (SIMD_LEN - bitOffset) % groupSize;
         int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
-        simdOffset += BYTE_IN_SIMD - partialBytes;
+        byteOffset += BYTE_IN_SIMD - partialBytes;
+        bitOffset = partialBytes * 8 - partialEntryLen;
+    }
+}
+
+void SimdRLEScanner::lessFast() {
+    uint8_t *uinput = (uint8_t *) input;
+    uint8_t *uoutput = (uint8_t *) output;
+
+    uint64_t entryDone = 0;
+
+    uint64_t byteOffset = 0;
+    int bitOffset = 0;
+    uint8_t preserve;
+
+    while (entryDone < this->numEntry) {
+        __m512i current = _mm512_loadu_si512(uinput + byteOffset);
+
+        __m512i mask = this->msbmasks[bitOffset];
+        __m512i aornm = this->nmval1s[bitOffset];
+        __m512i na = this->nval1s[bitOffset];
+
+        __m512i xorm = _mm512_or_si512(current, mask);
+        __m512i l = mm512_sub_epi512(xorm, aornm);
+        __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
+                                          _mm512_or_si512(_mm512_and_si512(current, na), l));
+
+        _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
+
+        entryDone += (SIMD_LEN - bitOffset) / groupSize;
+
+        int partialEntryLen = (SIMD_LEN - bitOffset) % groupSize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteOffset += BYTE_IN_SIMD - partialBytes;
         bitOffset = partialBytes * 8 - partialEntryLen;
     }
 }

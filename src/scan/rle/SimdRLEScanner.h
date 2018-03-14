@@ -35,6 +35,9 @@ private:
     // This one set the rl region all 0
     __m512i *notmasks = NULL;
     // This one set the rl region all 1
+
+    uint8_t masks[8] = {0, 1, 2, 4, 8, 16, 32, 64};
+    uint8_t invmasks[8] = {0, 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf};
 public:
     SimdRLEScanner(int es, int rls, bool aligned);
 
@@ -43,10 +46,12 @@ public:
     void scan(int *, uint64_t, int *, Predicate *);
 
 protected:
-    void equal();
+    void equalNormal();
+    void equalFast();
     void aequal();
 
-    void less();
+    void lessFast();
+    void lessNormal();
     void aless();
 };
 
