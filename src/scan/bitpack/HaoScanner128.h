@@ -33,7 +33,7 @@ private:
     __m128i *msbmasks = NULL;
     __m128i *notmasks = NULL;
 
-    uint8_t masks[] = {0,1,2,4,8,16,32,64};
+    uint8_t masks[8] = {0,1,2,4,8,16,32,64};
 public:
     HaoScanner128(int, bool);
 
