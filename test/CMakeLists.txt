@@ -9,7 +9,7 @@ include_directories(${GOOGLETEST_DIR}/include)
 link_directories(${GOOGLETEST_DIR}/make)
 
 
-add_executable(unittest ${TEST_SOURCES} scan/bitpack/BitWeaverHScanner128_test.cpp scan/rle/TrivialRLEScanner_test.cpp)
+add_executable(unittest ${TEST_SOURCES})
 
 target_link_libraries(unittest util scan)
 target_link_libraries(unittest gtest gtest_main)
