@@ -9,6 +9,7 @@
 #include "scan/rle/TrivialRLEScanner.h"
 #include "scan/rle/SimdRLEScanner.h"
 
+
 int rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
     int *input = (int *) aligned_alloc(64, sizeof(int) * num);
 
@@ -40,7 +41,7 @@ int rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
-    printf("%d\n", output[232]);
+   // printf("%d\n", output[232]);
 
     free(input);
     free(output);
@@ -51,8 +52,8 @@ int rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
 int main(int argc, char **argv) {
     uint64_t repeat = 100000000;
 
-    for (int es = 5; es < 32; es++) {
-        for (int rls = 5; rls < 32; rls++) {
+    for (int rls = 5; rls < 32; rls++) {
+        for (int es = 5; es < 32 - rls; es++) {
             int trivial = rle_throughput(new TrivialRLEScanner(es, rls), repeat, es, rls);
             int aligned = rle_throughput(new SimdRLEScanner(es, rls, true), repeat, es, rls);
             int ualigned = rle_throughput(new SimdRLEScanner(es, rls, false), repeat, es, rls);
