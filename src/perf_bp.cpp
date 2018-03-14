@@ -14,8 +14,8 @@
 #include "scan/bitpack/BitWeaverHScanner256.h"
 #include "scan/bitpack/BitWeaverHScanner512.h"
 #include "scan/delta/TrivialDeltaScanner.h"
-#include "scan/delta/SimdDeltaScanner128.h"
-#include "scan/delta/SimdDeltaScanner256.h"
+#include "scan/delta/SimdDeltaScanner32.h"
+#include "scan/delta/SimdDeltaScanner16.h"
 
 
 int bp_throughput(Scanner *scanner, uint64_t num, int entrySize) {

@@ -10,7 +10,7 @@
 
 class TrivialDeltaScanner : public Scanner {
 protected:
-    bool shortMode;
+    int entrySize;
 
     // Scan 16 bit
     void shortScan(int *, uint64_t, int *, Predicate *);
@@ -19,7 +19,7 @@ protected:
     void normalScan(int *, uint64_t, int *, Predicate *);
 
 public:
-    TrivialDeltaScanner(bool);
+    TrivialDeltaScanner(int);
 
     virtual ~TrivialDeltaScanner();
 

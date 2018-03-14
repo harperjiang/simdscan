@@ -4,8 +4,8 @@
 #include <random>
 #include <iostream>
 #include <sys/time.h>
-#include "scan/delta/SimdDeltaScanner128.h"
-#include "scan/delta/SimdDeltaScanner256.h"
+#include "scan/delta/SimdDeltaScanner32.h"
+#include "scan/delta/SimdDeltaScanner16.h"
 #include "scan/delta/TrivialDeltaScanner.h"
 
 int delta_throughput(Scanner *scanner, uint64_t num) {
@@ -50,10 +50,10 @@ int main(int argc, char **argv) {
 
     int tds = delta_throughput(new TrivialDeltaScanner(true), repeat);
     int tdn = delta_throughput(new TrivialDeltaScanner(false), repeat);
-    int sds128 = delta_throughput(new SimdDeltaScanner128(true), repeat);
-    int sdn128 = delta_throughput(new SimdDeltaScanner128(false), repeat);
-    int sds256 = delta_throughput(new SimdDeltaScanner256(true), repeat);
-    int sdn256 = delta_throughput(new SimdDeltaScanner256(false), repeat);
+    int sds128 = delta_throughput(new SimdDeltaScanner32(true), repeat);
+    int sdn128 = delta_throughput(new SimdDeltaScanner32(false), repeat);
+    int sds256 = delta_throughput(new SimdDeltaScanner16(true), repeat);
+    int sdn256 = delta_throughput(new SimdDeltaScanner16(false), repeat);
 
     std::cout << tds << "," << tdn << "," << sds128 << "," << sdn128 << "," << sds256 << "," << sdn256 << std::endl;
 
