@@ -251,7 +251,7 @@ TEST(SimdRLEScanner, TestEqAligned) {
         int bitoff = i * (entrySize + rlSize) + entrySize - 1;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2] != 5) {
+        if (expected[i * 2] == 5) {
             EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
@@ -315,7 +315,7 @@ TEST(SimdRLEScanner, TestEqUnalignedNormal) {
         int bitoff = i * (entrySize + rlSize) + entrySize - 1;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2] != 5) {
+        if (expected[i * 2] == 5) {
             EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
@@ -379,7 +379,7 @@ TEST(SimdRLEScanner, TestEqUnalignedFast) {
         int bitoff = i * (entrySize + rlSize) + entrySize - 1;
         int intidx = bitoff / 32;
         int intoff = bitoff % 32;
-        if (expected[i * 2] != 5) {
+        if (expected[i * 2] == 5) {
             EXPECT_FALSE(output[intidx] & (1 << intoff)) << "Compare " << i;
         } else {
             EXPECT_TRUE(output[intidx] & (1 << intoff)) << "Compare " << i;
