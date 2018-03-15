@@ -22,39 +22,71 @@ SimdDeltaScanner32::SimdDeltaScanner32(int es) {
     int entryInSimd = SIMD_LEN / es;
     assert(es > 16 && es < 32);
     // 32 bit mode, 8 entries per word
-    this->bufferSize = entryInSimd / 8 + (entryInSimd % 8 ? 1 : 0);
+
     // Use 512 bit SIMD as buffer, so do not need to consider overflow
-    buffer = new __m512i[this->bufferSize];
-}
+    this->shuffleInst = new __m512i[8];
+    this->shiftInst = new __m512i[8];
 
-SimdDeltaScanner32::~SimdDeltaScanner32() {
-    delete[] this->buffer;
-}
+    uint64_t shubuffer[8];
+    uint64_t sftbuffer[8];
 
-void SimdDeltaScanner32::unpack(__m256i &input, int offset) {
-    for (int i = 0; i < bufferSize; i++) {
-        __m512i data = _mm512_castsi256_si512(input);
-        data = _mm512_shuffle_epi8(data, SHUFFLE_INST[offset][i]);
-        data = _mm512_sllv_epi32(data, SHIFT_INST[offfset][i]);
-        buffer[i] = data;
+    for (int offset = 0; offset < 8; offset++) {
+        // 8 entries
+        for (int j = 0; j < 8; j++) {
+            shubuffer[j] = 0;
+            uint64_t bitLoc = offset + j * entrySize;
+            uint64_t byteLoc = bitLoc / 8;
+            int bitsDone = 0;
+            // 1st-th byte
+            shubuffer[j] |= byteLoc;
+            bitsDone += 8 - bitLoc % 8;
+            int remain = (entrySize - bitsDone) / 8 + ((entrySize - bitsDone) % 8 ? 1 : 0);
+            for (uint64_t k = 1; k <= remain; k++) {
+                shubuffer[j] |= (byteLoc + k) << k * 8;
+            }
+            sftbuffer[j] = bitLoc % 8; // Erase previous
+        }
+
+        shuffleInst[offset] = _mm512_setr_epi64(shubuffer[0], shubuffer[1], shubuffer[2], shubuffer[3],
+                                                shubuffer[4], shubuffer[5], shubuffer[6], shubuffer[7]);
+
+        shiftInst[offset] = _mm512_setr_epi64(sftbuffer[0], sftbuffer[1], sftbuffer[2], sftbuffer[3],
+                                              sftbuffer[4], sftbuffer[5], sftbuffer[6], sftbuffer[7]);
     }
 }
 
+SimdDeltaScanner32::~SimdDeltaScanner32() {
+    delete[] shuffleInst;
+    delete[] shiftInst;
+}
+
+__m256i SimdDeltaScanner32::unpack(__m256i &input, int offset) {
+    __m512i data = _mm512_castsi256_si512(input);
+    data = _mm512_shuffle_epi8(data, shuffleInst[offset]);
+    data = _mm512_sllv_epi32(data, shiftInst[offset]);
+    return _mm512_cvtepi64_epi32(data);
+}
+
 void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicate *p) {
-    __m256i *simdin = (__m256i *) input;
-    uint64_t numSimd = (length / NORMAL_IN_SIMD) + (length % NORMAL_IN_SIMD ? 1 : 0);
+    uint8_t *bytein = (uint8_t *) input;
 
     __m256i a = _mm256_set1_epi32(p->getVal1());
-    __m256i b = _mm256_set1_epi32(p->getVal2());
 
     __mmask8 *maskout = (__mmask8 *) output;
+
+
+    uint64_t byteOffset = 0;
+    uint8_t offset = 0;
+    uint64_t numEntryDone = 0;
+    uint64_t outputCounter = 0;
 
     int cumsum = 0;
     switch (p->getOpr()) {
         case opr_eq:
         case opr_neq:
-            for (uint64_t i = 0; i < numSimd; i++) {
-                __m256i current = _mm256_stream_load_si256(simdin + i);
+            while (numEntryDone < length) {
+                __m256i current = _mm256_loadu_si256((__m256i *) (bytein + byteOffset));
+                current = unpack(current, offset);
 
                 __m256i aligned = _mm256_permutex2var_epi32(current, ZERO, IDX);
                 __m256i s1 = _mm256_hadd_epi32(current, aligned);
@@ -67,12 +99,18 @@ void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicat
                 cumsum = _mm256_extract_epi32(extracted, 0);
 
                 __mmask8 result = _mm256_cmpeq_epi32_mask(extracted, a);
-                maskout[i] = result;
+                maskout[outputCounter++] = result;
+
+                numEntryDone += 8;
+                uint64_t bitAdvance = offset + 8 * entrySize;
+                byteOffset += bitAdvance / 8;
+                offset = bitAdvance % 8;
             }
             break;
         case opr_less:
-            for (uint64_t i = 0; i < numSimd; i++) {
-                __m256i current = _mm256_stream_load_si256(simdin + i);
+            while (numEntryDone < length) {
+                __m256i current = _mm256_loadu_si256((__m256i *) (bytein + byteOffset));
+                current = unpack(current, offset);
 
                 __m256i aligned = _mm256_permutex2var_epi32(current, ZERO, IDX);
                 __m256i s1 = _mm256_hadd_epi32(current, aligned);
@@ -86,8 +124,14 @@ void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicat
 
                 __mmask8 lower = _mm256_cmp_epi32_mask(extracted, a, _MM_CMPINT_LE);
 
-                maskout[i] = lower;
+                maskout[outputCounter++] = lower;
+
+                numEntryDone += 8;
+                uint64_t bitAdvance = offset + 8 * entrySize;
+                byteOffset += bitAdvance / 8;
+                offset = bitAdvance % 8;
             }
             break;
     }
+
 }

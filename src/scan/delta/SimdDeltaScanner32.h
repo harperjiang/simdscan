@@ -11,14 +11,14 @@
 class SimdDeltaScanner32 : public Scanner {
 protected:
     int entrySize;
-    int bufferSize;
 
-    __m512i* buffer;
+    __m512i* shuffleInst;
+    __m512i* shiftInst;
     /**
      * Unpack entries in the given SIMD to buffer
      * @param input SIMD word containing packed entries
      */
-    void unpack(__m256i& input, int offset);
+    __m256i unpack(__m256i &input, int offset);
 
 public:
     SimdDeltaScanner32(int es);
