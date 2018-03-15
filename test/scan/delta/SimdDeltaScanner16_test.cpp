@@ -26,7 +26,9 @@ TEST(SimdDeltaScanner16, unpack) {
         __m256i unpacked = tester->unpackForTest(loaded, o);
 
         for (int i = 0; i < 16; i++) {
-            ASSERT_EQ(data[i] >> o, mm256_extract_epi16(unpacked, i));
+            int bitoff = o + i * entrySize;
+            int extract = extract_entry(output, bitoff / 8, bitoff % 8, entrySize);
+            ASSERT_EQ(extract, mm256_extract_epi16(unpacked, i));
         }
     }
 }

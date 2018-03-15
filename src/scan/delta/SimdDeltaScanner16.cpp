@@ -22,9 +22,9 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
     int entryInSimd = SIMD_LEN / es;
     assert(es <= 16);
     // Use 512 bit SIMD as buffer, so do not need to consider overflow
-    this->shuffleInst = new __m512i[8];
-    this->shiftInst = new __m512i[8];
-    this->unpackMask = new __m256i[8];
+    this->shuffleInst = (__m512i *) aligned_alloc(64, 64 * 8);
+    this->shiftInst = (__m512i *) aligned_alloc(64, 64 * 8);
+    this->unpackMask = (__m256i *) aligned_alloc(32, 32 * 8);
 
     uint32_t shubuffer[16];
     uint32_t sftbuffer[16];
@@ -61,9 +61,9 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
 }
 
 SimdDeltaScanner16::~SimdDeltaScanner16() {
-    delete[] this->shuffleInst;
-    delete[] this->shiftInst;
-    delete[] this->unpackMask;
+    free(this->shuffleInst);
+    free(this->shiftInst);
+    free(this->unpackMask);
 }
 
 __m256i SimdDeltaScanner16::unpack(__m256i &input, int offset) {
