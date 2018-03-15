@@ -115,3 +115,11 @@ int extract_entry(int *input, int index, int offset, int entrySize) {
         return ((word0 >> offset & mask0) | word1 << (32 - offset)) & mask;
     }
 }
+
+__m256i unpack16_small(uint8_t *input, int offset, int entrySize) {
+
+}
+
+__m256i unpack16_large(uint8_t *input, int offset, int entrySize) {
+
+}

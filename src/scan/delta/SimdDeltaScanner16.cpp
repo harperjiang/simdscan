@@ -3,6 +3,9 @@
 //
 
 #include "SimdDeltaScanner16.h"
+#include "../../util/encode.h"
+#include "../../util/unpack/Small16Unpacker.h"
+#include "../../util/unpack/Large16Unpacker.h"
 #include <immintrin.h>
 #include <assert.h>
 
@@ -21,57 +24,22 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
     this->entrySize = es;
     int entryInSimd = SIMD_LEN / es;
     assert(es <= 16);
-    // Use 512 bit SIMD as buffer, so do not need to consider overflow
-    this->shuffleInst = (__m512i *) aligned_alloc(64, 64 * 8);
-    this->shiftInst = (__m512i *) aligned_alloc(64, 64 * 8);
-    this->unpackMask = (__m256i *) aligned_alloc(32, 32 * 8);
-
-    uint32_t shubuffer[16];
-    uint32_t sftbuffer[16];
-
-    for (int offset = 0; offset < 8; offset++) {
-        // 16 entries
-        for (int j = 0; j < 16; j++) {
-            shubuffer[j] = 0;
-            uint32_t bitLoc = offset + j * entrySize;
-            uint32_t byteLoc = bitLoc / 8;
-            int bitsDone = 0;
-            // 1st-th byte
-            shubuffer[j] |= byteLoc;
-            bitsDone += 8 - bitLoc % 8;
-            int remain = (entrySize - bitsDone) / 8 + ((entrySize - bitsDone) % 8 ? 1 : 0);
-            for (int k = 1; k <= remain; k++) {
-                shubuffer[j] |= (byteLoc + k) << k * 8;
-            }
-            sftbuffer[j] = bitLoc % 8; // Erase previous
-        }
-
-
-        shuffleInst[offset] = _mm512_setr_epi32(shubuffer[0], shubuffer[1], shubuffer[2], shubuffer[3],
-                                                shubuffer[4], shubuffer[5], shubuffer[6], shubuffer[7],
-                                                shubuffer[8], shubuffer[9], shubuffer[10], shubuffer[11],
-                                                shubuffer[12], shubuffer[13], shubuffer[14], shubuffer[15]);
-        shiftInst[offset] = _mm512_setr_epi32(sftbuffer[0], sftbuffer[1], sftbuffer[2], sftbuffer[3],
-                                              sftbuffer[4], sftbuffer[5], sftbuffer[6], sftbuffer[7],
-                                              sftbuffer[8], sftbuffer[9], sftbuffer[10], sftbuffer[11],
-                                              sftbuffer[12], sftbuffer[13], sftbuffer[14], sftbuffer[15]);
-        unpackMask[offset] = _mm256_set1_epi16((1 << entrySize) - 1);
+    if (es <= 8) {
+        this->unpacker = new Small16Unpacker(es);
+    } else {
+        this->unpacker = new Large16Unpacker(es);
     }
-
 }
 
 SimdDeltaScanner16::~SimdDeltaScanner16() {
-    free(this->shuffleInst);
-    free(this->shiftInst);
-    free(this->unpackMask);
 }
 
-__m256i SimdDeltaScanner16::unpack(__m256i &input, int offset) {
-    __m512i data = _mm512_castsi256_si512(input);
-    data = _mm512_permutexvar_epi8(data, shuffleInst[offset]);
-    data = _mm512_sllv_epi16(data, shiftInst[offset]);
-    return _mm256_and_si256(_mm512_cvtepi32_epi16(data), unpackMask[offset]);
-}
+//__m256i SimdDeltaScanner16::unpack(uint8_t *target, int offset) {
+//    __m512i data = _mm512_castsi256_si512(input);
+//    data = _mm512_permutexvar_epi8(data, shuffleInst[offset]);
+//    data = _mm512_sllv_epi16(data, shiftInst[offset]);
+//    return _mm256_and_si256(_mm512_cvtepi32_epi16(data), unpackMask[offset]);
+//}
 
 void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicate *p) {
     uint8_t *bytein = (uint8_t *) input;
@@ -90,8 +58,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
         case opr_eq:
         case opr_neq:
             while (entryCounter < length) {
-                __m256i current = _mm256_loadu_si256((__m256i *) (bytein + byteCounter));
-                current = unpack(current, offset);
+                __m256i current = unpacker->unpack(bytein + byteCounter, offset);
                 __m256i aligned = _mm256_bslli_epi128(current, 16);
                 __m256i s1 = _mm256_hadd_epi16(current, aligned);
                 __m256i s2 = _mm256_sllv_epi64(s1, SHIFT16);
@@ -122,7 +89,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
             break;
         case opr_less:
             while (entryCounter < length) {
-                __m256i current = _mm256_loadu_si256((__m256i *) (bytein + byteCounter));
+                __m256i current = unpacker->unpack(bytein + byteCounter, offset);
                 __m256i aligned = _mm256_bslli_epi128(current, 16);
                 __m256i s1 = _mm256_hadd_epi16(current, aligned);
                 __m256i s2 = _mm256_sllv_epi64(s1, SHIFT16);

@@ -7,20 +7,17 @@
 
 
 #include "../Scanner.h"
+#include "../../util/unpack/Unpacker.h"
 #include <immintrin.h>
 
 class SimdDeltaScanner16 : public Scanner {
 protected:
     int entrySize;
 
-    __m512i* shuffleInst;
-    __m512i* shiftInst;
-    __m256i* unpackMask;
-    /**
-     * Unpack entries in the given SIMD to buffer
-     * @param input SIMD word containing packed entries
-     */
-    __m256i unpack(__m256i& input, int offset);
+    __m512i *shuffleInst;
+    __m512i *shiftInst;
+
+    Unpacker *unpacker;
 
 public:
     SimdDeltaScanner16(int es);
