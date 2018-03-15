@@ -14,6 +14,7 @@ protected:
 
     __m512i* shuffleInst;
     __m512i* shiftInst;
+    __m256i* unpackMask;
     /**
      * Unpack entries in the given SIMD to buffer
      * @param input SIMD word containing packed entries

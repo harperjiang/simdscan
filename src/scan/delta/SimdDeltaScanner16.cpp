@@ -24,6 +24,7 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
     // Use 512 bit SIMD as buffer, so do not need to consider overflow
     this->shuffleInst = new __m512i[8];
     this->shiftInst = new __m512i[8];
+    this->unpackMask = new __m256i[8];
 
     uint32_t shubuffer[16];
     uint32_t sftbuffer[16];
@@ -54,6 +55,7 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
                                               sftbuffer[4], sftbuffer[5], sftbuffer[6], sftbuffer[7],
                                               sftbuffer[8], sftbuffer[9], sftbuffer[10], sftbuffer[11],
                                               sftbuffer[12], sftbuffer[13], sftbuffer[14], sftbuffer[15]);
+        unpackMask[offset] = _mm256_set1_epi16((1 << entrySize) - 1);
     }
 
 }
@@ -67,7 +69,7 @@ __m256i SimdDeltaScanner16::unpack(__m256i &input, int offset) {
     __m512i data = _mm512_castsi256_si512(input);
     data = _mm512_permutexvar_epi8(data, shuffleInst[offset]);
     data = _mm512_sllv_epi16(data, shiftInst[offset]);
-    return _mm512_cvtepi32_epi16(data);
+    return _mm256_and_si256(_mm512_cvtepi32_epi16(data), unpackMask[offset]);
 }
 
 void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicate *p) {
