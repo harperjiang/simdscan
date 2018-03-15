@@ -7,6 +7,7 @@
 
 
 #include "../Scanner.h"
+#include <immintrin.h>
 
 class SimdDeltaScanner16 : public Scanner {
 protected:

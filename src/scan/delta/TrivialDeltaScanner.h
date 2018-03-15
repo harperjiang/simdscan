@@ -11,13 +11,6 @@
 class TrivialDeltaScanner : public Scanner {
 protected:
     int entrySize;
-
-    // Scan 16 bit
-    void shortScan(int *, uint64_t, int *, Predicate *);
-
-    // Scan 32 bit
-    void normalScan(int *, uint64_t, int *, Predicate *);
-
 public:
     TrivialDeltaScanner(int);
 

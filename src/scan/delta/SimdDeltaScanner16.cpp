@@ -63,6 +63,7 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
 SimdDeltaScanner16::~SimdDeltaScanner16() {
     delete[] this->shuffleInst;
     delete[] this->shiftInst;
+    delete[] this->unpackMask;
 }
 
 __m256i SimdDeltaScanner16::unpack(__m256i &input, int offset) {

@@ -6,7 +6,7 @@
 #define SIMDSCAN_SIMDDELTASCANNER32FORTEST_H
 
 
-#include <avxintrin.h>
+#include <immintrin.h>
 #include "../../../src/scan/delta/SimdDeltaScanner32.h"
 
 class SimdDeltaScanner32ForTest : public SimdDeltaScanner32 {

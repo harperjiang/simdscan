@@ -12,9 +12,9 @@ private:
     int entrySize = 0;
 public:
 
-    TrivialBPScanner512(int);
+    TrivialBPScanner(int);
 
-    virtual ~TrivialBPScanner512();
+    virtual ~TrivialBPScanner();
 
     void scan(int *, uint64_t, int *, Predicate *);
 

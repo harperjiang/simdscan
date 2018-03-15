@@ -3,13 +3,13 @@
 //
 
 #include "TrivialBPScanner.h"
-#include "../util/encode.h"
+#include "../../util/encode.h"
 
-TrivialBPScanner::TrivialBPScanner512(int es) {
+TrivialBPScanner::TrivialBPScanner(int es) {
     this->entrySize = es;
 }
 
-virtual TrivialBPScanner::~TrivialBPScanner512() {
+TrivialBPScanner::~TrivialBPScanner() {
 
 }
 
