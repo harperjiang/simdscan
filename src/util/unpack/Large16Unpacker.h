@@ -11,8 +11,8 @@
 class Large16Unpacker : public Unpacker {
 private:
     int entrySize;
-    __m256i *shuffleInst;
-    __m256i *shiftInst;
+    __m512i *shuffleInst;
+    __m512i *shiftInst;
     __m256i mask;
 public:
     Large16Unpacker(int es);

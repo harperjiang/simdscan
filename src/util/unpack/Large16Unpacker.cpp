@@ -2,11 +2,14 @@
 // Created by harper on 3/15/18.
 //
 
+#include <assert.h>
 #include "Large16Unpacker.h"
 
 Large16Unpacker::Large16Unpacker(int es) {
     this->entrySize = es;
+    assert(es > 8 && es < 16);
 
+    this->mask = _mm256_set1_epi16((1 << es) - 1);
     this->shuffleInst = (__m512i *) aligned_alloc(64, 64 * 8);
     this->shiftInst = (__m512i *) aligned_alloc(64, 64 * 8);
 
@@ -41,7 +44,7 @@ Large16Unpacker::Large16Unpacker(int es) {
         __m128i su2 = shuffleBuffer[higher];
         __m128i su3 = shuffleBuffer[evenHigher];
 
-        __m256i shuffle = _mm512_castsi128_si512(su0);
+        __m512i shuffle = _mm512_castsi128_si512(su0);
         shuffle = _mm512_inserti64x2(shuffle, su1, 1);
         shuffle = _mm512_inserti64x2(shuffle, su2, 2);
         shuffle = _mm512_inserti64x2(shuffle, su3, 3);
@@ -52,7 +55,7 @@ Large16Unpacker::Large16Unpacker(int es) {
         __m128i sh2 = shuffleBuffer[higher];
         __m128i sh3 = shuffleBuffer[evenHigher];
 
-        __m256i shift = _mm512_castsi128_si512(sh0);
+        __m512i shift = _mm512_castsi128_si512(sh0);
         shift = _mm512_inserti64x2(shift, sh1, 1);
         shift = _mm512_inserti64x2(shift, sh2, 2);
         shift = _mm512_inserti64x2(shift, sh3, 3);
@@ -86,7 +89,7 @@ __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     __m256i lower = _mm256_loadu2_m128i((__m128i *) bytes[1], (__m128i *) bytes[0]);
     __m256i higher = _mm256_loadu2_m128i((__m128i *) bytes[3], (__m128i *) bytes[2]);
     // Get a single 512 bit
-    __m512 main = _mm512_castsi256_si512(lower);
+    __m512i main = _mm512_castsi256_si512(lower);
     main = _mm512_inserti64x4(main, higher, 1);
 
     // Shuffle bytes
@@ -94,5 +97,5 @@ __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shift bits
     main = _mm512_sllv_epi16(main, shiftInst[offset]);
     // Mask
-    return _mm512_and_si512(_mm512_cvtepi32_epi16(main), mask);
+    return _mm256_and_si256(_mm512_cvtepi32_epi16(main), mask);
 }
