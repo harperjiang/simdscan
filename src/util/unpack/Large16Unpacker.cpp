@@ -62,10 +62,10 @@ Large16Unpacker::Large16Unpacker(uint32_t es) {
         shuffle = _mm512_inserti64x2(shuffle, su3, 3);
         this->shuffleInst[i] = shuffle;
 
-        __m128i sh0 = shuffleBuffer[i];
-        __m128i sh1 = shuffleBuffer[high];
-        __m128i sh2 = shuffleBuffer[higher];
-        __m128i sh3 = shuffleBuffer[evenHigher];
+        __m128i sh0 = shiftBuffer[i];
+        __m128i sh1 = shiftBuffer[high];
+        __m128i sh2 = shiftBuffer[higher];
+        __m128i sh3 = shiftBuffer[evenHigher];
 
         __m512i shift = _mm512_castsi128_si512(sh0);
         shift = _mm512_inserti64x2(shift, sh1, 1);
@@ -97,9 +97,9 @@ __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     main = _mm512_inserti64x4(main, higher, 1);
 
     // Shuffle bytes
-    main = _mm512_shuffle_epi8(main, shuffleInst[offset]);
+    __m512i shuffle = _mm512_shuffle_epi8(main, shuffleInst[offset]);
     // Shift bits
-    main = _mm512_srlv_epi16(main, shiftInst[offset]);
+    __m512i shift = _mm512_srlv_epi16(shuffle, shiftInst[offset]);
     // Mask
-    return _mm256_and_si256(_mm512_cvtepi32_epi16(main), *mask);
+    return _mm256_and_si256(_mm512_cvtepi32_epi16(shift), *mask);
 }

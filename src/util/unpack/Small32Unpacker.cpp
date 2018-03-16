@@ -68,9 +68,9 @@ __m256i Small32Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Load data into 2 128 buffer and combine as 256
     __m256i main = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset]), (__m128i *) data);
     // Shuffle
-    main = _mm256_shuffle_epi8(main, shuffleInst[offset]);
+    __m256i shuffle = _mm256_shuffle_epi8(main, shuffleInst[offset]);
     // Shift
-    main = _mm256_srlv_epi32(main, shiftInst[offset]);
+    __m256i shift = _mm256_srlv_epi32(shuffle, shiftInst[offset]);
     // Mask
-    return _mm256_and_si256(main, *mask);
+    return _mm256_and_si256(shift, *mask);
 }
