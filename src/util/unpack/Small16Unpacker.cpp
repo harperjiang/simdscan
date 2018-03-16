@@ -39,13 +39,9 @@ Small16Unpacker::Small16Unpacker(uint32_t es) {
 
     // Combine them to make 256-bit shuffle and shift instructions
     for (int i = 0; i < 8; i++) {
-        int higher = (i + entrySize * 8) % 8;
-        __m256i shuffle = _mm256_castsi128_si256(shuffleBuffer[higher]);
-        shuffle = _mm256_inserti128_si256(shuffle, shuffleBuffer[i], 1);
-        this->shuffleInst[i] = shuffle;
-        __m256i shift = _mm256_castsi128_si256(shiftBuffer[higher]);
-        shift = _mm256_inserti128_si256(shift, shiftBuffer[i], 1);
-        this->shiftInst[i] = shift;
+        uint32_t higher = (i + entrySize * 8) % 8;
+        this->shuffleInst[i] = _mm256_set_m128i(shuffleBuffer[higher], shuffleBuffer[i]);
+        this->shiftInst[i] = _mm256_set_m128i(shiftBuffer[higher], shiftBuffer[i]);
     }
 
     free(shuffleDataBuffer);
