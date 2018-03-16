@@ -20,8 +20,8 @@ Small16Unpacker::Small16Unpacker(uint32_t es) {
         uint32_t entryoff = entrySize * idx;
         shuffleDataBuffer[idx] = entryoff / 8;
         shiftDataBuffer[idx] = entryoff % 8;
-        if (entryoff % 8 + entrySize > 8) {
-            shuffleDataBuffer[idx] |= (entryoff % 8 + 1) << 8;
+        if (shiftDataBuffer[idx] + entrySize > 8) {
+            shuffleDataBuffer[idx] |= (entryoff / 8 + 1) << 8;
         } else {
             shuffleDataBuffer[idx] |= 0xff << 8;
         }
