@@ -16,7 +16,7 @@ private:
 
     __m512i *shuffleInst;
     __m512i *shiftInst;
-    __m256i mask;
+    __m256i *mask;
 public:
     Large16Unpacker(uint32_t es);
 

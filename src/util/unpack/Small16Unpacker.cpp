@@ -12,7 +12,8 @@ Small16Unpacker::Small16Unpacker(uint32_t es) {
 
     this->shuffleInst = (__m256i *) aligned_alloc(32, 32 * 8);
     this->shiftInst = (__m256i *) aligned_alloc(32, 32 * 8);
-    this->mask = _mm256_set1_epi16((1 << entrySize) - 1);
+    this->mask = (__m256i *) aligned_alloc(32, 32);
+    *mask = _mm256_set1_epi16((1 << entrySize) - 1);
 
     __m128i *shuffleBuffer = (__m128i *) aligned_alloc(16, 16 * 8);
     __m128i *shiftBuffer = (__m128i *) aligned_alloc(16, 16 * 8);
@@ -54,6 +55,7 @@ Small16Unpacker::~Small16Unpacker() {
     delete[] this->nextPos;
     free(this->shuffleInst);
     free(this->shiftInst);
+    free(this->mask);
 }
 
 __m256i Small16Unpacker::unpack(uint8_t *data, uint8_t offset) {
@@ -68,5 +70,5 @@ __m256i Small16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shift bits
     main = _mm256_sllv_epi16(main, shiftInst[offset]);
     // Mask
-    return _mm256_and_si256(main, mask);
+    return _mm256_and_si256(main, *mask);
 }

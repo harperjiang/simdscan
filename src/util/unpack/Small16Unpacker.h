@@ -16,7 +16,7 @@ private:
     uint8_t *nextPos;
     __m256i *shuffleInst;
     __m256i *shiftInst;
-    __m256i mask;
+    __m256i *mask;
 public:
     Small16Unpacker(uint32_t es);
 

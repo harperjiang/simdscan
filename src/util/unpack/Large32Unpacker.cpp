@@ -14,7 +14,8 @@ Large32Unpacker::Large32Unpacker(uint32_t es) {
     shiftInst = (__m512i *) aligned_alloc(64, 8 * 64);
     shuffleInst = (__m512i *) aligned_alloc(64, 8 * 64);
 
-    mask = _mm256_set1_epi32((1 << entrySize) - 1);
+    mask = (__m256i*)aligned_alloc(32,32);
+    *mask = _mm256_set1_epi32((1 << entrySize) - 1);
 
     __m128i *shuffleBuffer = (__m128i *) aligned_alloc(16, 16 * 8);
     __m128i *shiftBuffer = (__m128i *) aligned_alloc(16, 16 * 8);
@@ -81,6 +82,7 @@ Large32Unpacker::Large32Unpacker(uint32_t es) {
 Large32Unpacker::~Large32Unpacker() {
     free(shiftInst);
     free(shuffleInst);
+    free(mask);
     delete[] nextPos;
 }
 
@@ -98,5 +100,5 @@ __m256i Large32Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shift
     main = _mm512_sllv_epi32(main, shiftInst[offset]);
     // Mask
-    return _mm256_and_si256(_mm512_cvtepi64_epi32(main), mask);
+    return _mm256_and_si256(_mm512_cvtepi64_epi32(main), *mask);
 }

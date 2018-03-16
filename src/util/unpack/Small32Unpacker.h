@@ -16,7 +16,7 @@ private:
 
     __m256i *shuffleInst;
     __m256i *shiftInst;
-    __m256i mask;
+    __m256i *mask;
 public:
     Small32Unpacker(uint32_t es);
 

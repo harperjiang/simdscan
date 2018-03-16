@@ -11,7 +11,8 @@ Large16Unpacker::Large16Unpacker(uint32_t es) {
 
     this->nextPos = new uint8_t[24];
 
-    this->mask = _mm256_set1_epi16((1 << es) - 1);
+    this->mask = (__m256i *) aligned_alloc(32, 32);
+    *mask = _mm256_set1_epi16((1 << es) - 1);
     this->shuffleInst = (__m512i *) aligned_alloc(64, 64 * 8);
     this->shiftInst = (__m512i *) aligned_alloc(64, 64 * 8);
 
@@ -77,6 +78,7 @@ Large16Unpacker::Large16Unpacker(uint32_t es) {
 Large16Unpacker::~Large16Unpacker() {
     free(this->shuffleInst);
     free(this->shiftInst);
+    free(this->mask);
     delete[] this->nextPos;
 }
 
@@ -94,5 +96,5 @@ __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shift bits
     main = _mm512_sllv_epi16(main, shiftInst[offset]);
     // Mask
-    return _mm256_and_si256(_mm512_cvtepi32_epi16(main), mask);
+    return _mm256_and_si256(_mm512_cvtepi32_epi16(main), *mask);
 }
