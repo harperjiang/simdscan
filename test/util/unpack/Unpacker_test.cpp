@@ -9,8 +9,8 @@
 #include "../../../src/util/unpack/Small32Unpacker.h"
 #include "../../../src/util/unpack/Large32Unpacker.h"
 
-int mm256_extract_epi16(__m256i input, int index);
-int mm256_extract_epi32(__m256i input, int index);
+static int mm256_extract_epi16(__m256i input, int index);
+static int mm256_extract_epi32(__m256i input, int index);
 
 TEST(Small16Unpacker, unpack) {
     int entrySize = 7;
