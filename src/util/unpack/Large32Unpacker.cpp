@@ -35,7 +35,7 @@ Large32Unpacker::Large32Unpacker(uint32_t es) {
                 shuffleDataBuffer[idx] |= (start + bi) << bi * 8;
             }
             for (int bi = round + 1; bi < 8; bi++) {
-                shuffleDataBuffer[idx] |= 0xff << bi * 8;
+                shuffleDataBuffer[idx] |= 0xffL << bi * 8;
             }
         }
         for (int j = 0; j < 3; j++) {
