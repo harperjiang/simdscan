@@ -34,7 +34,7 @@ Large32Unpacker::Large32Unpacker(uint32_t es) {
             for (int bi = 0; bi <= round; bi++) {
                 shuffleDataBuffer[idx] |= (start + bi) << bi * 8;
             }
-            for (int bi = round+1; bi < 8; bi++) {
+            for (int bi = round + 1; bi < 8; bi++) {
                 shuffleDataBuffer[idx] |= 0xff << bi * 8;
             }
         }
@@ -90,9 +90,9 @@ Large32Unpacker::~Large32Unpacker() {
 
 __m256i Large32Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Load 4 128 bit into a 512 bit register
-    __m256i lower = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset]), (__m128i *) data);
-    __m256i higher = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset + 1]),
-                                         (__m128i *) (data + nextPos[offset + 2]));
+    __m256i lower = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset * 3]), (__m128i *) data);
+    __m256i higher = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset * 3 + 1]),
+                                         (__m128i *) (data + nextPos[offset * 3 + 2]));
     // Get a single 512 bit
     __m512i main = _mm512_castsi256_si512(lower);
     main = _mm512_inserti64x4(main, higher, 1);

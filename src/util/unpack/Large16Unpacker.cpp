@@ -89,9 +89,9 @@ Large16Unpacker::~Large16Unpacker() {
 
 __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Load 4 128 bits, each contains 4 entries to build a 512-bit SIMD
-    __m256i lower = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset]), (__m128i *) data);
-    __m256i higher = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset + 2]),
-                                         (__m128i *) (data + nextPos[offset + 1]));
+    __m256i lower = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset*3]), (__m128i *) data);
+    __m256i higher = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset*3 + 2]),
+                                         (__m128i *) (data + nextPos[offset*3 + 1]));
     // Get a single 512 bit
     __m512i main = _mm512_castsi256_si512(lower);
     main = _mm512_inserti64x4(main, higher, 1);
