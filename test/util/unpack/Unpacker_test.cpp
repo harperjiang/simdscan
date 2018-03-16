@@ -6,6 +6,8 @@
 #include "../../../src/util/encode.h"
 #include "../../../src/util/unpack/Small16Unpacker.h"
 #include "../../../src/util/unpack/Large16Unpacker.h"
+#include "../../../src/util/unpack/Small32Unpacker.h"
+#include "../../../src/util/unpack/Large32Unpacker.h"
 
 int mm256_extract_epi16(__m256i input, int index);
 
@@ -60,7 +62,7 @@ TEST(Small32Unpacker, unpack) {
     int output[16];
     encode(data, output, 17, entrySize);
 
-    Small16Unpacker *unpacker = new Small16Unpacker(entrySize);
+    Small32Unpacker *unpacker = new Small32Unpacker(entrySize);
 
 
     for (int o = 0; o < 8; o++) {
@@ -81,7 +83,7 @@ TEST(Large32Unpacker, unpack) {
     int output[16];
     encode(data, output, 17, entrySize);
 
-    Large16Unpacker *unpacker = new Large16Unpacker(entrySize);
+    Large32Unpacker *unpacker = new Large32Unpacker(entrySize);
 
 
     for (int o = 0; o < 8; o++) {
