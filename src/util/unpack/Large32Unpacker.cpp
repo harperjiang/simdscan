@@ -100,7 +100,7 @@ __m256i Large32Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shuffle
     __m512i shuffle = _mm512_shuffle_epi8(main, shuffleInst[offset]);
     // Shift
-    __m512i shift = _mm512_srlv_epi32(shuffle, shiftInst[offset]);
+    __m512i shift = _mm512_srlv_epi64(shuffle, shiftInst[offset]);
     // Mask
     return _mm256_and_si256(_mm512_cvtepi64_epi32(shift), *mask);
 }
