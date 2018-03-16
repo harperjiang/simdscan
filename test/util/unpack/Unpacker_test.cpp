@@ -25,8 +25,7 @@ TEST(Small16Unpacker, unpack) {
 
     for (int i = 0; i < 16; i++) {
         int bitoff = i * entrySize;
-        int extract = extract_entry(output, bitoff / 32, bitoff % 32, entrySize);
-        EXPECT_EQ(extract, mm256_extract_epi16(unpacked, i)) << i;
+        EXPECT_EQ(data[i], mm256_extract_epi16(unpacked, i)) << i;
     }
 }
 
