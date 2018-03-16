@@ -52,7 +52,7 @@ __m256i Small16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shuffle bytes
     __m256i shuffle = _mm256_shuffle_epi8(main, *shuffleInst);
     // Shift bits
-    __m256i shift = _mm256_sllv_epi16(shuffle, *shiftInst);
+    __m256i shift = _mm256_srlv_epi16(shuffle, *shiftInst);
     // Mask
     return _mm256_and_si256(shift, *mask);
 }
