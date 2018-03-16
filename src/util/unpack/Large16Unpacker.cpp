@@ -41,8 +41,10 @@ Large16Unpacker::Large16Unpacker(int es) {
         __m128i su2 = shuffleBuffer[higher];
         __m128i su3 = shuffleBuffer[evenHigher];
 
-        __m256i shuffle = _mm256_castsi128_si256(shuffleBuffer[higher]);
-        shuffle = _mm256_inserti128_si256(shuffle, shuffleBuffer[i], 1);
+        __m256i shuffle = _mm512_castsi128_si512(su0);
+        shuffle = _mm512_inserti64x2(shuffle, su1, 1);
+        shuffle = _mm512_inserti64x2(shuffle, su2, 2);
+        shuffle = _mm512_inserti64x2(shuffle, su3, 3);
         this->shuffleInst[i] = shuffle;
 
         __m128i sh0 = shuffleBuffer[i];
@@ -50,8 +52,10 @@ Large16Unpacker::Large16Unpacker(int es) {
         __m128i sh2 = shuffleBuffer[higher];
         __m128i sh3 = shuffleBuffer[evenHigher];
 
-        __m256i shift = _mm256_castsi128_si256(shiftBuffer[higher]);
-        shift = _mm256_inserti128_si256(shift, shiftBuffer[i], 1);
+        __m256i shift = _mm512_castsi128_si512(sh0);
+        shift = _mm512_inserti64x2(shift, sh1, 1);
+        shift = _mm512_inserti64x2(shift, sh2, 2);
+        shift = _mm512_inserti64x2(shift, sh3, 3);
         this->shiftInst[i] = shift;
     }
 
@@ -67,24 +71,28 @@ Large16Unpacker::~Large16Unpacker() {
 }
 
 __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
+    // Load 4 128 bits, each contains 4 entries to build a 512-bit SIMD
+    uint8_t *bytes[4];
+    uint8_t offs[4];
+    bytes[0] = data;
+    offs[0] = offset;
 
-    // Load 4 128 bits, each contains 4 entries
-    __m256i lower = _mm256_loadu_si256((__m256i *) data);
-    uint8_t lowoff = offset;
+    for (int idx = 1; idx < 4; idx++) {
+        int bitadv = offset + entrySize * 4;
+        bytes[idx] = bytes[idx - 1] + bitadv / 8;
+        offs[idx] = bitadv % 8;
+    }
 
-    uint32_t bitadv = entrySize * 8 + offset;
-    __m256i higher = _mm256_loadu_si256((__m256i *) data + bitadv / 8);
-    uint8_t highoff = bitadv % 8;
-
+    __m256i lower = _mm256_loadu2_m128i((__m128i *) bytes[1], (__m128i *) bytes[0]);
+    __m256i higher = _mm256_loadu2_m128i((__m128i *) bytes[3], (__m128i *) bytes[2]);
     // Get a single 512 bit
     __m512 main = _mm512_castsi256_si512(lower);
     main = _mm512_inserti64x4(main, higher, 1);
 
-    uint32_t index = highoff * 8 + lowoff;
     // Shuffle bytes
-    main = _mm512_shuffle_epi8(main, shuffleInst[index]);
+    main = _mm512_shuffle_epi8(main, shuffleInst[offset]);
     // Shift bits
-    main = _mm512_sllv_epi16(main, shiftInst[index]);
+    main = _mm512_sllv_epi16(main, shiftInst[offset]);
     // Mask
     return _mm512_and_si512(_mm512_cvtepi32_epi16(main), mask);
 }

@@ -56,14 +56,9 @@ Small16Unpacker::~Small16Unpacker() {
 
 __m256i Small16Unpacker::unpack(uint8_t *data, uint8_t offset) {
 
-    // Load two 128 bits, each contains 8 entries
-    __m128i lower = _mm_loadu_si128((__m128i *) data);
+    // Load two 128 bits, each contains 8 entries as a 256-bit
     uint32_t bitadv = entrySize * 8 + offset;
-    __m128i higher = _mm_loadu_si128((__m128i *) data + bitadv / 8);
-
-    // Get a single 256 bit
-    __m256 main = _mm256_castsi128_si256(lower);
-    main = _mm256_inserti128_si256(main, higher, 1);
+    __m256 main = _mm256_loadu2_m128i((__m128i *) (data + bitadv / 8), (__m128i *) data);
 
     // Shuffle bytes
     main = _mm256_shuffle_epi8(main, shuffleInst[offset]);
