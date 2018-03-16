@@ -30,7 +30,7 @@ Large32Unpacker::Large32Unpacker(uint32_t es) {
 
             uint8_t round = (shiftDataBuffer[idx] + entrySize) / 8;
             shuffleDataBuffer[idx] = 0;
-            int start = entryoff / 8;
+            uint64_t start = entryoff / 8;
             for (int bi = 0; bi <= round; bi++) {
                 shuffleDataBuffer[idx] |= (start + bi) << bi * 8;
             }
