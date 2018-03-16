@@ -21,15 +21,12 @@ TEST(Small16Unpacker, unpack) {
 
     Small16Unpacker *unpacker = new Small16Unpacker(entrySize);
 
+    __m256i unpacked = unpacker->unpack((uint8_t *) output, 0);
 
-    for (int o = 0; o < 8; o++) {
-        __m256i unpacked = unpacker->unpack((uint8_t *) output, o);
-
-        for (int i = 0; i < 16; i++) {
-            int bitoff = o + i * entrySize;
-            int extract = extract_entry(output, bitoff / 8, bitoff % 8, entrySize);
-            ASSERT_EQ(extract, mm256_extract_epi16(unpacked, i));
-        }
+    for (int i = 0; i < 16; i++) {
+        int bitoff = i * entrySize;
+        int extract = extract_entry(output, bitoff / 8, bitoff % 8, entrySize);
+        ASSERT_EQ(extract, mm256_extract_epi16(unpacked, i));
     }
 }
 
