@@ -24,7 +24,6 @@ TEST(Small16Unpacker, unpack) {
     __m256i unpacked = unpacker->unpack((uint8_t *) output, 0);
 
     for (int i = 0; i < 16; i++) {
-        int bitoff = i * entrySize;
         EXPECT_EQ(data[i], mm256_extract_epi16(unpacked, i)) << i;
     }
 }
@@ -45,8 +44,8 @@ TEST(Large16Unpacker, unpack) {
 
         for (int i = 0; i < 16; i++) {
             int bitoff = o + i * entrySize;
-            int extract = extract_entry(output, bitoff / 8, bitoff % 8, entrySize);
-            ASSERT_EQ(extract, mm256_extract_epi16(unpacked, i));
+            int extract = extract_entry(output, bitoff / 32, bitoff % 32, entrySize);
+            EXPECT_EQ(extract, mm256_extract_epi16(unpacked, i)) << o << "," << i;
         }
     }
 }
@@ -66,8 +65,8 @@ TEST(Small32Unpacker, unpack) {
 
         for (int i = 0; i < 8; i++) {
             int bitoff = o + i * entrySize;
-            int extract = extract_entry(output, bitoff / 8, bitoff % 8, entrySize);
-            ASSERT_EQ(extract, mm256_extract_epi16(unpacked, i));
+            int extract = extract_entry(output, bitoff / 32, bitoff % 32, entrySize);
+            EXPECT_EQ(extract, mm256_extract_epi16(unpacked, i)) << o << "," << i;
         }
     }
 }
@@ -87,8 +86,8 @@ TEST(Large32Unpacker, unpack) {
 
         for (int i = 0; i < 8; i++) {
             int bitoff = o + i * entrySize;
-            int extract = extract_entry(output, bitoff / 8, bitoff % 8, entrySize);
-            ASSERT_EQ(extract, mm256_extract_epi16(unpacked, i));
+            int extract = extract_entry(output, bitoff / 32, bitoff % 32, entrySize);
+            EXPECT_EQ(extract, mm256_extract_epi16(unpacked, i)) << o << "," << i;
         }
     }
 }

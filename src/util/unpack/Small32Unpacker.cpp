@@ -31,10 +31,10 @@ Small32Unpacker::Small32Unpacker(uint32_t es) {
             uint8_t round = (shiftDataBuffer[idx] + entrySize) / 8;
             shuffleDataBuffer[idx] = 0;
             int start = entryoff / 8;
-            for (int bi = 0; bi < round; bi++) {
+            for (int bi = 0; bi <= round; bi++) {
                 shuffleDataBuffer[idx] |= (start + bi) << bi * 8;
             }
-            for (int bi = round; bi < 4; bi++) {
+            for (int bi = round + 1; bi < 4; bi++) {
                 shuffleDataBuffer[idx] |= 0xff << bi * 8;
             }
         }
@@ -46,7 +46,7 @@ Small32Unpacker::Small32Unpacker(uint32_t es) {
 
     // Combine them to make 256-bit shuffle and shift instructions
     for (int i = 0; i < 8; i++) {
-        uint32_t higher = (i + entrySize * 8) % 8;
+        uint32_t higher = (i + entrySize * 4) % 8;
         this->shuffleInst[i] = _mm256_set_m128i(shuffleBuffer[higher], shuffleBuffer[i]);
         this->shiftInst[i] = _mm256_set_m128i(shiftBuffer[higher], shiftBuffer[i]);
     }
@@ -55,7 +55,6 @@ Small32Unpacker::Small32Unpacker(uint32_t es) {
     free(shiftDataBuffer);
     free(shuffleBuffer);
     free(shiftBuffer);
-
 }
 
 Small32Unpacker::~Small32Unpacker() {
@@ -71,7 +70,7 @@ __m256i Small32Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shuffle
     main = _mm256_shuffle_epi8(main, shuffleInst[offset]);
     // Shift
-    main = _mm256_sllv_epi32(main, shiftInst[offset]);
+    main = _mm256_srlv_epi32(main, shiftInst[offset]);
     // Mask
     return _mm256_and_si256(main, *mask);
 }

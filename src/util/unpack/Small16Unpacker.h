@@ -13,7 +13,6 @@ class Small16Unpacker : public Unpacker {
 private:
     uint32_t entrySize;
 
-    uint8_t *nextPos;
     __m256i *shuffleInst;
     __m256i *shiftInst;
     __m256i *mask;

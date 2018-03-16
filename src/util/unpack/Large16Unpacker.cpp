@@ -18,18 +18,23 @@ Large16Unpacker::Large16Unpacker(uint32_t es) {
 
     __m128i *shuffleBuffer = (__m128i *) aligned_alloc(16, 16 * 8);
     __m128i *shiftBuffer = (__m128i *) aligned_alloc(16, 16 * 8);
-    uint16_t *shuffleDataBuffer = (uint16_t *) aligned_alloc(16, 16);
-    uint16_t *shiftDataBuffer = (uint16_t *) aligned_alloc(16, 16);
+    uint32_t *shuffleDataBuffer = (uint32_t *) aligned_alloc(16, 16);
+    uint32_t *shiftDataBuffer = (uint32_t *) aligned_alloc(16, 16);
     // Compute shuffle and shift instructions
     for (int offset = 0; offset < 8; offset++) {
-        for (int idx = 0; idx < 8; idx++) {
+        for (int idx = 0; idx < 4; idx++) {
             uint32_t entryoff = offset + entrySize * idx;
-            shuffleDataBuffer[idx] = entryoff / 8;
+
             shiftDataBuffer[idx] = entryoff % 8;
-            if (entryoff % 8 + entrySize > 8) {
-                shuffleDataBuffer[idx] |= (entryoff % 8 + 1) << 8;
-            } else {
-                shuffleDataBuffer[idx] |= 0xff << 8;
+
+            uint8_t round = (shiftDataBuffer[idx] + entrySize) / 8;
+            shuffleDataBuffer[idx] = 0;
+            int start = entryoff / 8;
+            for (int bi = 0; bi <= round; bi++) {
+                shuffleDataBuffer[idx] |= (start + bi) << bi * 8;
+            }
+            for (int bi = round + 1; bi < 4; bi++) {
+                shuffleDataBuffer[idx] |= 0xff << bi * 8;
             }
         }
         for (int j = 0; j < 3; j++) {
@@ -42,9 +47,9 @@ Large16Unpacker::Large16Unpacker(uint32_t es) {
 
     // Combine them to make 512-bit shuffle and shift instructions
     for (int i = 0; i < 8; i++) {
-        int high = (i + entrySize * 8) % 8;
-        int higher = (high + entrySize * 8) % 8;
-        int evenHigher = (higher + entrySize * 8) % 8;
+        int high = (i + entrySize * 4) % 8;
+        int higher = (high + entrySize * 4) % 8;
+        int evenHigher = (higher + entrySize * 4) % 8;
 
         __m128i su0 = shuffleBuffer[i];
         __m128i su1 = shuffleBuffer[high];
@@ -94,7 +99,7 @@ __m256i Large16Unpacker::unpack(uint8_t *data, uint8_t offset) {
     // Shuffle bytes
     main = _mm512_shuffle_epi8(main, shuffleInst[offset]);
     // Shift bits
-    main = _mm512_sllv_epi16(main, shiftInst[offset]);
+    main = _mm512_srlv_epi16(main, shiftInst[offset]);
     // Mask
     return _mm256_and_si256(_mm512_cvtepi32_epi16(main), *mask);
 }
