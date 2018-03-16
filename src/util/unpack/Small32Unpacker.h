@@ -8,11 +8,17 @@
 
 #include "Unpacker.h"
 
-class Small32Unpacker: public Unpacker {
+class Small32Unpacker : public Unpacker {
 private:
-    int entrySize;
+    uint32_t entrySize;
+
+    uint8_t* nextPos;
+
+    __m256i *shuffleInst;
+    __m256i *shiftInst;
+    __m256i mask;
 public:
-    Small32Unpacker(int es);
+    Small32Unpacker(uint32_t es);
 
     virtual ~Small32Unpacker();
 

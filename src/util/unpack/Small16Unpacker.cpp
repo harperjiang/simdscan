@@ -4,9 +4,11 @@
 
 #include "Small16Unpacker.h"
 
-Small16Unpacker::Small16Unpacker(int es) {
+Small16Unpacker::Small16Unpacker(uint32_t es) {
     this->entrySize = es;
     assert(es <= 8);
+
+    this->nextPos = new uint8_t[8];
 
     this->shuffleInst = (__m256i *) aligned_alloc(32, 32 * 8);
     this->shiftInst = (__m256i *) aligned_alloc(32, 32 * 8);
@@ -18,6 +20,9 @@ Small16Unpacker::Small16Unpacker(int es) {
     uint16_t *shiftDataBuffer = (uint16_t *) aligned_alloc(16, 16);
     // Compute shuffle and shift instructions
     for (int offset = 0; offset < 8; offset++) {
+        int bitadv = offset + entrySize * 8;
+        this->nextPos[offset] = bitadv / 8;
+
         for (int idx = 0; idx < 8; idx++) {
             uint32_t entryoff = offset + entrySize * idx;
             shuffleDataBuffer[idx] = entryoff / 8;
@@ -50,6 +55,7 @@ Small16Unpacker::Small16Unpacker(int es) {
 }
 
 Small16Unpacker::~Small16Unpacker() {
+    delete[] this->nextPos;
     free(this->shuffleInst);
     free(this->shiftInst);
 }
@@ -57,9 +63,7 @@ Small16Unpacker::~Small16Unpacker() {
 __m256i Small16Unpacker::unpack(uint8_t *data, uint8_t offset) {
 
     // Load two 128 bits, each contains 8 entries as a 256-bit
-    uint32_t bitadv = entrySize * 8 + offset;
-
-    __m256i main = _mm256_loadu2_m128i((__m128i *) (data + bitadv / 8), (__m128i *) data);
+    __m256i main = _mm256_loadu2_m128i((__m128i *) (data + nextPos[offset]), (__m128i *) data);
 //    __m256i main = _mm256_inserti128_si256(_mm256_castsi128_si256(_mm_loadu_si128((__m128i *) data)),
 //                                           _mm_loadu_si128((__m128i *) (data + bitadv / 8)), 1);
 

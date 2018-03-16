@@ -11,12 +11,14 @@
 
 class Small16Unpacker : public Unpacker {
 private:
-    int entrySize;
-    __m256i* shuffleInst;
-    __m256i* shiftInst;
+    uint32_t entrySize;
+
+    uint8_t *nextPos;
+    __m256i *shuffleInst;
+    __m256i *shiftInst;
     __m256i mask;
 public:
-    Small16Unpacker(int es);
+    Small16Unpacker(uint32_t es);
 
     virtual ~Small16Unpacker();
 

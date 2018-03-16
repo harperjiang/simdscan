@@ -10,12 +10,15 @@
 
 class Large16Unpacker : public Unpacker {
 private:
-    int entrySize;
+    uint32_t entrySize;
+
+    uint8_t *nextPos;
+
     __m512i *shuffleInst;
     __m512i *shiftInst;
     __m256i mask;
 public:
-    Large16Unpacker(int es);
+    Large16Unpacker(uint32_t es);
 
     virtual ~Large16Unpacker();
 
