@@ -55,7 +55,7 @@ void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicat
             while (numEntryDone < length) {
                 __m256i current = unpacker->unpack(bytein + byteOffset, offset);
 
-                __m256i aligned = _mm256_permutex2var_epi32(current, ZERO, IDX);
+                __m256i aligned = _mm256_permutex2var_epi32(current, IDX, ZERO);
                 __m256i s1 = _mm256_hadd_epi32(current, aligned);
                 __m256i s2 = _mm256_bslli_epi128(s1, 32);
                 __m256i s3 = _mm256_hadd_epi32(s1, s2);
@@ -78,7 +78,7 @@ void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicat
             while (numEntryDone < length) {
                 __m256i current = unpacker->unpack(bytein + byteOffset, offset);
 
-                __m256i aligned = _mm256_permutex2var_epi32(current, ZERO, IDX);
+                __m256i aligned = _mm256_permutex2var_epi32(current, IDX, ZERO);
                 __m256i s1 = _mm256_hadd_epi32(current, aligned);
                 __m256i s2 = _mm256_bslli_epi128(s1, 32);
                 __m256i s3 = _mm256_hadd_epi32(s1, s2);
