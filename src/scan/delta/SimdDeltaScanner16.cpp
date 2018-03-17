@@ -6,6 +6,7 @@
 #include "../../util/encode.h"
 #include "../../util/unpack/Small16Unpacker.h"
 #include "../../util/unpack/Large16Unpacker.h"
+#include "../../util/unpack/TrivialUnpacker.h"
 #include <immintrin.h>
 #include <assert.h>
 
@@ -26,6 +27,8 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
     assert(es <= 16);
     if (es <= 8) {
         this->unpacker = new Small16Unpacker(es);
+    } else if (es == 16) {
+        this->unpacker = new TrivialUnpacker();
     } else {
         this->unpacker = new Large16Unpacker(es);
     }
