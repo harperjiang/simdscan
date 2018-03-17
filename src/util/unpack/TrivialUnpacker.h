@@ -15,7 +15,7 @@ public:
     virtual ~TrivialUnpacker();
 
 
-    __m256i unpack(uint8_t *data, uint8_t offset) =0;
+    __m256i unpack(uint8_t *data, uint8_t offset);
 };
 
 
