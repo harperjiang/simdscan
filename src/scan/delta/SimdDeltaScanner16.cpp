@@ -110,7 +110,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
 
                 cumsum += cs1 + cs2;
 
-                maskout[outputCounter++] = _mm256_cmpge_epi16_mask(a, extracted);
+                maskout[outputCounter++] = _mm256_cmplt_epi16_mask(extracted, a);
                 entryCounter += 16;
 
                 int bitAdvance = offset + entrySize * 16;
