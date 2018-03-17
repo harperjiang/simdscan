@@ -26,9 +26,9 @@ TEST(SimdDeltaScanner16, equal) {
 
     for (int i = 0; i < 24; i++) {
         if (i != 3)
-            EXPECT_EQ(0, result[i / 8] & (1 << i % 8));
+            EXPECT_EQ(0, result[i / 8] & (1 << (7 - i % 8)));
         else
-            EXPECT_EQ(1 << i % 8, (result[i / 8] & (1 << i % 8)));
+            EXPECT_EQ(1 << (7 - i % 8), (result[i / 8] & (1 << (7 - i % 8))));
     }
 
     delete[] cumsum;
@@ -54,9 +54,9 @@ TEST(SimdDeltaScanner16, less) {
 
     for (int i = 0; i < 24; i++) {
         if (cumsum[i] < 30)
-            EXPECT_EQ(1 << (i % 8), result[i / 8] & (1 << i % 8));
+            EXPECT_EQ(1 << (7 - i % 8), result[i / 8] & (1 << (7 - i % 8)));
         else
-            EXPECT_EQ(0, (result[i / 8] & (1 << i % 8)));
+            EXPECT_EQ(0, (result[i / 8] & (1 << (7 - i % 8))));
     }
 
     delete[] cumsum;
