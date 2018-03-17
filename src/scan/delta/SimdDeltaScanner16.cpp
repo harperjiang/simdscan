@@ -75,7 +75,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
                 int first = (cus << 16) + cus;
                 int second = ((cus + cs1) << 16) + cus + cs1;
                 __m256i cumadd = _mm256_setr_epi32(first, first, first, first, second, second, second, second);
-                extracted = _mm256_add_epi16(cumadd, extracted);
+                extracted = _mm256_add_epi32(cumadd, extracted);
 
                 cumsum += cs1 + cs2;
 
@@ -103,8 +103,8 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
 
                 int cus = (int) cumsum;
 
-                int first = cus << 16 + cus;
-                int second = (cus + cs1) << 16 + cus + cs1;
+                int first = (cus << 16) + cus;
+                int second = ((cus + cs1) << 16) + cus + cs1;
                 __m256i cumadd = _mm256_setr_epi32(first, first, first, first, second, second, second, second);
                 extracted = _mm256_add_epi32(cumadd, extracted);
 
