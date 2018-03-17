@@ -33,6 +33,7 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
 }
 
 SimdDeltaScanner16::~SimdDeltaScanner16() {
+    delete this->unpacker;
 }
 
 //__m256i SimdDeltaScanner16::unpack(uint8_t *target, int offset) {
