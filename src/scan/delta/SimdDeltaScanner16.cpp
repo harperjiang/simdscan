@@ -91,7 +91,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
         case opr_less:
             while (entryCounter < length) {
                 __m256i current = unpacker->unpack(bytein + byteCounter, offset);
-                __m256i aligned = _mm256_bslli_epi128(current, 16);
+                __m256i aligned = _mm256_bslli_epi128(current, 2);
                 __m256i s1 = _mm256_hadd_epi16(current, aligned);
                 __m256i s2 = _mm256_sllv_epi64(s1, SHIFT16);
                 __m256i s3 = _mm256_hadd_epi16(s1, s2);
