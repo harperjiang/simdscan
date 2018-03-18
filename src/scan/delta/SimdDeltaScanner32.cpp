@@ -28,7 +28,7 @@ SimdDeltaScanner32::SimdDeltaScanner32(int es) {
     assert(es > 16 && es <= 32);
     // 32 bit mode, 8 entries per word
 
-    if (es > 25) {
+    if (es > 25 && es < 32) {
         unpacker = new Large32Unpacker(es);
     } else if (es == 32) {
         unpacker = new TrivialUnpacker();
