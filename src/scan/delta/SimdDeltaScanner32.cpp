@@ -5,6 +5,7 @@
 #include "SimdDeltaScanner32.h"
 #include "../../util/unpack/Large32Unpacker.h"
 #include "../../util/unpack/Small32Unpacker.h"
+#include "../../util/unpack/TrivialUnpacker.h"
 #include <immintrin.h>
 #include <assert.h>
 
@@ -24,13 +25,16 @@ static const __m256i MASK32 = _mm256_set1_epi64x(0xffffffff00000000);
 SimdDeltaScanner32::SimdDeltaScanner32(int es) {
     this->entrySize = es;
     int entryInSimd = SIMD_LEN / es;
-    assert(es > 16 && es < 32);
+    assert(es > 16 && es <= 32);
     // 32 bit mode, 8 entries per word
 
-    if (es > 25)
+    if (es > 25) {
         unpacker = new Large32Unpacker(es);
-    else
+    } else if (es == 32) {
+        unpacker = new TrivialUnpacker();
+    } else {
         unpacker = new Small32Unpacker(es);
+    }
 }
 
 SimdDeltaScanner32::~SimdDeltaScanner32() {

@@ -9,7 +9,6 @@
 #include "Unpacker.h"
 
 class TrivialUnpacker: public Unpacker {
-
 public:
     TrivialUnpacker();
     virtual ~TrivialUnpacker();

@@ -51,7 +51,7 @@ uint64_t delta_throughput(Scanner *scanner, int es, uint64_t num) {
 int main(int argc, char **argv) {
     uint64_t num = 100000000;
     int MAX_REPEAT = 5;
-    for (int es = 3; es < 31; es++) {
+    for (int es = 29; es <= 32; es++) {
         uint64_t trivial = 0L;
         uint64_t simd = 0L;
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
