@@ -64,6 +64,6 @@ int main(int argc, char **argv) {
             }
             simd += delta_throughput(deltaScanner, es, num);
         }
-        std::cout << trivial << "," << simd << "," << ((double) simd) / trivial << std::endl;
+        std::cout << es << "," << trivial << "," << simd << "," << ((double) simd) / trivial << std::endl;
     }
 }
