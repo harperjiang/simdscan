@@ -60,6 +60,6 @@ int main(int argc, char **argv) {
             deltaScanner = new SimdDeltaScanner32(es);
         }
         int delta = delta_throughput(deltaScanner, es, repeat);
-        std::cout << trivial << "," << delta << "," << delta / trivial << std::endl;
+        std::cout << trivial << "," << delta << "," << ((double)delta) / trivial << std::endl;
     }
 }
