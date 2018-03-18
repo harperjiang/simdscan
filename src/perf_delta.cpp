@@ -50,20 +50,20 @@ uint64_t delta_throughput(Scanner *scanner, int es, uint64_t num) {
 
 
 int main(int argc, char **argv) {
-    uint64_t repeat = 100000000;
+    uint64_t num = 100000000;
     int MAX_REPEAT = 5;
     for (int es = 3; es < 31; es++) {
         uint64_t trivial = 0L;
         uint64_t simd = 0L;
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
-            trivial += delta_throughput(new TrivialDeltaScanner(es), es, repeat);
+            trivial += delta_throughput(new TrivialDeltaScanner(es), es, num);
             Scanner *deltaScanner;
             if (es <= 16) {
                 deltaScanner = new SimdDeltaScanner16(es);
             } else {
                 deltaScanner = new SimdDeltaScanner32(es);
             }
-            simd += delta_throughput(deltaScanner, es, repeat);
+            simd += delta_throughput(deltaScanner, es, num);
         }
         std::cout << trivial << "," << simd << "," << ((double) simd) / trivial << std::endl;
     }
