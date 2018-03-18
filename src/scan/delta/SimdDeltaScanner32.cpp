@@ -17,7 +17,7 @@ static const __m256i MASK16 = _mm256_set1_epi32(0xffff);
 
 static const __m256i ZERO = _mm256_set1_epi32(0);
 static const __m256i IDX = _mm256_setr_epi32(8, 0, 1, 2, 3, 4, 5, 6);
-static const __m256i IDX2 = _mm256_setr_epi32(0, 8, 2, 8, 1, 5, 4, 6);
+static const __m256i IDX2 = _mm256_setr_epi32(0, 8, 2, 8, 1, 4, 3, 6);
 static const __m256i IDX3 = _mm256_setr_epi32(8, 8, 8, 8, 0, 1, 2, 3);
 static const __m256i MASK32 = _mm256_set1_epi64x(0xffffffff00000000);
 
