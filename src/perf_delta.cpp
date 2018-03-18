@@ -9,7 +9,7 @@
 #include "scan/delta/TrivialDeltaScanner.h"
 #include "util/encode.h"
 
-int delta_throughput(Scanner *scanner, int es, uint64_t num) {
+uint64_t delta_throughput(Scanner *scanner, int es, uint64_t num) {
     int *input = (int *) aligned_alloc(64, sizeof(int) * num);
 
     std::mt19937 rng;
@@ -50,16 +50,20 @@ int delta_throughput(Scanner *scanner, int es, uint64_t num) {
 
 int main(int argc, char **argv) {
     uint64_t repeat = 100000000;
-
+    int MAX_REPEAT = 5;
     for (int es = 3; es < 31; es++) {
-        int trivial = delta_throughput(new TrivialDeltaScanner(es), es, repeat);
-        Scanner *deltaScanner;
-        if (es <= 16) {
-            deltaScanner = new SimdDeltaScanner16(es);
-        } else {
-            deltaScanner = new SimdDeltaScanner32(es);
+        uint64_t trivial = 0L;
+        uint64_t simd = 0L;
+        for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
+            trivial += delta_throughput(new TrivialDeltaScanner(es), es, repeat);
+            Scanner *deltaScanner;
+            if (es <= 16) {
+                deltaScanner = new SimdDeltaScanner16(es);
+            } else {
+                deltaScanner = new SimdDeltaScanner32(es);
+            }
+            simd += delta_throughput(deltaScanner, es, repeat);
         }
-        int delta = delta_throughput(deltaScanner, es, repeat);
-        std::cout << trivial << "," << delta << "," << ((double)delta) / trivial << std::endl;
+        std::cout << trivial << "," << simd << "," << ((double) simd) / trivial << std::endl;
     }
 }
