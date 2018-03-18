@@ -51,7 +51,7 @@ uint64_t delta_throughput(Scanner *scanner, int es, uint64_t num) {
 int main(int argc, char **argv) {
     uint64_t num = 100000000;
     int MAX_REPEAT = 5;
-    for (int es = 29; es <= 32; es++) {
+    for (int es = 17; es <= 32; es++) {
         uint64_t trivial = 0L;
         uint64_t simd = 0L;
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
@@ -64,6 +64,6 @@ int main(int argc, char **argv) {
             }
             simd += delta_throughput(deltaScanner, es, num);
         }
-        std::cout << es << "," << trivial << "," << simd << "," << ((double) simd) / trivial << std::endl;
+        std::cout << es << "," << trivial/MAX_REPEAT << "," << simd/MAX_REPEAT << "," << ((double) simd) / trivial << std::endl;
     }
 }
