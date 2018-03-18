@@ -25,10 +25,11 @@ TEST(SimdDeltaScanner32, equal) {
     scanner->scan(output, 24, (int *) result, new Predicate(opr_eq, cumsum[3], 0));
 
     for (int i = 0; i < 24; i++) {
+        int bitidx = (i % 8) >= 4 ? (11 - i % 8) : (3 - i % 8);
         if (i != 3)
-            EXPECT_EQ(0, result[i / 8] & (1 << (7 - i % 8))) << i;
+            EXPECT_EQ(0, result[i / 8] & (1 << bitidx)) << i;
         else
-            EXPECT_EQ(1 << (7 - i % 8), (result[i / 8] & (1 << (7 - i % 8)))) << i;
+            EXPECT_EQ(1 << bitidx, (result[i / 8] & (1 << bitidx))) << i;
     }
 
     delete[] cumsum;
@@ -53,10 +54,11 @@ TEST(SimdDeltaScanner32, less) {
     scanner->scan(output, 24, (int *) result, new Predicate(opr_less, 30, 0));
 
     for (int i = 0; i < 24; i++) {
+        int bitidx = (i % 8) >= 4 ? (11 - i % 8) : (3 - i % 8);
         if (cumsum[i] < 30)
-            EXPECT_EQ(1 << (7 - i % 8), result[i / 8] & (1 << (7 - i % 8))) << i;
+            EXPECT_EQ(1 << bitidx, result[i / 8] & (1 << bitidx)) << i;
         else
-            EXPECT_EQ(0, (result[i / 8] & (1 << (7 - i % 8)))) << i;
+            EXPECT_EQ(0, (result[i / 8] & (1 << bitidx))) << i;
     }
 
     delete[] cumsum;
