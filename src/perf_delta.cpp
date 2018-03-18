@@ -7,8 +7,9 @@
 #include "scan/delta/SimdDeltaScanner32.h"
 #include "scan/delta/SimdDeltaScanner16.h"
 #include "scan/delta/TrivialDeltaScanner.h"
+#include "util/encode.h"
 
-int delta_throughput(Scanner *scanner, uint64_t num) {
+int delta_throughput(Scanner *scanner, int es, uint64_t num) {
     int *input = (int *) aligned_alloc(64, sizeof(int) * num);
 
     std::mt19937 rng;
@@ -19,6 +20,10 @@ int delta_throughput(Scanner *scanner, uint64_t num) {
         input[i] = dist(rng);
     }
     // Large enough
+    int *encoded = (int *) aligned_alloc(64, sizeof(int) * num);
+
+    encode(input, encoded, num, es);
+
     int *output = (int *) aligned_alloc(64, sizeof(int) * num);
 
     auto x = dist(rng);
@@ -31,12 +36,10 @@ int delta_throughput(Scanner *scanner, uint64_t num) {
     long start, elapse;
     start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
-    scanner->scan(input, num, output, &p);
+    scanner->scan(encoded, num, output, &p);
 
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
-
-    printf("%d\n", output[3234]);
 
     free(input);
     free(output);
@@ -48,13 +51,15 @@ int delta_throughput(Scanner *scanner, uint64_t num) {
 int main(int argc, char **argv) {
     uint64_t repeat = 100000000;
 
-    int tds = delta_throughput(new TrivialDeltaScanner(true), repeat);
-    int tdn = delta_throughput(new TrivialDeltaScanner(false), repeat);
-    int sds128 = delta_throughput(new SimdDeltaScanner32(true), repeat);
-    int sdn128 = delta_throughput(new SimdDeltaScanner32(false), repeat);
-    int sds256 = delta_throughput(new SimdDeltaScanner16(true), repeat);
-    int sdn256 = delta_throughput(new SimdDeltaScanner16(false), repeat);
-
-    std::cout << tds << "," << tdn << "," << sds128 << "," << sdn128 << "," << sds256 << "," << sdn256 << std::endl;
-
+    for (int es = 3; es < 31; es++) {
+        int trivial = delta_throughput(new TrivialDeltaScanner(es), es, repeat);
+        Scanner *deltaScanner;
+        if (es <= 16) {
+            deltaScanner = new SimdDeltaScanner16(es);
+        } else {
+            deltaScanner = new SimdDeltaScanner32(es);
+        }
+        int delta = delta_throughput(deltaScanner, es, repeat);
+        std::cout << trivial << "," << delta << "," << delta / trivial << std::endl;
+    }
 }
