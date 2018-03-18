@@ -41,7 +41,6 @@ uint64_t delta_throughput(Scanner *scanner, int es, uint64_t num) {
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
-    fprintf(stderr, "%d\n", output[123]);
     free(input);
     free(output);
 
