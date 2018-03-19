@@ -13,7 +13,7 @@
 
 const __m512i one = _mm512_set1_epi32(0xffffffff);
 
-static __m512i build512(int num, int bitLength, int offset) {
+static __m512i build512(uint64_t num, int bitLength, int offset) {
 
     uint64_t r[8];
 
