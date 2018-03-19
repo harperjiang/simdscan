@@ -64,9 +64,9 @@ SimdRLEScanner::SimdRLEScanner(int es, int rls, bool aligned) {
     this->nmval2s = (__m512i *) aligned_alloc(ALIGN, LEN);
     this->rlmasks = (__m512i *) aligned_alloc(ALIGN, LEN);
     for (int i = 0; i < entrySize; i++) {
-        this->msbmasks[i] = build512(1 << (entrySize - 1), groupSize, i);
-        this->notmasks[i] = build512((1 << (entrySize - 1)) - 1, groupSize, i);
-        this->rlmasks[i] = build512((1 << entrySize) - 1, groupSize, i);
+        this->msbmasks[i] = build512(1L << (entrySize - 1), groupSize, i);
+        this->notmasks[i] = build512((1L << (entrySize - 1)) - 1, groupSize, i);
+        this->rlmasks[i] = build512((1L << entrySize) - 1, groupSize, i);
     }
 }
 
