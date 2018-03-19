@@ -21,10 +21,10 @@ uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
         input[i] = dist(rng);
     }
     // Large enough
-    int *encoded = (int *) aligned_alloc(64, sizeof(int) * num);
+    int *encoded = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
     int numRle = encode_rle(input, encoded, num, es, rls);
 
-    int *output = (int *) aligned_alloc(64, sizeof(int) * num);
+    int *output = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
 
     auto x = dist(rng);
 //    Predicate p(opr_in, x / 2, x);
