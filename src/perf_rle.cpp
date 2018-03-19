@@ -10,7 +10,7 @@
 #include "scan/rle/SimdRLEScanner.h"
 
 
-int rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
+uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
     int *input = (int *) aligned_alloc(64, sizeof(int) * num);
 
     std::mt19937 rng;
@@ -41,7 +41,7 @@ int rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
-   // printf("%d\n", output[232]);
+    // printf("%d\n", output[232]);
 
     free(input);
     free(output);
@@ -51,15 +51,20 @@ int rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
 
 int main(int argc, char **argv) {
     uint64_t repeat = 100000000;
-
+    int MAX_REPEAT = 5;
     for (int rls = 5; rls < 32; rls++) {
         for (int es = 5; es < 32 - rls; es++) {
-            int trivial = rle_throughput(new TrivialRLEScanner(es, rls), repeat, es, rls);
-            int aligned = rle_throughput(new SimdRLEScanner(es, rls, true), repeat, es, rls);
-            int ualigned = rle_throughput(new SimdRLEScanner(es, rls, false), repeat, es, rls);
+            uint64_t trivial = 0;
+            uint64_t aligned = 0;
+            uint64_t unaligned = 0;
+            for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
+                trivial += rle_throughput(new TrivialRLEScanner(es, rls), repeat, es, rls);
+                aligned += rle_throughput(new SimdRLEScanner(es, rls, true), repeat, es, rls);
+                unaligned += rle_throughput(new SimdRLEScanner(es, rls, false), repeat, es, rls);
+            }
             std::cout << es << "," << rls << "," << (double) aligned / trivial << ","
-                      << (double) ualigned / trivial << "," << trivial << "," << aligned << "," << ualigned
-                      << std::endl;
+                      << (double) unaligned / trivial << "," << trivial / MAX_REPEAT << ","
+                      << aligned / MAX_REPEAT << "," << unaligned / MAX_REPEAT << std::endl;
         }
     }
 }
