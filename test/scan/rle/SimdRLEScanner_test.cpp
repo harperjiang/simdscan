@@ -265,7 +265,7 @@ TEST(SimdRLEScanner, TestEqAligned) {
 }
 
 TEST(SimdRLEScanner, TestEqUnalignedNormal) {
-    int entrySize = 21;
+    int entrySize = 28;
     int rlSize = 5;
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
