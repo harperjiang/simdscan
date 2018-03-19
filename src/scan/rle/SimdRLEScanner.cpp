@@ -7,12 +7,33 @@
 
 #define SIMD_LEN 512
 #define INT_LEN 32
+#define LONG_LEN 64
 #define BYTE_LEN 8
 #define BYTE_IN_SIMD 64
 
 const __m512i one = _mm512_set1_epi32(0xffffffff);
 
-extern __m512i build512(int num, int bitLength, int offset);
+static __m512i build512(int num, int bitLength, int offset) {
+
+    uint64_t r[8];
+
+    for (int i = 0; i < 8; i++) {
+        uint64_t val = 0;
+        int current = offset;
+        // Leave bits before offset to 0 can preserve result in last entry.
+        // This is useful for unaligned load
+        if (offset != 0 && i != 0) {
+            val |= (num >> (bitLength - offset));
+        }
+        while (current < LONG_LEN) {
+            val |= (num << current);
+            current += bitLength;
+        }
+        r[i] = val;
+        offset = bitLength - (LONG_LEN - offset) % bitLength;
+    }
+    return _mm512_setr_epi64(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]);
+}
 
 int buildRlePiece(__m512i prev, __m512i current, int entrySize, int bitOffset) {
     int piece1 = _mm_extract_epi32(_mm512_extracti32x4_epi32(prev, 3), 3);
@@ -80,7 +101,7 @@ void SimdRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *p) 
         case opr_eq:
         case opr_neq:
             if (aligned) {
-                    aequal();
+                aequal();
             } else {
                 if (rlSize >= 8) {
                     equalFast();
@@ -91,7 +112,7 @@ void SimdRLEScanner::scan(int *input, uint64_t size, int *output, Predicate *p) 
             break;
         case opr_less:
             if (aligned)
-                    aless();
+                aless();
             else {
                 if (rlSize >= 8) {
                     lessFast();
@@ -201,7 +222,7 @@ void SimdRLEScanner::equalNormal() {
 
         if (bitOffset > rlSize) {
             preserve = uoutput[byteOffset];
-            preserve &= masks[bitOffset-rlSize];
+            preserve &= masks[bitOffset - rlSize];
         }
         _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
         if (bitOffset > rlSize) {
@@ -287,7 +308,7 @@ void SimdRLEScanner::lessNormal() {
 
         if (bitOffset > rlSize) {
             preserve = uoutput[byteOffset];
-            preserve &= masks[bitOffset-rlSize];
+            preserve &= masks[bitOffset - rlSize];
         }
         _mm512_storeu_si512((__m512i *) (uoutput + byteOffset), result);
         if (bitOffset > rlSize) {
