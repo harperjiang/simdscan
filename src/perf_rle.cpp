@@ -50,7 +50,7 @@ uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
 }
 
 int main(int argc, char **argv) {
-    uint64_t repeat = 100000000;
+    uint64_t num = 100000000;
     int MAX_REPEAT = 5;
     for (int rls = 5; rls < 32; rls++) {
         for (int es = 5; es < 32; es++) {
@@ -58,9 +58,9 @@ int main(int argc, char **argv) {
             uint64_t aligned = 0;
             uint64_t unaligned = 0;
             for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
-                trivial += rle_throughput(new TrivialRLEScanner(es, rls), repeat, es, rls);
-                aligned += rle_throughput(new SimdRLEScanner(es, rls, true), repeat, es, rls);
-                unaligned += rle_throughput(new SimdRLEScanner(es, rls, false), repeat, es, rls);
+                trivial += rle_throughput(new TrivialRLEScanner(es, rls), num, es, rls);
+                aligned += rle_throughput(new SimdRLEScanner(es, rls, true), num, es, rls);
+                unaligned += rle_throughput(new SimdRLEScanner(es, rls, false), num, es, rls);
             }
             std::cout << es << "," << rls << "," << (double) aligned / trivial << ","
                       << (double) unaligned / trivial << "," << trivial / MAX_REPEAT << ","
