@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     int *output = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
 
     int MAX_REPEAT = 5;
-    for (int rls = 7; rls < 32; rls++) {
+    for (int rls = 5; rls < 32; rls++) {
         for (int es = 5; es < 32; es++) {
             uint64_t trivial = 0;
             uint64_t aligned = 0;
