@@ -36,7 +36,7 @@ uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
     long start, elapse;
     start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
-    scanner->scan(input, numRle, output, &p);
+    scanner->scan(encoded, numRle, output, &p);
 
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
