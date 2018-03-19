@@ -45,6 +45,7 @@ uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
 
     free(input);
     free(output);
+    free(encoded);
 
     return num / elapse;
 }
@@ -52,8 +53,8 @@ uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls) {
 int main(int argc, char **argv) {
     uint64_t num = 100000000;
     int MAX_REPEAT = 5;
-    for (int rls = 5; rls < 32; rls++) {
-        for (int es = 5; es < 32; es++) {
+    for (int rls = 7; rls < 32; rls++) {
+        for (int es = 10; es < 32; es++) {
             uint64_t trivial = 0;
             uint64_t aligned = 0;
             uint64_t unaligned = 0;
