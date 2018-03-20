@@ -66,11 +66,6 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
         input[i] = dist(rng);
     }
 
-    uint64_t numEntryInWord = 64 / (entrySize + 1);
-    uint64_t numEntryInSimd = 8 * numEntryInWord;
-    uint64_t numSimd = num / numEntryInSimd + (num % numEntryInSimd ? 1 : 0);
-
-
     bitweaverh_encode(input, encoded, num, entrySize);
 
     // Large enough
