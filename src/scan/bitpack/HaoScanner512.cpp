@@ -144,18 +144,18 @@ void HaoScanner512::alignedEq() {
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
         _mm512_stream_si512(mdest + (laneCounter++), result);
-        if (bitOffset != 0) {
-            // Has remain to process
-            int num = buildPiece512(prev, current, entrySize, bitOffset);
-
-            int remainIdx = bitOffset / 8;
-            int remainOffset = bitOffset % 8;
-            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
-            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
-            set &= invmasks[remainOffset];
-            set |= remain;
-            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
-        }
+//        if (bitOffset != 0) {
+//            // Has remain to process
+//            int num = buildPiece512(prev, current, entrySize, bitOffset);
+//
+//            int remainIdx = bitOffset / 8;
+//            int remainOffset = bitOffset % 8;
+//            uint32_t remain = (num != predicate->getVal1()) << (remainOffset - 1);
+//            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+//            set &= invmasks[remainOffset];
+//            set |= remain;
+//            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
+//        }
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
@@ -190,18 +190,18 @@ void HaoScanner512::alignedLess() {
                                           _mm512_or_si512(_mm512_and_si512(current, na), l));
 
         _mm512_stream_si512(mdest + (laneCounter++), result);
-        if (bitOffset != 0) {
-            // Has remain to process
-            int num = buildPiece512(prev, current, entrySize, bitOffset);
-
-            int remainIdx = bitOffset / 8;
-            int remainOffset = bitOffset % 8;
-            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
-            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
-            set &= invmasks[remainOffset];
-            set |= remain;
-            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
-        }
+//        if (bitOffset != 0) {
+//            // Has remain to process
+//            int num = buildPiece512(prev, current, entrySize, bitOffset);
+//
+//            int remainIdx = bitOffset / 8;
+//            int remainOffset = bitOffset % 8;
+//            uint32_t remain = (num >= predicate->getVal1()) << (remainOffset - 1);
+//            uint8_t set = bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx];
+//            set &= invmasks[remainOffset];
+//            set |= remain;
+//            bytedest[(laneCounter - 1) * BYTE_IN_SIMD + remainIdx] = set;
+//        }
 
         bitOffset = entrySize - (SIMD_LEN - bitOffset) % entrySize;
 
