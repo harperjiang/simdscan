@@ -87,6 +87,7 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
 
     scanner->scan(encoded, num, output, &p);
 
+    printf("%d\n", output[123214]);
     gettimeofday(&tp, NULL);
     elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
