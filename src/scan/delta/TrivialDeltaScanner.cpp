@@ -42,8 +42,8 @@ void TrivialDeltaScanner::scan(int *in, uint64_t len, int *out, Predicate *p) {
             outintoff++;
         }
         bitoff += entrySize;
-        byteoff += bitoff / 8;
-        bitoff %= 8;
+        byteoff += bitoff / 32;
+        bitoff %= 32;
     }
 }
 

@@ -3,10 +3,9 @@
 //
 
 #include "SimdDeltaScanner16.h"
-#include "../../util/encode.h"
 #include "../../util/unpack/Small16Unpacker.h"
 #include "../../util/unpack/Large16Unpacker.h"
-#include <immintrin.h>
+#include "../../util/unpack/TrivialUnpacker.h"
 #include <assert.h>
 
 #define SIMD_LEN 256
@@ -26,12 +25,15 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
     assert(es <= 16);
     if (es <= 8) {
         this->unpacker = new Small16Unpacker(es);
+    } else if (es == 16) {
+        this->unpacker = new TrivialUnpacker();
     } else {
         this->unpacker = new Large16Unpacker(es);
     }
 }
 
 SimdDeltaScanner16::~SimdDeltaScanner16() {
+    delete this->unpacker;
 }
 
 //__m256i SimdDeltaScanner16::unpack(uint8_t *target, int offset) {
@@ -59,7 +61,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
         case opr_neq:
             while (entryCounter < length) {
                 __m256i current = unpacker->unpack(bytein + byteCounter, offset);
-                __m256i aligned = _mm256_bslli_epi128(current, 16);
+                __m256i aligned = _mm256_bslli_epi128(current, 2);
                 __m256i s1 = _mm256_hadd_epi16(current, aligned);
                 __m256i s2 = _mm256_sllv_epi64(s1, SHIFT16);
                 __m256i s3 = _mm256_hadd_epi16(s1, s2);
@@ -71,8 +73,8 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
 
                 int cus = (int) cumsum;
 
-                int first = cus << 16 + cus;
-                int second = (cus + cs1) << 16 + cus + cs1;
+                int first = (cus << 16) + cus;
+                int second = ((cus + cs1) << 16) + cus + cs1;
                 __m256i cumadd = _mm256_setr_epi32(first, first, first, first, second, second, second, second);
                 extracted = _mm256_add_epi32(cumadd, extracted);
 
@@ -90,7 +92,7 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
         case opr_less:
             while (entryCounter < length) {
                 __m256i current = unpacker->unpack(bytein + byteCounter, offset);
-                __m256i aligned = _mm256_bslli_epi128(current, 16);
+                __m256i aligned = _mm256_bslli_epi128(current, 2);
                 __m256i s1 = _mm256_hadd_epi16(current, aligned);
                 __m256i s2 = _mm256_sllv_epi64(s1, SHIFT16);
                 __m256i s3 = _mm256_hadd_epi16(s1, s2);
@@ -102,14 +104,14 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
 
                 int cus = (int) cumsum;
 
-                int first = cus << 16 + cus;
-                int second = (cus + cs1) << 16 + cus + cs1;
+                int first = (cus << 16) + cus;
+                int second = ((cus + cs1) << 16) + cus + cs1;
                 __m256i cumadd = _mm256_setr_epi32(first, first, first, first, second, second, second, second);
                 extracted = _mm256_add_epi32(cumadd, extracted);
 
                 cumsum += cs1 + cs2;
 
-                maskout[outputCounter++] = _mm256_cmpge_epi16_mask(a, extracted);
+                maskout[outputCounter++] = _mm256_cmplt_epi16_mask(extracted, a);
                 entryCounter += 16;
 
                 int bitAdvance = offset + entrySize * 16;

@@ -265,8 +265,8 @@ TEST(SimdRLEScanner, TestEqAligned) {
 }
 
 TEST(SimdRLEScanner, TestEqUnalignedNormal) {
-    int entrySize = 9;
-    int rlSize = 4;
+    int entrySize = 28;
+    int rlSize = 5;
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
                   2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
@@ -329,8 +329,8 @@ TEST(SimdRLEScanner, TestEqUnalignedNormal) {
 }
 
 TEST(SimdRLEScanner, TestEqUnalignedFast) {
-    int entrySize = 9;
-    int rlSize = 10;
+    int entrySize = 24;
+    int rlSize = 20;
     int data[] = {2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
                   6, 8, 22, 12, 12, 21, 21, 21, 4, 4, 4, 5, 5, 5,
                   2, 2, 3, 7, 7, 8, 9, 1, 2, 2, 4, 5, 29, 11,
