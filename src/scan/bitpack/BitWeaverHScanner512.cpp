@@ -9,7 +9,7 @@
 #define WORD_IN_SIMD 8
 
 
-__m512i make512(int num, int entrySize) {
+__m512i make512(uint64_t num, int entrySize) {
     int entryInWord = 64 / (entrySize + 1);
     uint64_t word;
     for (int i = 0; i < entryInWord; i++) {
