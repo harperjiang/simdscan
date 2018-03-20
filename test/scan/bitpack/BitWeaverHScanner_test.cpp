@@ -30,7 +30,7 @@ TEST(BitWeaverHScanner128, TestScan) {
     scanner->scan(encoded, 20, output, &p);
     for (int i = 0; i < 20; i++) {
         int longIndex = i / numEntryInWord;
-        int longOffset = (i % numEntryInWord) * (entrySize + 1);
+        int longOffset = (i % numEntryInWord) * (entrySize + 1) + entrySize;
 
         if (i == 17) {
             EXPECT_EQ(0, outputLong[longIndex] & (1L << longOffset)) << i;
@@ -62,7 +62,7 @@ TEST(BitWeaverHScanner256, TestScan) {
     scanner->scan(encoded, 20, output, &p);
     for (int i = 0; i < 20; i++) {
         int longIndex = i / numEntryInWord;
-        int longOffset = (i % numEntryInWord) * (entrySize + 1);
+        int longOffset = (i % numEntryInWord) * (entrySize + 1)+entrySize;
 
         if (i == 17) {
             EXPECT_EQ(0, outputLong[longIndex] & (1L << longOffset)) << i;
@@ -94,7 +94,7 @@ TEST(BitWeaverHScanner512, TestScan) {
     scanner->scan(encoded, 20, output, &p);
     for (int i = 0; i < 20; i++) {
         int longIndex = i / numEntryInWord;
-        int longOffset = (i % numEntryInWord) * (entrySize + 1);
+        int longOffset = (i % numEntryInWord) * (entrySize + 1)+entrySize;
 
         if (i == 17) {
             EXPECT_EQ(0, outputLong[longIndex] & (1L << longOffset)) << i;
