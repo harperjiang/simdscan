@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
     int *bp_encoded = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
     int *bp_output = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
 
-    int MAX_REPEAT = 5;
+    int MAX_REPEAT = 1;
 
     for (int es = 5; es < 32; es++) {
         uint32_t h512 = 0;
