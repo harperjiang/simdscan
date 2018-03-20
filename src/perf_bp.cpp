@@ -100,15 +100,26 @@ int main(int argc, char **argv) {
     int *bp_encoded = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
     int *bp_output = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
 
+    int MAX_REPEAT = 5;
+
     for (int es = 5; es < 32; es++) {
-        int h512 = bp_throughput(new HaoScanner512(es, true), num, es, bp_input, bp_encoded, bp_output);
-        int uh512 = bp_throughput(new HaoScanner512(es, false), num, es, bp_input, bp_encoded, bp_output);
-        int bwh256 = bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
-        int bwh512 = bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
-        int w = bp_throughput(new WillhalmScanner128(es, true), num, es, bp_input, bp_encoded, bp_output);
-        int trivial = bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
-        std::cout << es << "," << h512 << "," << uh512 << "," << bwh256 << "," << bwh512 << "," << w
-                  << trivial << std::endl;
+        uint32_t h512 = 0;
+        uint32_t uh512 = 0;
+        uint32_t bwh256 = 0;
+        uint32_t bwh512 = 0;
+        uint32_t w = 0;
+        uint32_t trivial = 0;
+        for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
+            bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
+            bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
+            w += bp_throughput(new WillhalmScanner128(es, true), num, es, bp_input, bp_encoded, bp_output);
+            trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
+            h512 += bp_throughput(new HaoScanner512(es, true), num, es, bp_input, bp_encoded, bp_output);
+            uh512 += bp_throughput(new HaoScanner512(es, false), num, es, bp_input, bp_encoded, bp_output);
+        }
+        std::cout << es << "," << h512 / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
+                  << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
+                  << "," << trivial / MAX_REPEAT << std::endl;
     }
 
     delete[] bp_input;
