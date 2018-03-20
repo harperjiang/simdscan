@@ -227,10 +227,10 @@ void HaoScanner512::unalignedEq() {
         __m512i result = _mm512_or_si512(
                 mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
 
-        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
-        preserve &= masks[bitOffset];
+//        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+//        preserve &= masks[bitOffset];
         _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
-        ((uint8_t *) byteDest)[byteOffset] |= preserve;
+//        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
         entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
@@ -264,10 +264,10 @@ void HaoScanner512::unalignedLess() {
 
         _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
 
-        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
-        preserve &= masks[bitOffset];
+//        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+//        preserve &= masks[bitOffset];
         _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
-        ((uint8_t *) byteDest)[byteOffset] |= preserve;
+//        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
         entryCounter += (SIMD_LEN - bitOffset) / entrySize;
 
