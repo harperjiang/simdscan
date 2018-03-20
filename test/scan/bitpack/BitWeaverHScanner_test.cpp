@@ -14,8 +14,8 @@ TEST(BitWeaverHScanner128, TestScan) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                   18, 19, 20};
-    int *encoded = (int *) aligned_alloc(16, 20 * sizeof(int));
-    int *output = (int *) aligned_alloc(16, 20 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(16, 64 * sizeof(int));
+    int *output = (int *) aligned_alloc(16, 64 * sizeof(int));
     bitweaverh_encode(data, encoded, 20, entrySize);
 
     BitWeaverHScanner128 *scanner = new BitWeaverHScanner128(entrySize);
@@ -46,8 +46,8 @@ TEST(BitWeaverHScanner256, TestScan) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                   18, 19, 20};
-    int *encoded = (int *) aligned_alloc(16, 20 * sizeof(int));
-    int *output = (int *) aligned_alloc(16, 20 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(32, 64 * sizeof(int));
+    int *output = (int *) aligned_alloc(32, 64 * sizeof(int));
     bitweaverh_encode(data, encoded, 20, entrySize);
 
     Scanner *scanner = new BitWeaverHScanner256(entrySize);
@@ -78,8 +78,8 @@ TEST(BitWeaverHScanner512, TestScan) {
     int entrySize = 9;
     int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                   18, 19, 20};
-    int *encoded = (int *) aligned_alloc(16, 20 * sizeof(int));
-    int *output = (int *) aligned_alloc(16, 20 * sizeof(int));
+    int *encoded = (int *) aligned_alloc(64, 64 * sizeof(int));
+    int *output = (int *) aligned_alloc(64, 64 * sizeof(int));
     bitweaverh_encode(data, encoded, 20, entrySize);
 
     Scanner *scanner = new BitWeaverHScanner512(entrySize);
