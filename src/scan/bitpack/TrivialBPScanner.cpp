@@ -40,7 +40,7 @@ void TrivialBPScanner::scan(int *input, uint64_t numEntry, int *output, Predicat
         outbuffer |= (res << outindex++);
         if (outindex == 32) {
             outindex = 0;
-            output[outindex++] = outbuffer;
+            output[outoffset++] = outbuffer;
             outbuffer = 0;
         }
     }
