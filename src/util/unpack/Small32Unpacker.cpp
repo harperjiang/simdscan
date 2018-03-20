@@ -7,7 +7,7 @@
 
 Small32Unpacker::Small32Unpacker(uint32_t es) {
     this->entrySize = es;
-    assert(es > 16 && es < 26);
+    assert(es < 26);
 
     this->nextPos = new uint8_t[8];
 

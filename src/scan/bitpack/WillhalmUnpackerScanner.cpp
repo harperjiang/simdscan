@@ -11,13 +11,7 @@
 
 WillhalmUnpackerScanner::WillhalmUnpackerScanner(int es) {
     this->entrySize = es;
-    if (es <= 8) {
-        this->unpacker = new Small16Unpacker(es);
-    } else if (es == 16) {
-        this->unpacker = new TrivialUnpacker();
-    } else if (es < 16 && es > 8) {
-        this->unpacker = new Large16Unpacker(es);
-    } else if (es > 25 && es < 32) {
+    if (es > 25 && es < 32) {
         unpacker = new Large32Unpacker(es);
     } else if (es == 32) {
         unpacker = new TrivialUnpacker();
@@ -77,7 +71,7 @@ void WillhalmUnpackerScanner::scan(int *input, uint64_t length, int *output, Pre
             }
             break;
         case opr_less:
-            if(entrySize <= 16) {
+            if (entrySize <= 16) {
                 while (numEntryDone < length) {
                     __m256i current = unpacker->unpack(bytein + byteOffset, offset);
 
