@@ -11,12 +11,11 @@
 
 __m256i make256(int num, int entrySize) {
     int entryInWord = 64 / (entrySize + 1);
-    long word[4];
+    uint64_t word = 0;
     for (int i = 0; i < entryInWord; i++) {
-        for (int j = 0; j < 4; j++)
-            word[j] |= num << i * (entrySize + 1);
+        word |= num << i * (entrySize + 1);
     }
-    return _mm256_setr_epi64x(word[0], word[1], word[2], word[3]);
+    return _mm256_set1_epi64x(word);
 }
 
 __m256i makeMask256(int entrySize) {

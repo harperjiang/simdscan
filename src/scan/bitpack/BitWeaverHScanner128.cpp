@@ -10,12 +10,11 @@
 
 __m128i make128(int num, int entrySize) {
     int entryInWord = 64 / (entrySize + 1);
-    long word[2];
+    uint64_t word = 0;
     for (int i = 0; i < entryInWord; i++) {
-        word[0] |= num << i * (entrySize + 1);
-        word[1] |= num << i * (entrySize + 1);
+        word |= num << i * (entrySize + 1);
     }
-    return _mm_setr_epi64(_mm_set_pi64x(word[0]), _mm_set_pi64x(word[1]));
+    return _mm_setr_epi64(_mm_set_pi64x(word), _mm_set_pi64x(word));
 }
 
 __m128i makeMask128(int entrySize) {

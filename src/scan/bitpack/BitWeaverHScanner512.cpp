@@ -11,12 +11,11 @@
 
 __m512i make512(int num, int entrySize) {
     int entryInWord = 64 / (entrySize + 1);
-    long word[8];
+    uint64_t word;
     for (int i = 0; i < entryInWord; i++) {
-        for (int j = 0; j < 4; j++)
-            word[j] |= num << i * (entrySize + 1);
+        word |= num << i * (entrySize + 1);
     }
-    return _mm512_setr_epi64(word[0], word[1], word[2], word[3], word[4], word[5], word[6], word[7]);
+    return _mm512_set1_epi64(word);
 }
 
 __m512i makeMask512(int entrySize) {
