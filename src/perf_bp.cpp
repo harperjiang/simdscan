@@ -16,6 +16,7 @@
 #include "scan/delta/TrivialDeltaScanner.h"
 #include "scan/delta/SimdDeltaScanner32.h"
 #include "scan/delta/SimdDeltaScanner16.h"
+#include "scan/bitpack/TrivialBPScanner.h"
 
 
 int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int *encoded, int *output) {
@@ -105,8 +106,9 @@ int main(int argc, char **argv) {
         int bwh256 = bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
         int bwh512 = bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
         int w = bp_throughput(new WillhalmScanner128(es, true), num, es, bp_input, bp_encoded, bp_output);
+        int trivial = bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
         std::cout << es << "," << h512 << "," << uh512 << "," << bwh256 << "," << bwh512 << "," << w
-                  << std::endl;
+                  << trivial << std::endl;
     }
 
     delete[] bp_input;
