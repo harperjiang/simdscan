@@ -64,7 +64,7 @@ TEST(HaoScanner512, TestUnalignedEq) {
     int output[16];
     encode(data, result, 20, entrySize);
 
-    HaoScanner512 *scanner = new HaoScanner512(entrySize, false);
+    HaoScanner512 *scanner = new HaoScanner512(entrySize);
 
     Predicate p(opr_eq, 18, 0);
 
@@ -89,7 +89,7 @@ TEST(HaoScanner512, TestAlignedEq) {
     int *output = (int *) aligned_alloc(64, 32 * sizeof(int));
     encode(data, encoded, 20, entrySize);
 
-    HaoScanner512 *scanner = new HaoScanner512(entrySize, true);
+    HaoScanner512 *scanner = new HaoScanner512(entrySize);
 
     Predicate p(opr_eq, 18, 0);
 
@@ -116,7 +116,7 @@ TEST(HaoScanner512, TestUnalignedLess) {
     int *output = (int *) aligned_alloc(64, 16 * sizeof(int));
     encode(data, encoded, 25, entrySize);
 
-    HaoScanner512 *scanner = new HaoScanner512(entrySize, false);
+    HaoScanner512 *scanner = new HaoScanner512(entrySize);
 
     Predicate p(opr_less, 8, 0);
 
@@ -142,7 +142,7 @@ TEST(HaoScanner512, TestAlignedLess) {
     int *output = (int *) aligned_alloc(64, 16 * sizeof(int));
     encode(data, encoded, 25, entrySize);
 
-    HaoScanner512 *scanner = new HaoScanner512(entrySize, true);
+    HaoScanner512 *scanner = new HaoScanner512(entrySize);
 
     Predicate p(opr_less, 8, 0);
 

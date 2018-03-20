@@ -17,7 +17,7 @@ protected:
     __m512i *shuffleInst;
     __m512i *shiftInst;
 
-    Unpacker *unpacker;
+    Unpacker128 *unpacker;
 
 public:
     SimdDeltaScanner16(int es);

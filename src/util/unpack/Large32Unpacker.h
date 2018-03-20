@@ -8,7 +8,7 @@
 
 #include "Unpacker.h"
 
-class Large32Unpacker : public Unpacker {
+class Large32Unpacker : public Unpacker128 {
 private:
     uint32_t entrySize;
 

@@ -2,8 +2,8 @@
 // Created by harper on 3/15/18.
 //
 
-#ifndef SIMDSCAN_UNPACKER_H
-#define SIMDSCAN_UNPACKER_H
+#ifndef SIMDSCAN_UNPACKER128_H
+#define SIMDSCAN_UNPACKER128_H
 
 
 /**
@@ -11,9 +11,6 @@
  */
 #include <immintrin.h>
 #include <cstdint>
-
-#define _mm256_loadu2_m128i(vh, vl) _mm256_insertf128_si256(_mm256_castsi128_si256(_mm_loadu_si128((vl))), _mm_loadu_si128(vh), 1)
-#define _mm256_set_m128i(vh, vl)  _mm256_insertf128_si256(_mm256_castsi128_si256(vl), (vh), 1)
 
 class Unpacker128 {
 
@@ -36,8 +33,8 @@ public:
      * @param offset offset in a byte
      * @return unpacked integer
      */
-    virtual __m256i unpack(uint8_t *data, uint8_t offset) =0;
+    virtual __m128i unpack(uint8_t *data, uint8_t offset) =0;
 };
 
 
-#endif //SIMDSCAN_UNPACKER_H
+#endif //SIMDSCAN_UNPACKER128_H

@@ -11,7 +11,7 @@
 
 class WillhalmUnpackerScanner : public Scanner {
 private:
-    Unpacker *unpacker;
+    Unpacker128 *unpacker;
     uint64_t entrySize;
 public:
     WillhalmUnpackerScanner(int es);

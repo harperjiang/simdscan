@@ -8,7 +8,7 @@
 
 #include "Unpacker.h"
 
-class TrivialUnpacker: public Unpacker {
+class TrivialUnpacker: public Unpacker128 {
 public:
     TrivialUnpacker();
     virtual ~TrivialUnpacker();

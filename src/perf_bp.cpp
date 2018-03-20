@@ -112,8 +112,7 @@ int main(int argc, char **argv) {
             bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
             w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
-            h512 += bp_throughput(new HaoScanner512(es, true), num, es, bp_input, bp_encoded, bp_output);
-            uh512 += bp_throughput(new HaoScanner512(es, false), num, es, bp_input, bp_encoded, bp_output);
+            uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
         }
         std::cout << es << "," << h512 / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
                   << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT

@@ -13,7 +13,6 @@
 class HaoScanner512 : public Scanner {
 private:
     int entrySize;
-    bool aligned = true;
 
     int *data = NULL;
     int *dest = NULL;
@@ -22,11 +21,8 @@ private:
     Predicate *predicate;
 
     __m512i *val1s = NULL;
-    __m512i *val2s = NULL;
     __m512i *nval1s = NULL;
-    __m512i *nval2s = NULL;
     __m512i *nmval1s = NULL;
-    __m512i *nmval2s = NULL;
     __m512i *msbmasks = NULL;
     __m512i *notmasks = NULL;
 
@@ -34,21 +30,15 @@ private:
     uint8_t invmasks[8] = {0, 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf};
 public:
 
-    HaoScanner512(int, bool);
+    HaoScanner512(int);
 
     virtual ~HaoScanner512();
 
     void scan(int *, uint64_t, int *, Predicate *);
 
 protected:
-
-    void alignedEq();
-
-    void alignedLess();
-
-    void unalignedEq();
-
-    void unalignedLess();
+    void equal();
+    void less();
 
 };
 

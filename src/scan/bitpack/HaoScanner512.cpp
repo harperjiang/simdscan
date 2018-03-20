@@ -39,15 +39,6 @@ __m512i buildMask512(int bitLength, int offset) {
     return build512(1 << (bitLength - 1), bitLength, offset);
 }
 
-int buildPiece512(__m512i prev, __m512i current, int entrySize, int bitOffset) {
-    int piece1 = _mm_extract_epi32(_mm512_extracti32x4_epi32(prev, 3), 3);
-    int piece2 = _mm_extract_epi32(_mm512_extracti32x4_epi32(current, 0), 0);
-    int s1 = entrySize - bitOffset;
-    int num = piece1 >> (INT_LEN - s1) & ((1 << s1) - 1);
-    num |= (piece2 << s1) & (((1 << bitOffset) - 1) << s1);
-    return num;
-}
-
 HaoScanner512::HaoScanner512(int es) {
     assert(es < 32 && es > 0);
     this->entrySize = es;
