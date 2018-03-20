@@ -17,6 +17,7 @@
 #include "scan/delta/SimdDeltaScanner32.h"
 #include "scan/delta/SimdDeltaScanner16.h"
 #include "scan/bitpack/TrivialBPScanner.h"
+#include "scan/bitpack/WillhalmScanner256.h"
 
 
 int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int *encoded, int *output) {
@@ -108,7 +109,7 @@ int main(int argc, char **argv) {
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
             bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
-            w += bp_throughput(new WillhalmScanner128(es, true), num, es, bp_input, bp_encoded, bp_output);
+            w += bp_throughput(new WillhalmScanner256(es, true), num, es, bp_input, bp_encoded, bp_output);
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
             h512 += bp_throughput(new HaoScanner512(es, true), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es, false), num, es, bp_input, bp_encoded, bp_output);

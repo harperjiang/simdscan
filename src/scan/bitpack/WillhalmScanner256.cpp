@@ -206,7 +206,7 @@ __m256i shuffle256(__m256i data, int offset, int entrySize, __m256i *shift, __m2
 }
 
 
-WillhalmScanner256::WillhalmScanner256(int bitSize, bool aligned) {
+WillhalmScanner256::WillhalmScanner256(int entrySize, bool aligned) {
     assert(entrySize < INT_LEN && entrySize > 0);
     this->entrySize = entrySize;
     this->data = NULL;
