@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
     int *bp_encoded = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
     int *bp_output = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
 
-    int MAX_REPEAT = 1;
+    int MAX_REPEAT = 5;
 
     for (int es = 5; es < 32; es++) {
         uint32_t h512 = 0;
@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
         }
-        std::cout << es << "," << h512 / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
+        std::cout << es << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
                   << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
                   << "," << trivial / MAX_REPEAT << std::endl;
     }
