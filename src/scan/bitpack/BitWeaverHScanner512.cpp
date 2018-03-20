@@ -11,7 +11,7 @@
 
 __m512i make512(uint64_t num, int entrySize) {
     int entryInWord = 64 / (entrySize + 1);
-    uint64_t word;
+    uint64_t word = 0;
     for (int i = 0; i < entryInWord; i++) {
         word |= num << i * (entrySize + 1);
     }
