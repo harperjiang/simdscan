@@ -20,8 +20,8 @@
 #include "scan/bitpack/WillhalmScanner256.h"
 #include "scan/bitpack/WillhalmUnpackerScanner.h"
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
+//#pragma GCC push_options
+//#pragma GCC optimize ("O0")
 
 int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int *encoded, int *output) {
     // Prepare random numbers
@@ -43,17 +43,21 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
 //    Predicate p(opr_in, x / 2, x);
     Predicate p(opr_eq, x, 0);
 
-    struct timeval tp;
+//    struct timeval tp;
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
 
-    gettimeofday(&tp, NULL);
-    long start, elapse;
-    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+//    gettimeofday(&tp, NULL);
+//    long start, elapse;
+//    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
     scanner->scan(encoded, num, output, &p);
 
-    gettimeofday(&tp, NULL);
-    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+//    gettimeofday(&tp, NULL);
+//    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
+    clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
+    uint64_t elapse = (end.tv_sec - start.tv_sec)*1000 + (end.tv_nsec - start.tv_nsec)*1000000;
 
     return num / elapse;
 }
@@ -78,21 +82,25 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
 //    Predicate p(opr_in, x / 2, x);
     Predicate p(opr_eq, x, 0);
 
-    struct timeval tp;
+//    struct timeval tp;
 
-    gettimeofday(&tp, NULL);
-    long start, elapse;
-    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+//    gettimeofday(&tp, NULL);
+//    long start, elapse;
+//    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
 
     scanner->scan(encoded, num, output, &p);
 
 //    printf("%d\n", output[123214]);
-    gettimeofday(&tp, NULL);
-    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+//    gettimeofday(&tp, NULL);
+//    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
+    clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
+    uint64_t elapse = (end.tv_sec - start.tv_sec)*1000 + (end.tv_nsec - start.tv_nsec)*1000000;
 
     return num / elapse;
 }
-#pragma GCC pop_options
+//#pragma GCC pop_options
 int main(int argc, char **argv) {
     uint64_t num = 100000000;
 
@@ -110,11 +118,11 @@ int main(int argc, char **argv) {
         uint32_t w = 0;
         uint32_t trivial = 0;
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
-            bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
-            w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
+            bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
+            w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
         }
         std::cout << es << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
                   << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
