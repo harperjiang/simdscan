@@ -57,7 +57,7 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
     clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
     uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
-    fprintf(stderr, "%d\n", output[123]);
+//    fprintf(stderr, "%d\n", output[123]);
     return num / elapse;
 }
 
@@ -94,7 +94,7 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
     clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
     uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
-    fprintf(stderr, "%d\n", output[123]);
+//    fprintf(stderr, "%d\n", output[123]);
     return num / elapse;
 }
 
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
     int MAX_REPEAT = 1;
 
     for (int es = 5; es < 32; es++) {
-        uint32_t h512 = 0;
+        uint32_t uh256 = 0;
         uint32_t uh512 = 0;
         uint32_t bwh256 = 0;
         uint32_t bwh512 = 0;
@@ -119,6 +119,7 @@ int main(int argc, char **argv) {
             bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
             bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
+            uh256 += bp_throughput(new HaoScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
             w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
         }
