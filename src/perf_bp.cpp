@@ -45,7 +45,7 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
 
 //    struct timeval tp;
     struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
+    clock_gettime(CLOCK_MONOTONIC, &start);    /* mark start time */
 
 //    gettimeofday(&tp, NULL);
 //    long start, elapse;
@@ -56,8 +56,8 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
 //    gettimeofday(&tp, NULL);
 //    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
-    clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
-    uint64_t elapse = (end.tv_sec - start.tv_sec)*1000000L + (end.tv_nsec - start.tv_nsec)/1000L;
+    clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
+    uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
     return num / elapse;
 }
@@ -88,18 +88,19 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
 //    long start, elapse;
 //    start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
     struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
+    clock_gettime(CLOCK_MONOTONIC, &start);    /* mark start time */
 
     scanner->scan(encoded, num, output, &p);
 
-//    printf("%d\n", output[123214]);
 //    gettimeofday(&tp, NULL);
 //    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
-    clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
-    uint64_t elapse = (end.tv_sec - start.tv_sec)*1000000L + (end.tv_nsec - start.tv_nsec)/1000L;
+    clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
+    uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
+    fprintf(stderr, "%d\n", output[123214]);
     return num / elapse;
 }
+
 //#pragma GCC pop_options
 int main(int argc, char **argv) {
     uint64_t num = 500000000L;
