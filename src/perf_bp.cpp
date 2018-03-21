@@ -102,7 +102,7 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
 }
 //#pragma GCC pop_options
 int main(int argc, char **argv) {
-    uint64_t num = 100000000;
+    uint64_t num = 500000000L;
 
     int *bp_input = new int[num];
     int *bp_encoded = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
