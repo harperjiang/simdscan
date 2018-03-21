@@ -54,7 +54,7 @@ LaneLoader64::LaneLoader64(int es) {
     for (int offset = 0; offset < 8; offset++) {
         int numEntries = countInLane[offset][0] + countInLane[offset][1];
         for (int j = 0; j < 3; j++) {
-            int newOffset = (offset + entrySize * numEntries) / 8;
+            int newOffset = (offset + entrySize * numEntries) % 8;
             numEntries += countInLane[newOffset][0] + countInLane[newOffset][1];
             nextPos[offset * 3 + j] = newOffset;
         }
