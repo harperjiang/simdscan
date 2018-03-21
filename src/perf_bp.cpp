@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 
     int MAX_REPEAT = 5;
 
-    for (int es = 5; es < 32; es++) {
+    for (int es = 3; es < 32; es++) {
         uint32_t fast = 0;
         uint32_t uh512 = 0;
         uint32_t bwh256 = 0;
