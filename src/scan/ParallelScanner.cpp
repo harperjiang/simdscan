@@ -39,7 +39,7 @@ void ParallelScanner::scan(int *input, uint64_t num, int *output, Predicate *p) 
         params[i].input = input + i * offset;
         params[i].output = output + i * offset;
         params[i].size = numPerThread;
-        pthread_create(threadHandles + i, NULL, scanner_thread, (void *) params + i);
+        pthread_create(threadHandles + i, NULL, scanner_thread, (void *) (params + i));
     }
     for (int i = 0; i < numThread; i++) {
         pthread_join(threadHandles[i], NULL);
