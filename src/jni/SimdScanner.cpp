@@ -64,7 +64,7 @@ JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner
 
 }
 
-JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner_decodeBitPacked
+JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner_decodeBitpacked
         (JNIEnv *env, jobject self, jobject input, jint offset, jint size, jint entryWidth) {
     jbyte *array = (jbyte *) env->GetDirectBufferAddress(input);
     jlong arrayLen = env->GetDirectBufferCapacity(input);
