@@ -38,14 +38,14 @@ TEST(LaneLoader64, load) {
 
                 uint64_t expected = ((uint64_t *) (bytes + idx))[0] >> laneoff;
 
-                EXPECT_EQ(expected & mask, lane & mask) << es << "," << offset << ", Lane " << i;
+                ASSERT_EQ(expected & mask, lane & mask) << es << "," << offset << ", Lane " << i;
 
                 idx += (laneoff + bitsInLane) / 8;
                 laneoff = (laneoff + bitsInLane) % 8;
             }
-            EXPECT_EQ(nextByte, idx) << es << "," << offset << ", Next Idx";
-            EXPECT_EQ(nextOff, laneoff) << es << "," << offset << ", Next Off";
-            EXPECT_EQ(entryCounter, counter) << es << "," << offset << ", Counter";
+            ASSERT_EQ(nextByte, idx) << es << "," << offset << ", Next Idx";
+            ASSERT_EQ(nextOff, laneoff) << es << "," << offset << ", Next Off";
+            ASSERT_EQ(entryCounter, counter) << es << "," << offset << ", Counter";
         }
     }
 }
