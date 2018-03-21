@@ -46,8 +46,8 @@ LaneLoader64::LaneLoader64(int es) {
                     shuffleDataBuffer[idx] |= 0xffL << bi * 8;
                 }
             }
+            currentByte = (currentOffset + entrySize * countInLane[offset][idx]) / 8;
             currentOffset = (currentOffset + entrySize * countInLane[offset][idx]) % 8;
-            currentByte += (currentOffset + entrySize * countInLane[offset][idx]) / 8;
         }
         shuffleBuffer[offset] = _mm_load_si128((__m128i *) shuffleDataBuffer);
         shiftBuffer[offset] = _mm_load_si128((__m128i *) shiftDataBuffer);
