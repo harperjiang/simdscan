@@ -7,11 +7,11 @@
 
 
 #include "../Scanner.h"
-#include "../../util/unpack/Unpacker.h"
+#include "../../util/unpack/u256/Unpacker.h"
 
 class WillhalmUnpackerScanner : public Scanner {
 private:
-    Unpacker128 *unpacker;
+    Unpacker *unpacker;
     uint64_t entrySize;
 public:
     WillhalmUnpackerScanner(int es);

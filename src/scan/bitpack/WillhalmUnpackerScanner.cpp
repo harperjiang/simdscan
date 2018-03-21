@@ -4,11 +4,11 @@
 
 #include <cstdio>
 #include "WillhalmUnpackerScanner.h"
-#include "../../util/unpack/Small16Unpacker.h"
-#include "../../util/unpack/TrivialUnpacker.h"
-#include "../../util/unpack/Large16Unpacker.h"
-#include "../../util/unpack/Large32Unpacker.h"
-#include "../../util/unpack/Small32Unpacker.h"
+#include "../../util/unpack/u256/Small16Unpacker.h"
+#include "../../util/unpack/u256/TrivialUnpacker.h"
+#include "../../util/unpack/u256/Large16Unpacker.h"
+#include "../../util/unpack/u256/Large32Unpacker.h"
+#include "../../util/unpack/u256/Small32Unpacker.h"
 
 WillhalmUnpackerScanner::WillhalmUnpackerScanner(int es) {
     this->entrySize = es;
@@ -55,7 +55,6 @@ void WillhalmUnpackerScanner::scan(int *input, uint64_t length, int *output, Pre
                 byteOffset += bitAdvance / 8;
                 offset = bitAdvance % 8;
             }
-            printf("Unpacker Equal Loop Counter:%d\n", outputCounter);
             break;
         case opr_less:
             while (numEntryDone < length) {
@@ -70,7 +69,6 @@ void WillhalmUnpackerScanner::scan(int *input, uint64_t length, int *output, Pre
                 byteOffset += bitAdvance / 8;
                 offset = bitAdvance % 8;
             }
-            printf("Unpacker Less Loop Counter:%d\n", outputCounter);
             break;
     }
 }

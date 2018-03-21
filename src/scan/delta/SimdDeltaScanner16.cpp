@@ -3,9 +3,9 @@
 //
 
 #include "SimdDeltaScanner16.h"
-#include "../../util/unpack/Small16Unpacker.h"
-#include "../../util/unpack/Large16Unpacker.h"
-#include "../../util/unpack/TrivialUnpacker.h"
+#include "../../util/unpack/u256/Small16Unpacker.h"
+#include "../../util/unpack/u256/Large16Unpacker.h"
+#include "../../util/unpack/u256/TrivialUnpacker.h"
 #include <assert.h>
 
 #define SIMD_LEN 256

@@ -7,7 +7,7 @@
 
 
 #include "../Scanner.h"
-#include "../../util/unpack/Unpacker.h"
+#include "../../util/unpack/u256/Unpacker.h"
 #include <immintrin.h>
 
 class SimdDeltaScanner16 : public Scanner {
@@ -17,7 +17,7 @@ protected:
     __m512i *shuffleInst;
     __m512i *shiftInst;
 
-    Unpacker128 *unpacker;
+    Unpacker *unpacker;
 
 public:
     SimdDeltaScanner16(int es);

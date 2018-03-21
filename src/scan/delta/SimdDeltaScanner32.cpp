@@ -3,9 +3,9 @@
 //
 
 #include "SimdDeltaScanner32.h"
-#include "../../util/unpack/Large32Unpacker.h"
-#include "../../util/unpack/Small32Unpacker.h"
-#include "../../util/unpack/TrivialUnpacker.h"
+#include "../../util/unpack/u256/Large32Unpacker.h"
+#include "../../util/unpack/u256/Small32Unpacker.h"
+#include "../../util/unpack/u256/TrivialUnpacker.h"
 #include <immintrin.h>
 #include <assert.h>
 

@@ -15,18 +15,18 @@
 #define _mm256_loadu2_m128i(vh, vl) _mm256_insertf128_si256(_mm256_castsi128_si256(_mm_loadu_si128((vl))), _mm_loadu_si128(vh), 1)
 #define _mm256_set_m128i(vh, vl)  _mm256_insertf128_si256(_mm256_castsi128_si256(vl), (vh), 1)
 
-class Unpacker128 {
+class Unpacker {
 
 public:
     /**
      *
      * @param es entry size
      */
-    Unpacker128() {
+    Unpacker() {
 
     }
 
-    virtual ~Unpacker128() {
+    virtual ~Unpacker() {
 
     }
 

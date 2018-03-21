@@ -3,11 +3,11 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../../src/util/encode.h"
-#include "../../../src/util/unpack/Small16Unpacker.h"
-#include "../../../src/util/unpack/Large16Unpacker.h"
-#include "../../../src/util/unpack/Small32Unpacker.h"
-#include "../../../src/util/unpack/Large32Unpacker.h"
+#include "../../src/util/encode.h"
+#include "../../src/util/unpack/u256/Small16Unpacker.h"
+#include "../../src/util/unpack/u256/Large16Unpacker.h"
+#include "../../src/util/unpack/u256/Small32Unpacker.h"
+#include "../../src/util/unpack/u256/Large32Unpacker.h"
 
 static int mm256_extract_epi16(__m256i input, int index);
 static int mm256_extract_epi32(__m256i input, int index);

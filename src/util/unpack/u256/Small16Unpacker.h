@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "Unpacker.h"
 
-class Small16Unpacker : public Unpacker128 {
+class Small16Unpacker : public Unpacker {
 private:
     uint32_t entrySize;
 
