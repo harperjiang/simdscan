@@ -48,7 +48,7 @@ JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner
     jbyte *array = (jbyte *) env->GetDirectBufferAddress(input);
     jlong arrayLen = env->GetDirectBufferCapacity(input);
 
-    jint safeSize = (arrayLen - 1024) / entryWidth;
+    jint safeSize = (arrayLen - 70) / entryWidth;
 
     // Allocate a 64-bit for each entry, should be enough
     allocOutput(safeSize * 8);
@@ -69,7 +69,7 @@ JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner
     jbyte *array = (jbyte *) env->GetDirectBufferAddress(input);
     jlong arrayLen = env->GetDirectBufferCapacity(input);
 
-    jint safeSize = (arrayLen - 1024) / entryWidth;
+    jint safeSize = (arrayLen - 70) / entryWidth;
 
     Decoder *decoder = new BPDecoder(entryWidth);
 
