@@ -72,7 +72,7 @@ void HaoLaneLoaderScanner::scan(int *input, uint64_t length, int *output, Predic
                 __m512i result = _mm512_or_si512(
                         _mm512_add_epi64(_mm512_and_si512(d, nmask), nmask), d);
 
-                _mm512_stream_si512(out + outputCounter++, result);
+                _mm512_storeu_si512(out + outputCounter++, result);
                 numEntryDone += loadedEntries;
                 byteOffset += increasedBytes;
                 offset = newOffset;
@@ -91,7 +91,7 @@ void HaoLaneLoaderScanner::scan(int *input, uint64_t length, int *output, Predic
                 __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
                                                   _mm512_or_si512(_mm512_and_si512(current, na), l));
 
-                _mm512_stream_si512(out + outputCounter++, result);
+                _mm512_storeu_si512(out + outputCounter++, result);
 
                 numEntryDone += loadedEntries;
                 byteOffset += increasedBytes;
