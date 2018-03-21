@@ -10,8 +10,14 @@ file(GLOB_RECURSE SCAN_SOURCE
         "scan/*.cpp"
         )
 
+file(GLOB_RECURSE DECODE_SOURCE
+        "decode/*.h"
+        "decode/*.cpp"
+        )
+
 add_library(util STATIC ${UTIL_SOURCE})
 add_library(scan STATIC ${SCAN_SOURCE})
+add_library(decode STATIC ${DECODE_SOURCE})
 
 add_executable(perf_bp "perf_bp.cpp")
 
@@ -19,6 +25,7 @@ add_executable(perf_delta "perf_delta.cpp")
 add_executable(perf_rle "perf_rle.cpp")
 add_executable(perf_uload "perf_uload.cpp")
 
+target_link_libraries(decode util)
 target_link_libraries(scan util)
 target_link_libraries(perf_bp util scan)
 target_link_libraries(perf_delta util scan)

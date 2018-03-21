@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner_scanBitpacked
   (JNIEnv *, jobject, jobject, jint, jint, jint, jint);
 
+/*
+ * Class:     edu_uchicago_cs_encsel_query_simdscan_SimdScanner
+ * Method:    decodeBitPacked
+ * Signature: (Ljava/nio/ByteBuffer;IIII)Ljava/nio/ByteBuffer;
+ */
+JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner_decodeBitPacked
+  (JNIEnv *, jobject, jobject, jint, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif
