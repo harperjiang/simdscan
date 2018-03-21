@@ -32,13 +32,12 @@ LaneLoader64::LaneLoader64(int es) {
     // Compute shuffle and shift instructions
     for (int offset = 0; offset < 8; offset++) {
         uint32_t currentOffset = offset;
-        uint32_t currentByte = 0;
+        uint64_t currentByte = 0;
         for (int idx = 0; idx < 2; idx++) {
             shiftDataBuffer[idx] = currentOffset;
             countInLane[offset][idx] = (LANE_SIZE - currentOffset) / entrySize;
             uint32_t bitsInLane = currentOffset + countInLane[offset][idx] * entrySize;
             shuffleDataBuffer[idx] = 0;
-            uint64_t start = currentOffset / 8;
 
             for (uint32_t bi = 0; bi < 8; bi++) {
                 if (bi * 8 + currentOffset < bitsInLane) {
