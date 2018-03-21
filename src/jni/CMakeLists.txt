@@ -6,3 +6,5 @@ include_directories(${JAVA_HOME}/include/linux)
 add_library(simdscan SHARED
         "edu_uchicago_cs_encsel_query_simdscan_SimdScanner.h"
         "SimdScanner.cpp")
+
+install(TARGETS simdscan DESTINATION bin)
