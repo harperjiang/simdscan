@@ -20,7 +20,7 @@ TEST(WillhalmScannerUnpacked, TestScan) {
     Predicate p(opr_eq, 18, 0);
 
     scanner->scan(result, 20, output, &p);
-    for (int i = 0; i < 20; i++) {  
+    for (int i = 0; i < 20; i++) {
         int idx = i / 32;
         int off = i % 32;
         if (data[i] == 18)
