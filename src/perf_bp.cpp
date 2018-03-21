@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
             w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
         }
-        std::cout << es << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
+        std::cout << es << "," << uh256 / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
                   << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
                   << "," << trivial / MAX_REPEAT << std::endl;
     }
