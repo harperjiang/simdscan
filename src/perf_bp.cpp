@@ -19,6 +19,7 @@
 #include "scan/bitpack/TrivialBPScanner.h"
 #include "scan/bitpack/WillhalmScanner256.h"
 #include "scan/bitpack/WillhalmUnpackerScanner.h"
+#include "scan/bitpack/HaoLaneLoaderScanner.h"
 
 //#pragma GCC push_options
 //#pragma GCC optimize ("O0")
@@ -109,7 +110,7 @@ int main(int argc, char **argv) {
     int MAX_REPEAT = 1;
 
     for (int es = 5; es < 32; es++) {
-        uint32_t uh256 = 0;
+        uint32_t fast = 0;
         uint32_t uh512 = 0;
         uint32_t bwh256 = 0;
         uint32_t bwh512 = 0;
@@ -119,11 +120,11 @@ int main(int argc, char **argv) {
             bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
             bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
-            uh256 += bp_throughput(new HaoScanner256(es), num, es, bp_input, bp_encoded, bp_output);
+            fast += bp_throughput(new HaoLaneLoaderScanner(es), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
             w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
         }
-        std::cout << es << "," << uh256 / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
+        std::cout << es << "," << fast / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
                   << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
                   << "," << trivial / MAX_REPEAT << std::endl;
     }
