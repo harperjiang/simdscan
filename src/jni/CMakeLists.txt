@@ -9,4 +9,6 @@ add_library(simdscan SHARED
         "edu_uchicago_cs_encsel_query_simdscan_SimdScanner.h"
         "SimdScanner.cpp")
 
+target_link_libraries(simdscan scan)
+
 install(TARGETS simdscan DESTINATION bin)
