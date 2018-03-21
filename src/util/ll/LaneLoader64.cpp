@@ -67,9 +67,12 @@ LaneLoader64::LaneLoader64(int es) {
 
     // Combine them to make 512-bit shuffle and shift instructions
     for (int i = 0; i < 8; i++) {
-        int high = (i + entrySize * 2) % 8;
-        int higher = (high + entrySize * 2) % 8;
-        int evenHigher = (higher + entrySize * 2) % 8;
+        int numEntries = countInLane[i][0] + countInLane[i][1];
+        int high = (i + entrySize * numEntries) % 8;
+        numEntries += countInLane[high][0] + countInLane[high][1];
+        int higher = (i + entrySize * numEntries) % 8;
+        numEntries += countInLane[higher][0] + countInLane[higher][1];
+        int evenHigher = (higher + entrySize * numEntries) % 8;
 
         __m128i su0 = shuffleBuffer[i];
         __m128i su1 = shuffleBuffer[high];
