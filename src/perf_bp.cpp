@@ -20,6 +20,8 @@
 #include "scan/bitpack/WillhalmScanner256.h"
 #include "scan/bitpack/WillhalmUnpackerScanner.h"
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 
 int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int *encoded, int *output) {
     // Prepare random numbers
@@ -90,7 +92,7 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
 
     return num / elapse;
 }
-
+#pragma GCC pop_options
 int main(int argc, char **argv) {
     uint64_t num = 100000000;
 
