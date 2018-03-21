@@ -27,19 +27,17 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
     // Prepare random numbers
     int max = (1 << entrySize) - 1;
 
-    std::mt19937 rng;
-    rng.seed(std::random_device()());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(0, max); // distribution in range [1, 6]
+    srand(time(NULL));
 
     for (int i = 0; i < num; i++) {
-        input[i] = dist(rng);
+        input[i] = rand();
     }
 
     encode(input, encoded, num, entrySize);
 
     // Large enough
 
-    auto x = dist(rng);
+    int x = rand();
 //    Predicate p(opr_in, x / 2, x);
     Predicate p(opr_eq, x, 0);
 
@@ -66,19 +64,17 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
     // Prepare random numbers
     int max = (1 << entrySize) - 1;
 
-    std::mt19937 rng;
-    rng.seed(std::random_device()());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(0, max); // distribution in range [1, 6]
+    srand(time(NULL));
 
     for (int i = 0; i < num; i++) {
-        input[i] = dist(rng);
+        input[i] = rand();
     }
 
     bitweaverh_encode(input, encoded, num, entrySize);
 
     // Large enough
 
-    auto x = dist(rng);
+    int x = rand();
 //    Predicate p(opr_in, x / 2, x);
     Predicate p(opr_eq, x, 0);
 
