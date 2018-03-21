@@ -56,10 +56,10 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
 //    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
 
     clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
-    uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) * 1.0 / 1000L;
+    uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
 //    fprintf(stderr, "%d\n", output[123]);
-    return num / elapse;
+    return (double) num / elapse;
 }
 
 int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int *encoded, int *output) {
@@ -93,10 +93,10 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
 //    gettimeofday(&tp, NULL);
 //    elapse = tp.tv_sec * 1000 + tp.tv_usec / 1000 - start;
     clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
-    uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) * 1.0 / 1000L;
+    uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
 //    fprintf(stderr, "%d\n", output[123]);
-    return 1.0 * num / elapse;
+    return (double) num / elapse;
 }
 
 //#pragma GCC pop_options
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     int *bp_encoded = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
     int *bp_output = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
 
-    int MAX_REPEAT = 1;
+    int MAX_REPEAT = 5;
 
     for (int es = 5; es < 32; es++) {
         uint32_t fast = 0;
