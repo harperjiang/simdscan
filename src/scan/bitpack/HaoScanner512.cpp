@@ -3,6 +3,7 @@
 //
 
 #include <cassert>
+#include <stdio.h>
 #include "HaoScanner512.h"
 #include "../../util/math_util.h"
 
@@ -44,7 +45,7 @@ HaoScanner512::HaoScanner512(int es) {
     this->entrySize = es;
 
     int ALIGN = SIMD_LEN / BYTE_LEN;
-    int LEN = 8* ALIGN;
+    int LEN = 8 * ALIGN;
 
 
     this->val1s = (__m512i *) aligned_alloc(ALIGN, LEN);
@@ -99,7 +100,7 @@ void HaoScanner512::equal() {
     int bitOffset = 0;
 
     uint64_t entryCounter = 0;
-
+    uint64_t loopCounter = 0;
     while (entryCounter < length) {
         __m512i eqnum = this->val1s[bitOffset];
         __m512i notmask = this->notmasks[bitOffset];
@@ -121,7 +122,9 @@ void HaoScanner512::equal() {
         int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
         byteOffset += BYTE_IN_SIMD - partialBytes;
         bitOffset = partialBytes * 8 - partialEntryLen;
+        loopCounter++;
     }
+    printf("Hao Scanner Loop Count: %d\n", loopCounter);
 }
 
 void HaoScanner512::less() {
