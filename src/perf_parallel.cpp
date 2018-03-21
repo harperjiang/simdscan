@@ -55,14 +55,14 @@ int main(int argc, char **argv) {
     int MAX_REPEAT = 5;
 
     for (int es = 3; es < 32; es += 5) {
-        for (int thread = 1; thread < 5; thread++) {
+        for (int thread = 0; thread < 5; thread++) {
             int numThread = 1 << thread;
             uint32_t fast = 0;
             Scanner *scanner = new ParallelScanner(numThread, es, new HaoLaneLoaderScanner(es));
             for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
                 fast += bp_throughput(scanner, num, es, bp_input, bp_encoded, bp_output);
             }
-            std::cout << es << "," << numThread << "," << "," << fast / MAX_REPEAT << std::endl;
+            std::cout << es << "," << numThread << ","  << fast / MAX_REPEAT << std::endl;
             delete scanner;
         }
     }
