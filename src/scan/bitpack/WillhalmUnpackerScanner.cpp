@@ -2,6 +2,7 @@
 // Created by harper on 3/20/18.
 //
 
+#include <cstdio>
 #include "WillhalmUnpackerScanner.h"
 #include "../../util/unpack/Small16Unpacker.h"
 #include "../../util/unpack/TrivialUnpacker.h"
@@ -54,6 +55,7 @@ void WillhalmUnpackerScanner::scan(int *input, uint64_t length, int *output, Pre
                 byteOffset += bitAdvance / 8;
                 offset = bitAdvance % 8;
             }
+            printf("Unpacker Equal Loop Counter:%d\n", outputCounter);
             break;
         case opr_less:
             while (numEntryDone < length) {
@@ -68,6 +70,7 @@ void WillhalmUnpackerScanner::scan(int *input, uint64_t length, int *output, Pre
                 byteOffset += bitAdvance / 8;
                 offset = bitAdvance % 8;
             }
+            printf("Unpacker Less Loop Counter:%d\n", outputCounter);
             break;
     }
 }

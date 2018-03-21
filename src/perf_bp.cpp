@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
             trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
             uh256 += bp_throughput(new HaoScanner256(es), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
-            w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
+            w += bp_throughput(new WillhalmScanner128(es), num, es, bp_input, bp_encoded, bp_output);
         }
         std::cout << es << "," << uh256 / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
                   << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT

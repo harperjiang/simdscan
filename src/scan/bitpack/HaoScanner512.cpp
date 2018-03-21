@@ -124,7 +124,7 @@ void HaoScanner512::equal() {
         bitOffset = partialBytes * 8 - partialEntryLen;
         loopCounter++;
     }
-    printf("Hao Scanner Loop Count: %d\n", loopCounter);
+    printf("Hao Scanner Equal Loop Count: %d\n", loopCounter);
 }
 
 void HaoScanner512::less() {
@@ -136,6 +136,7 @@ void HaoScanner512::less() {
 
     uint64_t entryCounter = 0;
 
+    uint64_t loopCounter = 0;
     while (entryCounter < length) {
         __m512i mask = this->msbmasks[bitOffset];
         __m512i aornm = this->nmval1s[bitOffset];
@@ -161,5 +162,8 @@ void HaoScanner512::less() {
         int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
         byteOffset += BYTE_IN_SIMD - partialBytes;
         bitOffset = partialBytes * 8 - partialEntryLen;
+
+        loopCounter++;
     }
+    printf("Hao Scanner Less Loop Count: %d\n", loopCounter);
 }
