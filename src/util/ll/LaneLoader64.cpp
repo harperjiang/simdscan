@@ -32,6 +32,7 @@ LaneLoader64::LaneLoader64(int es) {
     // Compute shuffle and shift instructions
     for (int offset = 0; offset < 8; offset++) {
         uint32_t currentOffset = offset;
+        uint32_t currentByte = 0;
         for (int idx = 0; idx < 2; idx++) {
             shiftDataBuffer[idx] = currentOffset;
             countInLane[offset][idx] = (LANE_SIZE - currentOffset) / entrySize;
@@ -41,12 +42,13 @@ LaneLoader64::LaneLoader64(int es) {
 
             for (uint32_t bi = 0; bi < 8; bi++) {
                 if (bi * 8 + currentOffset < bitsInLane) {
-                    shuffleDataBuffer[idx] |= (start + bi) << bi * 8;
+                    shuffleDataBuffer[idx] |= (currentByte + bi) << bi * 8;
                 } else {
                     shuffleDataBuffer[idx] |= 0xffL << bi * 8;
                 }
             }
             currentOffset = (currentOffset + entrySize * countInLane[offset][idx]) % 8;
+            currentByte += (currentOffset + entrySize * countInLane[offset][idx]) / 8;
         }
         shuffleBuffer[offset] = _mm_load_si128((__m128i *) shuffleDataBuffer);
         shiftBuffer[offset] = _mm_load_si128((__m128i *) shiftDataBuffer);
