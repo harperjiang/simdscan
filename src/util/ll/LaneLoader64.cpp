@@ -40,7 +40,7 @@ LaneLoader64::LaneLoader64(int es) {
             shuffleDataBuffer[idx] = 0;
 
             for (uint32_t bi = 0; bi < 8; bi++) {
-                if (bi * 8 + currentOffset < bitsInLane) {
+                if (bi * 8 < bitsInLane + currentOffset) {
                     shuffleDataBuffer[idx] |= (currentByte + bi) << bi * 8;
                 } else {
                     shuffleDataBuffer[idx] |= 0xffL << bi * 8;
