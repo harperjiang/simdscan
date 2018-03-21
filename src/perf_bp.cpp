@@ -57,6 +57,7 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
     clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
     uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
+    fprintf(stderr, "%d\n", output[123]);
     return num / elapse;
 }
 
@@ -93,7 +94,7 @@ int bwh_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, in
     clock_gettime(CLOCK_MONOTONIC, &end);    /* mark the end time */
     uint64_t elapse = (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_nsec - start.tv_nsec) / 1000L;
 
-    fprintf(stderr, "%d\n", output[123214]);
+    fprintf(stderr, "%d\n", output[123]);
     return num / elapse;
 }
 
