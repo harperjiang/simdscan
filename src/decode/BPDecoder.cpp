@@ -27,7 +27,7 @@ void BPDecoder::decode(int *input, uint64_t size, int *output) {
     uint64_t outputCounter = 0;
     for (uint64_t i = 0; i < round; i++) {
         __m256i unpacked = unpacker->unpack(bytein + byteOffset, offset);
-        _mm256_stream_si256(simdout + outputCounter++, unpacked);
+        _mm256_storeu_si256(simdout + outputCounter++, unpacked);
 
         uint64_t bitAdvance = offset + 8 * entrySize;
         byteOffset += bitAdvance / 8;
