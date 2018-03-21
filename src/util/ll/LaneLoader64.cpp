@@ -72,7 +72,7 @@ LaneLoader64::LaneLoader64(int es) {
         numEntries += countInLane[high][0] + countInLane[high][1];
         int higher = (i + entrySize * numEntries) % 8;
         numEntries += countInLane[higher][0] + countInLane[higher][1];
-        int evenHigher = (higher + entrySize * numEntries) % 8;
+        int evenHigher = (i + entrySize * numEntries) % 8;
 
         __m128i su0 = shuffleBuffer[i];
         __m128i su1 = shuffleBuffer[high];
