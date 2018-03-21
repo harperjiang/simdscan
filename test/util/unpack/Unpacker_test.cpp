@@ -71,6 +71,28 @@ TEST(Small32Unpacker, unpack) {
     }
 }
 
+TEST(Small32Unpacker, unpackSmall) {
+    int entrySize = 14;
+    int data[17] = {2124, 831, 2575, 1977, 15, 4241, 3090, 822, 3252, 4245, 934,
+                    941, 4244, 3314, 13, 1, 874};
+    int output[16];
+    encode(data, output, 17, entrySize);
+
+    Small32Unpacker *unpacker = new Small32Unpacker(entrySize);
+
+
+    for (int o = 0; o < 8; o++) {
+        __m256i unpacked = unpacker->unpack((uint8_t *) output, o);
+
+        for (int i = 0; i < 8; i++) {
+            int bitoff = o + i * entrySize;
+            int extract = extract_entry(output, bitoff / 32, bitoff % 32, entrySize);
+            EXPECT_EQ(extract, mm256_extract_epi32(unpacked, i)) << o << "," << i;
+        }
+    }
+}
+
+
 TEST(Large32Unpacker, unpack) {
     int entrySize = 30;
     int data[17] = {82934, 1941331, 224875, 4201277, 304135, 224241, 26, 112192, 99552, 4234532,
