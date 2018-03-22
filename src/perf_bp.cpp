@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 //        std::cout << es << "," << fast / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
 //                  << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
 //                  << "," << trivial / MAX_REPEAT << std::endl;
-        std::cout << es << fast / MAX_REPEAT << uh512 / MAX_REPEAT << std::endl;
+        std::cout << es << fast / MAX_REPEAT << "," << uh512 / MAX_REPEAT << std::endl;
     }
 
     delete[] bp_input;
