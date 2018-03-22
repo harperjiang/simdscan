@@ -22,10 +22,10 @@ static const __m256i IDX2 = _mm256_setr_epi32(0, 8, 2, 8, 1, 4, 3, 6);
 static const __m256i IDX3 = _mm256_setr_epi32(8, 8, 8, 8, 0, 1, 2, 3);
 static const __m256i MASK32 = _mm256_set1_epi64x(0xffffffff00000000);
 
-SimdDeltaScanner32::SimdDeltaScanner32(int es) {
+SimdDeltaScanner32::SimdDeltaScanner32(uint32_t es) {
     this->entrySize = es;
     int entryInSimd = SIMD_LEN / es;
-    assert(es > 16 && es <= 32);
+    assert(es <= 32);
     // 32 bit mode, 8 entries per word
 
     if (es > 25 && es < 32) {
@@ -105,5 +105,8 @@ void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicat
             }
             break;
     }
+}
 
+uint32_t SimdDeltaScanner32::getEntrySize() {
+    return entrySize;
 }

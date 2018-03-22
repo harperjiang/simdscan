@@ -19,11 +19,13 @@ protected:
 
     Unpacker* unpacker;
 public:
-    SimdDeltaScanner32(int es);
+    SimdDeltaScanner32(uint32_t es);
 
     virtual ~SimdDeltaScanner32();
 
     void scan(int *, uint64_t, int *, Predicate *);
+
+    uint32_t getEntrySize();
 };
 
 
