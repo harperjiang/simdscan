@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
     int MAX_REPEAT = 5;
 
-    for (int es = atoi(argv[0]); es < 32; es++) {
+    for (int es = atoi(argv[1]); es < 32; es++) {
         for (int thread = 0; thread < 7; thread++) {
             int numThread = 1 << thread;
             uint32_t fast = 0;
