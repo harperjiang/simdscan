@@ -108,7 +108,7 @@ void HaoScanner512::equal() {
                 (__m512i *) (byteData + byteOffset));
         __m512i d = _mm512_xor_si512(current, eqnum);
         __m512i result = _mm512_or_si512(
-                mm512_add_epi512(_mm512_and_si512(d, notmask), notmask), d);
+                _mm512_add_epi64(_mm512_and_si512(d, notmask), notmask), d);
 
         uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
         preserve &= masks[bitOffset];
@@ -141,7 +141,7 @@ void HaoScanner512::less() {
         __m512i current = _mm512_loadu_si512(
                 (__m512i *) (byteData + byteOffset));
         __m512i xorm = _mm512_or_si512(current, mask);
-        __m512i l = mm512_sub_epi512(xorm, aornm);
+        __m512i l = _mm512_sub_epi64(xorm, aornm);
         __m512i result = _mm512_and_si512(_mm512_or_si512(current, na),
                                           _mm512_or_si512(_mm512_and_si512(current, na), l));
 
