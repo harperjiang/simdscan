@@ -47,15 +47,13 @@ int bp_throughput(Scanner *scanner, uint64_t num, int entrySize, int *input, int
 //#pragma GCC pop_options
 int main(int argc, char **argv) {
     uint64_t num = 500000000L;
-    uint32_t entryChoice[] = {4, 9, 15, 22, 31};
     int *bp_input = new int[num];
     int *bp_encoded = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
     int *bp_output = (int *) aligned_alloc(64, sizeof(int) * (2 * num));
 
     int MAX_REPEAT = 5;
 
-    for (int ei = 0; ei < 5; ei++) {
-        uint32_t es = entryChoice[ei];
+    for (int es = 3; es <= 32; es++) {
         for (int thread = 0; thread < 5; thread++) {
             int numThread = 1 << thread;
             uint32_t fast = 0;
