@@ -4,13 +4,6 @@
 
 #include "ParallelScanner.h"
 
-typedef struct _ScannerParam {
-    int *input;
-    int *output;
-    uint64_t size;
-    Predicate *p;
-    Scanner *scanner;
-} ScannerParam;
 
 static void *scanner_thread(void *param);
 

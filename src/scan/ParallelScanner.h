@@ -24,4 +24,12 @@ public:
 };
 
 
+typedef struct _ScannerParam {
+    int *input;
+    int *output;
+    uint64_t size;
+    Predicate *p;
+    Scanner *scanner;
+} ScannerParam;
+
 #endif //SIMDSCAN_PARALLELSCANNER_H
