@@ -58,13 +58,7 @@ int main(int argc, char **argv) {
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
             trivial += delta_throughput(new TrivialDeltaScanner(es), es, num, input, output, encoded);
             lemire += delta_throughput(new LemireDeltaScanner(es), es, num, input, output, encoded);
-            Scanner *deltaScanner;
-            if (es <= 16) {
-                deltaScanner = new SimdDeltaScanner16(es);
-            } else {
-                deltaScanner = new SimdDeltaScanner32(es);
-            }
-            simd += delta_throughput(deltaScanner, es, num, input, output, encoded);
+            simd += delta_throughput(new SimdDeltaScanner32(es), es, num, input, output, encoded);
         }
         std::cout << es << "," << trivial / MAX_REPEAT << "," << simd / MAX_REPEAT << "," << lemire / MAX_REPEAT
                   << std::endl;
