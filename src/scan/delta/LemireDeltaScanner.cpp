@@ -5,11 +5,14 @@
 #include "LemireDeltaScanner.h"
 #include "../../util/unpack/u256/Small32Unpacker.h"
 #include "../../util/unpack/u256/Large32Unpacker.h"
+#include "../../util/unpack/u256/TrivialUnpacker.h"
 
 LemireDeltaScanner::LemireDeltaScanner(uint32_t es) {
     this->entrySize = es;
     if (es < 26)
         this->unpacker = new Small32Unpacker(es);
+    else if (es == 32)
+        this->unpacker = new TrivialUnpacker();
     else
         this->unpacker = new Large32Unpacker(es);
 }
