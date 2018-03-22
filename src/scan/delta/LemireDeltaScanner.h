@@ -6,8 +6,20 @@
 #define SIMDSCAN_LEMIREDELTASCANNER_H
 
 
-class LemireDeltaScanner {
+#include <cstdint>
+#include "../Scanner.h"
+#include "../../util/unpack/u256/Unpacker.h"
 
+class LemireDeltaScanner : public Scanner {
+private:
+    uint32_t entrySize;
+    Unpacker* unpacker;
+public:
+    LemireDeltaScanner(uint32_t es);
+
+    virtual ~LemireDeltaScanner();
+
+    void scan(int *, uint64_t, int *, Predicate *);
 };
 
 

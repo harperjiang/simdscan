@@ -8,6 +8,7 @@
 #include "scan/delta/SimdDeltaScanner16.h"
 #include "scan/delta/TrivialDeltaScanner.h"
 #include "util/encode.h"
+#include "scan/delta/LemireDeltaScanner.h"
 
 uint64_t delta_throughput(Scanner *scanner, int es, uint64_t num, int *input, int *output, int *encoded) {
     std::mt19937 rng;
@@ -53,8 +54,10 @@ int main(int argc, char **argv) {
     for (int es = 5; es <= 32; es++) {
         uint64_t trivial = 0L;
         uint64_t simd = 0L;
+        uint64_t lemire = 0L;
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
             trivial += delta_throughput(new TrivialDeltaScanner(es), es, num, input, output, encoded);
+            lemire += delta_throughput(new LemireDeltaScanner(es), es, num, input, output, encoded);
             Scanner *deltaScanner;
             if (es <= 16) {
                 deltaScanner = new SimdDeltaScanner16(es);
@@ -63,7 +66,7 @@ int main(int argc, char **argv) {
             }
             simd += delta_throughput(deltaScanner, es, num, input, output, encoded);
         }
-        std::cout << es << "," << trivial / MAX_REPEAT << "," << simd / MAX_REPEAT << "," << ((double) simd) / trivial
+        std::cout << es << "," << trivial / MAX_REPEAT << "," << simd / MAX_REPEAT << "," << lemire / MAX_REPEAT
                   << std::endl;
     }
 
