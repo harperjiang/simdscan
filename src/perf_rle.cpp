@@ -8,6 +8,7 @@
 #include "util/encode.h"
 #include "scan/rle/TrivialRLEScanner.h"
 #include "scan/rle/SimdRLEScanner.h"
+#include "scan/rle/LaneLoaderRLEScanner.h"
 
 
 uint64_t rle_throughput(Scanner *scanner, uint64_t num, int es, int rls, int *input, int *output, int *encoded) {
@@ -49,20 +50,22 @@ int main(int argc, char **argv) {
     int *encoded = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
     int *output = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
 
+    int rlsChoice[4] = {5, 7, 15, 26};
+
     int MAX_REPEAT = 5;
-    for (int rls = 5; rls < 32; rls++) {
+    for (int rli = 0; rli < 4; rli++) {
+        int rls = rlsChoice[rli];
         for (int es = 5; es < 32; es++) {
             uint64_t trivial = 0;
-            uint64_t aligned = 0;
-            uint64_t unaligned = 0;
+            uint64_t ll = 0;
+            uint64_t simd = 0;
             for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
                 trivial += rle_throughput(new TrivialRLEScanner(es, rls), num, es, rls, input, output, encoded);
-                aligned += rle_throughput(new SimdRLEScanner(es, rls, true), num, es, rls, input, output, encoded);
-                unaligned += rle_throughput(new SimdRLEScanner(es, rls, false), num, es, rls, input, output, encoded);
+                ll += rle_throughput(new LaneLoaderRLEScanner(es, rls), num, es, rls, input, output, encoded);
+                simd += rle_throughput(new SimdRLEScanner(es, rls, false), num, es, rls, input, output, encoded);
             }
-            std::cout << es << "," << rls << "," << (double) aligned / trivial << ","
-                      << (double) unaligned / trivial << "," << trivial / MAX_REPEAT << ","
-                      << aligned / MAX_REPEAT << "," << unaligned / MAX_REPEAT << std::endl;
+            std::cout << es << "," << rls << "," << trivial / MAX_REPEAT << ","
+                      << ll / MAX_REPEAT << "," << simd / MAX_REPEAT << std::endl;
         }
     }
 
