@@ -99,6 +99,18 @@ void HaoScanner512::equal() {
     int byteOffset = 0;
     int bitOffset = 0;
 
+    uint32_t entryCounters[8];
+    uint32_t byteAdvances[8];
+    uint32_t bitOffsets[8];
+
+    for (int i = 0; i < 8; i++) {
+        entryCounters[i] = (SIMD_LEN - i) / entrySize;
+        int partialEntryLen = (SIMD_LEN - i) % entrySize;
+        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
+        byteAdvances[i] = BYTE_IN_SIMD - partialBytes;
+        bitOffsets[i] = partialBytes * 8 - partialEntryLen;
+    }
+
     uint64_t entryCounter = 0;
     while (entryCounter < length) {
         __m512i eqnum = this->val1s[bitOffset];
@@ -110,17 +122,14 @@ void HaoScanner512::equal() {
         __m512i result = _mm512_or_si512(
                 _mm512_add_epi64(_mm512_and_si512(d, notmask), notmask), d);
 
-        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
-        preserve &= masks[bitOffset];
+//        uint8_t preserve = ((uint8_t *) byteDest)[byteOffset];
+//        preserve &= masks[bitOffset];
         _mm512_storeu_si512((__m512i *) (byteDest + byteOffset), result);
-        ((uint8_t *) byteDest)[byteOffset] |= preserve;
+//        ((uint8_t *) byteDest)[byteOffset] |= preserve;
 
-        entryCounter += (SIMD_LEN - bitOffset) / entrySize;
-
-        int partialEntryLen = (SIMD_LEN - bitOffset) % entrySize;
-        int partialBytes = (partialEntryLen / 8) + ((partialEntryLen % 8) ? 1 : 0);
-        byteOffset += BYTE_IN_SIMD - partialBytes;
-        bitOffset = partialBytes * 8 - partialEntryLen;
+        entryCounter += entryCounters[bitOffset];
+        byteOffset += byteAdvances[bitOffset];
+        bitOffset = bitOffsets[bitOffset];
     }
 }
 
