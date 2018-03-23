@@ -50,10 +50,10 @@ int main(int argc, char **argv) {
     int *encoded = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
     int *output = (int *) aligned_alloc(64, sizeof(int) * 2 * num);
 
-    int rlsChoice[4] = {5, 7, 15, 26};
+    int rlsChoice[1] = {9};
 
     int MAX_REPEAT = 5;
-    for (int rli = 0; rli < 4; rli++) {
+    for (int rli = 0; rli < 1; rli++) {
         int rls = rlsChoice[rli];
         for (int es = 5; es < 32; es++) {
             uint64_t trivial = 0;
