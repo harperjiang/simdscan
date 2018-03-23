@@ -117,17 +117,19 @@ int main(int argc, char **argv) {
         uint32_t w = 0;
         uint32_t trivial = 0;
         for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {
-//            bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
+            bwh512 += bwh_throughput(new BitWeaverHScanner512(es), num, es, bp_input, bp_encoded, bp_output);
 //            bwh256 += bwh_throughput(new BitWeaverHScanner256(es), num, es, bp_input, bp_encoded, bp_output);
-//            trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
+            trivial += bp_throughput(new TrivialBPScanner(es), num, es, bp_input, bp_encoded, bp_output);
             fast += bp_throughput(new HaoLaneLoaderScanner(es), num, es, bp_input, bp_encoded, bp_output);
             uh512 += bp_throughput(new HaoScanner512(es), num, es, bp_input, bp_encoded, bp_output);
-//            w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
+            w += bp_throughput(new WillhalmUnpackerScanner(es), num, es, bp_input, bp_encoded, bp_output);
         }
 //        std::cout << es << "," << fast / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << bwh256 / MAX_REPEAT << ","
 //                  << bwh512 / MAX_REPEAT << "," << w / MAX_REPEAT
 //                  << "," << trivial / MAX_REPEAT << std::endl;
-        std::cout << es << fast / MAX_REPEAT << "," << uh512 / MAX_REPEAT << std::endl;
+        std::cout << es << fast / MAX_REPEAT << "," << uh512 / MAX_REPEAT << "," << w / MAX_REPEAT << ","
+                  << trivial / MAX_REPEAT << "," << bwh512 / MAX_REPEAT
+                  << "," << std::endl;
     }
 
     delete[] bp_input;
