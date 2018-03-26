@@ -15,7 +15,7 @@ TEST(LaneLoader64, load) {
     for (int i = 0; i < 100; i++)
         input[i] = rand();
     uint8_t *bytes = (uint8_t *) input;
-    for (int es = 3; es < 32; es++) {
+    for (int es = 2; es < 32; es++) {
         LaneLoader *loader = new LaneLoader64(es);
         for (int offset = 0; offset < 8; offset++) {
             uint32_t nextByte;
