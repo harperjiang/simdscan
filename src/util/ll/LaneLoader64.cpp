@@ -17,7 +17,7 @@ LaneLoader64::LaneLoader64(int es) {
     // Given an offset, offset of next 512-bit lane
     nextOff = new uint8_t[8];
     // How many entries are loaded
-    counters = new uint8_t[8];
+    counters = new uint32_t[8];
 
     shiftInst = (__m512i *) aligned_alloc(64, 8 * 64);
     shuffleInst = (__m512i *) aligned_alloc(64, 8 * 64);

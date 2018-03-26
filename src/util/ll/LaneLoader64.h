@@ -17,7 +17,7 @@ private:
     uint8_t *nextPos;
     uint8_t *nextIdx;
     uint8_t *nextOff;
-    uint8_t *counters;
+    uint32_t *counters;
     __m512i *shiftInst;
     __m512i *shuffleInst;
 public:
