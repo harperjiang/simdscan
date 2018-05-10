@@ -53,9 +53,10 @@ int main(int argc, char **argv) {
 
     int MAX_REPEAT = 5;
 
-    for (int es = atoi(argv[1]); es < 32; es++) {
-        for (int thread = 0; thread < 7; thread++) {
-            int numThread = 1 << thread;
+    for (int es = 3; es < 32; es++) {
+        for (int thread = 16; thread <= 32; thread++) {
+//            int numThread = 1 << thread;
+            int numThread = thread;
             uint32_t fast = 0;
             Scanner *scanner = new ParallelScanner(numThread, es, new HaoLaneLoaderScanner(es));
             for (int repeat = 0; repeat < MAX_REPEAT; repeat++) {

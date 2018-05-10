@@ -14,6 +14,7 @@
 
 static const __m256i SHIFT16 = _mm256_set1_epi64x(16);
 static const __m256i MASK16 = _mm256_set1_epi32(0xffff);
+static const __m256i INV16 = _mm256_setr_epi16(7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
 
 static const __m256i ZERO = _mm256_set1_epi32(0);
 static const __m256i IDX = _mm256_setr_epi32(8, 0, 1, 2, 3, 4, 5, 6);
@@ -35,13 +36,6 @@ SimdDeltaScanner16::SimdDeltaScanner16(int es) {
 SimdDeltaScanner16::~SimdDeltaScanner16() {
     delete this->unpacker;
 }
-
-//__m256i SimdDeltaScanner16::unpack(uint8_t *target, int offset) {
-//    __m512i data = _mm512_castsi256_si512(input);
-//    data = _mm512_permutexvar_epi8(data, shuffleInst[offset]);
-//    data = _mm512_sllv_epi16(data, shiftInst[offset]);
-//    return _mm256_and_si256(_mm512_cvtepi32_epi16(data), unpackMask[offset]);
-//}
 
 void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicate *p) {
     uint8_t *bytein = (uint8_t *) input;
@@ -67,20 +61,17 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
                 __m256i s3 = _mm256_hadd_epi16(s1, s2);
                 __m256i s4 = _mm256_and_si256(s3, MASK16);
                 __m256i extracted = _mm256_hadd_epi16(s3, s4);
+                __m256i sorted = _mm256_shuffle_epi8(extracted, INV16);
 
-                int cs1 = _mm256_extract_epi16(extracted, 0);
-                int cs2 = _mm256_extract_epi16(extracted, 8);
-
+                int cs = _mm256_extract_epi16(extracted, 15);
                 int cus = (int) cumsum;
 
-                int first = (cus << 16) + cus;
-                int second = ((cus + cs1) << 16) + cus + cs1;
-                __m256i cumadd = _mm256_setr_epi32(first, first, first, first, second, second, second, second);
-                extracted = _mm256_add_epi32(cumadd, extracted);
+                __m256i cumadd = _mm256_set1_epi32(cus);
+                sorted = _mm256_add_epi32(cumadd, sorted);
 
-                cumsum += cs1 + cs2;
+                cumsum += cs;
 
-                maskout[outputCounter++] = _mm256_cmpeq_epi16_mask(extracted, a);
+                maskout[outputCounter++] = _mm256_cmpeq_epi16_mask(sorted, a);
 
                 entryCounter += 16;
 
@@ -99,19 +90,17 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
                 __m256i s4 = _mm256_and_si256(s3, MASK16);
                 __m256i extracted = _mm256_hadd_epi16(s3, s4);
 
-                int cs1 = _mm256_extract_epi16(extracted, 0);
-                int cs2 = _mm256_extract_epi16(extracted, 8);
+                __m256i sorted = _mm256_shuffle_epi8(extracted, INV16);
 
+                int cs = _mm256_extract_epi16(extracted, 15);
                 int cus = (int) cumsum;
 
-                int first = (cus << 16) + cus;
-                int second = ((cus + cs1) << 16) + cus + cs1;
-                __m256i cumadd = _mm256_setr_epi32(first, first, first, first, second, second, second, second);
-                extracted = _mm256_add_epi32(cumadd, extracted);
+                __m256i cumadd = _mm256_set1_epi32(cus);
+                sorted = _mm256_add_epi32(cumadd, sorted);
 
-                cumsum += cs1 + cs2;
+                cumsum += cs;
 
-                maskout[outputCounter++] = _mm256_cmplt_epi16_mask(extracted, a);
+                maskout[outputCounter++] = _mm256_cmplt_epi16_mask(sorted, a);
                 entryCounter += 16;
 
                 int bitAdvance = offset + entrySize * 16;
