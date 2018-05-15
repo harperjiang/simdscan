@@ -21,6 +21,7 @@ static const __m256i IDX = _mm256_setr_epi32(8, 0, 1, 2, 3, 4, 5, 6);
 static const __m256i IDX2 = _mm256_setr_epi32(0, 8, 2, 8, 1, 4, 3, 6);
 static const __m256i IDX3 = _mm256_setr_epi32(8, 8, 8, 8, 0, 1, 2, 3);
 static const __m256i MASK32 = _mm256_set1_epi64x(0xffffffff00000000);
+static const __m256i INV=  _mm256_setr_epi32(3, 2, 1, 0, 7, 6, 5, 4);
 
 SimdDeltaScanner32::SimdDeltaScanner32(uint32_t es) {
     this->entrySize = es;
@@ -109,4 +110,14 @@ void SimdDeltaScanner32::scan(int *input, uint64_t length, int *output, Predicat
 
 uint32_t SimdDeltaScanner32::getEntrySize() {
     return entrySize;
+}
+
+__m256i SimdDeltaScanner32::cumsum(__m256i current) {
+    __m256i aligned = _mm256_permutex2var_epi32(current, IDX, ZERO);
+    __m256i s1 = _mm256_hadd_epi32(current, aligned);
+    __m256i s2 = _mm256_permutex2var_epi32(s1, IDX2, ZERO);
+    __m256i s3 = _mm256_hadd_epi32(s1, s2);
+    __m256i s4 = _mm256_permutex2var_epi32(s3, IDX3, ZERO);
+    __m256i extracted = _mm256_add_epi32(s3, s4);
+    return _mm256_permutevar8x32_epi32(extracted, INV);
 }

@@ -65,3 +65,21 @@ TEST(SimdDeltaScanner32, less) {
     delete[] result;
 }
 
+TEST(SimdDeltaScanner32, cumsum) {
+
+    __m256i input = _mm256_setr_epi32(2,3,4,5,6,7,8,9);
+
+    SimdDeltaScanner32 *scanner = new SimdDeltaScanner32(29);
+
+    __m256i cumsum = scanner->cumsum(input);
+
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,0), 2);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,1), 5);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,2), 9);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,3), 14);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,4), 20);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,5), 27);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,6), 35);
+    EXPECT_EQ(_mm256_extract_epi32(cumsum,7), 44);
+}
+

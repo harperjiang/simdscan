@@ -26,6 +26,8 @@ public:
     void scan(int *, uint64_t, int *, Predicate *);
 
     uint32_t getEntrySize();
+
+    __m256i cumsum(__m256i input);
 };
 
 
