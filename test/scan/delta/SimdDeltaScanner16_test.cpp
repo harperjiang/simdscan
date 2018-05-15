@@ -63,4 +63,28 @@ TEST(SimdDeltaScanner16, less) {
     delete[] result;
 }
 
+TEST(SimdDeltaScanner32, cumsum) {
 
+    __m256i input = _mm256_setr_epi16(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
+
+    SimdDeltaScanner16 *scanner = new SimdDeltaScanner16(29);
+
+    __m256i cumsum = scanner->cumsum(input);
+
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,0), 1);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,1), 3);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,2), 6);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,3), 10);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,4), 15);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,5), 21);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,6), 28);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,7), 36);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,8), 45);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,9), 55);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,10), 66);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,11), 78);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,12), 91);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,13), 105);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,14), 120);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,15), 136);
+}

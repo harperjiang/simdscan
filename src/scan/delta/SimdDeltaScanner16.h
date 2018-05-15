@@ -25,6 +25,8 @@ public:
     virtual ~SimdDeltaScanner16();
 
     void scan(int *, uint64_t, int *, Predicate *);
+
+    __m256i cumsum(__m256i current);
 };
 
 

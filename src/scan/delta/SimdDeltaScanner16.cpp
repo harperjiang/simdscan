@@ -14,7 +14,9 @@
 
 static const __m256i SHIFT16 = _mm256_set1_epi64x(16);
 static const __m256i MASK16 = _mm256_set1_epi32(0xffff);
-static const __m256i INV16 = _mm256_setr_epi16(7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+static const __m256i INV16 = _mm256_setr_epi16(0xF0E, 0xD0C, 0xB0A,
+                                                         0x908, 0x706, 0x504, 0x302, 0x100, 0xF0E, 0xD0C, 0xB0A, 0x908,
+                                                         0x706, 0x504, 0x302, 0x100);
 
 static const __m256i ZERO = _mm256_set1_epi32(0);
 static const __m256i IDX = _mm256_setr_epi32(8, 0, 1, 2, 3, 4, 5, 6);
@@ -110,4 +112,14 @@ void SimdDeltaScanner16::scan(int *input, uint64_t length, int *output, Predicat
             break;
     }
 
+}
+
+__m256i SimdDeltaScanner16::cumsum(__m256i current) {
+    __m256i aligned = _mm256_bslli_epi128(current, 2);
+    __m256i s1 = _mm256_hadd_epi16(current, aligned);
+    __m256i s2 = _mm256_sllv_epi64(s1, SHIFT16);
+    __m256i s3 = _mm256_hadd_epi16(s1, s2);
+    __m256i s4 = _mm256_and_si256(s3, MASK16);
+    __m256i extracted = _mm256_hadd_epi16(s3, s4);
+    return _mm256_shuffle_epi8(extracted, INV16);
 }
