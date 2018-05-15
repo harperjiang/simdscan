@@ -79,12 +79,12 @@ TEST(SimdDeltaScanner16, cumsum) {
     EXPECT_EQ(_mm256_extract_epi16(cumsum,5), 21);
     EXPECT_EQ(_mm256_extract_epi16(cumsum,6), 28);
     EXPECT_EQ(_mm256_extract_epi16(cumsum,7), 36);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,8), 45);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,9), 55);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,10), 66);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,11), 78);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,12), 91);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,13), 105);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,14), 120);
-    EXPECT_EQ(_mm256_extract_epi16(cumsum,15), 136);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,8), 9);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,9), 19);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,10), 30);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,11), 42);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,12), 55);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,13), 69);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,14), 84);
+    EXPECT_EQ(_mm256_extract_epi16(cumsum,15), 100);
 }
