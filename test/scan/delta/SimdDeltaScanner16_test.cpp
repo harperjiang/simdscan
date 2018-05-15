@@ -63,7 +63,7 @@ TEST(SimdDeltaScanner16, less) {
     delete[] result;
 }
 
-TEST(SimdDeltaScanner32, cumsum) {
+TEST(SimdDeltaScanner16, cumsum) {
 
     __m256i input = _mm256_setr_epi16(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
 
