@@ -94,8 +94,8 @@ void HaoScanner512::scan(int *data, uint64_t length, int *dest, Predicate *p) {
 }
 
 void HaoScanner512::equal() {
-    void *byteData = data;
-    void *byteDest = dest;
+    uint8_t* byteData = (uint8_t*)data;
+    uint8_t* byteDest = (uint8_t*)dest;
     int byteOffset = 0;
     int bitOffset = 0;
 
@@ -134,9 +134,8 @@ void HaoScanner512::equal() {
 }
 
 void HaoScanner512::less() {
-
-    void *byteData = data;
-    void *byteDest = dest;
+    uint8_t* byteData = (uint8_t*)data;
+    uint8_t* byteDest = (uint8_t*)dest;
     int byteOffset = 0;
     int bitOffset = 0;
 

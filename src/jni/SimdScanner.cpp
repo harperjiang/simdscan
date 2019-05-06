@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
-#include "edu_uchicago_cs_encsel_query_simdscan_SimdScanner.h"
+#include "edu_uchicago_cs_db_sboost_SimdScanner.h"
 #include "../scan/bitpack/HaoLaneLoaderScanner.h"
 #include "../decode/BPDecoder.h"
 
@@ -43,8 +43,8 @@ void allocOutput(jlong outputSize) {
     }
 }
 
-JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner_scanBitpacked
-        (JNIEnv *env, jobject self, jobject input, jint offset, jint size, jint target, jint entryWidth) {
+JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_db_sboost_SimdScanner_filterBP
+        (JNIEnv *env, jobject self, jobject input, jint target, jint entryWidth) {
     jbyte *array = (jbyte *) env->GetDirectBufferAddress(input);
     jlong arrayLen = env->GetDirectBufferCapacity(input);
 
@@ -64,20 +64,7 @@ JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner
 
 }
 
-JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_encsel_query_simdscan_SimdScanner_decodeBitpacked
-        (JNIEnv *env, jobject self, jobject input, jint offset, jint size, jint entryWidth) {
-    jbyte *array = (jbyte *) env->GetDirectBufferAddress(input);
-    jlong arrayLen = env->GetDirectBufferCapacity(input);
-
-    jint safeSize = (arrayLen - 70) / entryWidth;
-
-    Decoder *decoder = new BPDecoder(entryWidth);
-
-    // Allocate a 64-bit for each entry, should be enough
-    jint numSafeBytes = (safeSize / 8 + 1) * 32;
-    allocOutput((safeSize / 8 + 1) * 32);
-
-    decoder->decode((int *) array, safeSize, (int *) memblock);
-
-    return env->NewDirectByteBuffer(memblock, numSafeBytes);
+JNIEXPORT jobject JNICALL Java_edu_uchicago_cs_db_sboost_SimdScanner_filterRLE
+        (JNIEnv *env, jobject self, jobject input, jint target, jint entryWidth, jint rleWidth) {
+    return NULL;
 }
